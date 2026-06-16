@@ -51,8 +51,18 @@ export default async function UreticiKokpit() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="font-display text-2xl font-semibold text-ink">Üretici Kokpiti</h1>
-      <p className="mt-1 text-sm text-gray">Stok, satış ve tazelik tek bakışta.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-semibold text-ink">Üretici Kokpiti</h1>
+          <p className="mt-1 text-sm text-gray">Stok, satış ve tazelik tek bakışta.</p>
+        </div>
+        <Link
+          href="/uretici/proje/yeni"
+          className="rounded-lg bg-navy px-4 py-2 font-medium text-white transition-colors hover:bg-ink"
+        >
+          + Yeni proje
+        </Link>
+      </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <KpiKart etiket="Proje" deger={projeler?.length ?? 0} />

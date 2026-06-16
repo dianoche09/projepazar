@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { blokEkle, daireTipiEkle, birimGenerator } from "@/app/uretici/actions";
 import {
   DURUM_BG,
   DURUM_ETIKET,
@@ -9,6 +10,11 @@ import {
   type BirimDurum,
   type InsaatAsama,
 } from "@/lib/types";
+
+const inpCls =
+  "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
+const btnCls =
+  "rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink";
 
 function trTarih(iso: string | null): string {
   if (!iso) return "—";
@@ -25,10 +31,13 @@ function Lejant({ renk, etiket }: { renk: string; etiket: string }) {
 
 export default async function ProjeDetay({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ hata?: string; mesaj?: string }>;
 }) {
   const { id } = await params;
+  const { hata, mesaj } = await searchParams;
   const supabase = await createClient();
 
   const { data: proje } = await supabase.from("proje").select("*").eq("id", id).single();
@@ -37,6 +46,12 @@ export default async function ProjeDetay({
   const { data: bloklar } = await supabase
     .from("blok")
     .select("id, ad, kat_sayisi")
+    .eq("proje_id", id)
+    .order("ad");
+
+  const { data: tipler } = await supabase
+    .from("daire_tipi")
+    .select("id, ad, oda, net_m2, taban_fiyat")
     .eq("proje_id", id)
     .order("ad");
 
@@ -67,7 +82,18 @@ export default async function ProjeDetay({
         </span>
       </div>
 
-      {/* İnşaat zaman çizelgesi (off-plan için kritik — MVP-12) */}
+      {hata ? (
+        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">
+          {hata}
+        </p>
+      ) : null}
+      {mesaj ? (
+        <p className="mt-4 rounded-lg border border-green/30 bg-green/10 px-3 py-2 text-sm text-ink">
+          {mesaj}
+        </p>
+      ) : null}
+
+      {/* İnşaat zaman çizelgesi (MVP-12) */}
       <div className="mt-6 rounded-2xl border border-hair bg-card p-5">
         <div className="flex items-center justify-between">
           <span className="font-medium text-ink">
@@ -95,6 +121,7 @@ export default async function ProjeDetay({
         </div>
       </div>
 
+      {/* Birim ızgarası */}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-lg font-semibold text-ink">
           Birim ızgarası <span className="font-mono text-sm text-gray">({toplam})</span>
@@ -116,35 +143,143 @@ export default async function ProjeDetay({
           return (
             <div key={blok.id} className="rounded-2xl border border-hair bg-card p-5">
               <h3 className="font-display text-base font-semibold text-ink">{blok.ad}</h3>
-              <div className="mt-3 space-y-1.5 overflow-x-auto">
-                {katlar.map((kat) => {
-                  const kb = bb
-                    .filter((b) => b.kat === kat)
-                    .sort((a, b) => (a.daire_no ?? "").localeCompare(b.daire_no ?? ""));
-                  return (
-                    <div key={kat} className="flex items-center gap-2">
-                      <span className="w-12 shrink-0 font-mono text-xs text-gray">
-                        {kat}. kat
-                      </span>
-                      <div className="flex gap-1.5">
-                        {kb.map((b) => (
-                          <div
-                            key={b.id}
-                            title={`${b.daire_no} · ${DURUM_ETIKET[b.durum as BirimDurum]}${!b.satilabilir ? " · arsa payı (satılamaz)" : ""}`}
-                            className={`flex size-11 shrink-0 items-center justify-center rounded-lg font-mono text-[10px] text-white ${DURUM_BG[b.durum as BirimDurum]} ${!b.satilabilir ? "opacity-70 ring-2 ring-inset ring-white/60" : ""}`}
-                          >
-                            {b.daire_no}
-                          </div>
-                        ))}
+              {katlar.length === 0 ? (
+                <p className="mt-2 text-sm text-gray">Bu blokta henüz birim yok (generator ile üret).</p>
+              ) : (
+                <div className="mt-3 space-y-1.5 overflow-x-auto">
+                  {katlar.map((kat) => {
+                    const kb = bb
+                      .filter((b) => b.kat === kat)
+                      .sort((a, b) => (a.daire_no ?? "").localeCompare(b.daire_no ?? ""));
+                    return (
+                      <div key={kat} className="flex items-center gap-2">
+                        <span className="w-12 shrink-0 font-mono text-xs text-gray">{kat}. kat</span>
+                        <div className="flex gap-1.5">
+                          {kb.map((b) => (
+                            <div
+                              key={b.id}
+                              title={`${b.daire_no} · ${DURUM_ETIKET[b.durum as BirimDurum]}${!b.satilabilir ? " · arsa payı (satılamaz)" : ""}`}
+                              className={`flex size-11 shrink-0 items-center justify-center rounded-lg font-mono text-[10px] text-white ${DURUM_BG[b.durum as BirimDurum]} ${!b.satilabilir ? "opacity-70 ring-2 ring-inset ring-white/60" : ""}`}
+                            >
+                              {b.daire_no}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+
+      {/* ===== STOK YÖNETİMİ ===== */}
+      <section className="mt-12 border-t border-hair pt-8">
+        <h2 className="font-display text-lg font-semibold text-ink">Stok yönetimi</h2>
+
+        <div className="mt-4 grid gap-5 md:grid-cols-2">
+          {/* Bloklar */}
+          <div className="rounded-2xl border border-hair bg-card p-5">
+            <h3 className="font-medium text-ink">Bloklar ({bloklar?.length ?? 0})</h3>
+            <ul className="mt-2 space-y-1 text-sm text-gray">
+              {(bloklar ?? []).map((b) => (
+                <li key={b.id}>
+                  {b.ad}
+                  {b.kat_sayisi ? ` · ${b.kat_sayisi} kat` : ""}
+                </li>
+              ))}
+            </ul>
+            <form action={blokEkle} className="mt-3 flex flex-wrap gap-2">
+              <input type="hidden" name="proje_id" value={id} />
+              <input name="ad" placeholder="C Blok" required className={`${inpCls} flex-1`} />
+              <input name="kat_sayisi" type="number" placeholder="kat" className={`${inpCls} w-20`} />
+              <button className={btnCls}>Ekle</button>
+            </form>
+          </div>
+
+          {/* Daire tipleri */}
+          <div className="rounded-2xl border border-hair bg-card p-5">
+            <h3 className="font-medium text-ink">Daire tipleri ({tipler?.length ?? 0})</h3>
+            <ul className="mt-2 space-y-1 text-sm text-gray">
+              {(tipler ?? []).map((t) => (
+                <li key={t.id}>
+                  {t.ad}
+                  {t.oda ? ` · ${t.oda}` : ""}
+                  {t.net_m2 ? ` · ${t.net_m2}m²` : ""}
+                  {t.taban_fiyat ? ` · ${Number(t.taban_fiyat).toLocaleString("tr-TR")}₺` : ""}
+                </li>
+              ))}
+            </ul>
+            <form action={daireTipiEkle} className="mt-3 grid grid-cols-2 gap-2">
+              <input type="hidden" name="proje_id" value={id} />
+              <input name="ad" placeholder="2+1 Standart" required className={inpCls} />
+              <input name="oda" placeholder="2+1" className={inpCls} />
+              <input name="net_m2" type="number" placeholder="net m²" className={inpCls} />
+              <input name="taban_fiyat" type="number" placeholder="taban fiyat ₺" className={inpCls} />
+              <button className={`${btnCls} col-span-2`}>Tip ekle</button>
+            </form>
+          </div>
+        </div>
+
+        {/* Generator */}
+        <div className="mt-5 rounded-2xl border border-hair bg-card p-5">
+          <h3 className="font-medium text-ink">Generator — toplu birim üret (tip × kat)</h3>
+          {(bloklar?.length ?? 0) > 0 && (tipler?.length ?? 0) > 0 ? (
+            <form action={birimGenerator} className="mt-3 grid gap-3 sm:grid-cols-3">
+              <input type="hidden" name="proje_id" value={id} />
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Blok
+                <select name="blok_id" required className={inpCls}>
+                  {(bloklar ?? []).map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.ad}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Daire tipi
+                <select name="tip_id" required className={inpCls}>
+                  {(tipler ?? []).map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.ad}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Daire / kat
+                <input name="daire_basina" type="number" defaultValue={2} min={1} className={inpCls} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Başlangıç kat
+                <input name="kat_bas" type="number" defaultValue={1} className={inpCls} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Bitiş kat
+                <input name="kat_son" type="number" defaultValue={10} className={inpCls} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Taban fiyat ₺
+                <input name="taban_fiyat" type="number" placeholder="ör. 2800000" className={inpCls} />
+              </label>
+              <label className="flex flex-col gap-1 text-xs text-gray">
+                Kat şerefiyesi %
+                <input name="kat_artis" type="number" defaultValue={2} className={inpCls} />
+              </label>
+              <div className="flex items-end sm:col-span-2">
+                <button className={`${btnCls} w-full`}>Birimleri üret</button>
+              </div>
+            </form>
+          ) : (
+            <p className="mt-2 text-sm text-gray">
+              Generator için en az 1 blok ve 1 daire tipi tanımla.
+            </p>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
