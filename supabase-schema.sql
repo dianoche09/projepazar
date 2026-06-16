@@ -344,6 +344,27 @@ create policy opsiyon_update on opsiyon for update using (
   is_admin()
   or exists (select 1 from birim b join proje p on p.id=b.proje_id join uretici u on u.id=p.uretici_id
              where b.id = opsiyon.birim_id and u.sahip_id = auth.uid()));
+-- emlakçı kendi opsiyonunu bırakır (delete) → birim müsait (trigger)
+create policy opsiyon_delete on opsiyon for delete using (satici_id = auth.uid() or is_admin());
+
+-- Opsiyon → birim durum senkron (çift-satış kalkanı #3; emlakçı birim'i doğrudan yazamaz)
+create or replace function opsiyon_birim_senkron() returns trigger
+  language plpgsql security definer set search_path = public as $$
+begin
+  if TG_OP = 'DELETE' then
+    if not exists (select 1 from opsiyon where birim_id = OLD.birim_id and durum in ('opsiyonlu','satis_beklemede') and id <> OLD.id) then
+      update birim set durum = 'musait', son_guncelleme = now() where id = OLD.birim_id and durum in ('opsiyonlu','satis_beklemede');
+    end if;
+    return OLD;
+  end if;
+  if NEW.durum in ('opsiyonlu','satis_beklemede','satildi') then
+    update birim set durum = NEW.durum, son_guncelleme = now() where id = NEW.birim_id;
+  end if;
+  return NEW;
+end; $$;
+drop trigger if exists opsiyon_birim_trg on opsiyon;
+create trigger opsiyon_birim_trg after insert or update or delete on opsiyon
+  for each row execute function opsiyon_birim_senkron();
 
 -- lead: paylaşan/atanan emlakçı + proje sahibi üretici görür
 create policy lead_select on lead for select using (

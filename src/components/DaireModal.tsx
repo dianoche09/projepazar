@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { birimDurumGuncelle } from "@/app/uretici/actions";
+import { opsiyonAl, opsiyonBirak } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
@@ -41,9 +42,23 @@ function Kaydet() {
   );
 }
 
+function OpsiyonBtn({ etiket, ton }: { etiket: string; ton: "amber" | "outline" }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      disabled={pending}
+      className={`w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity disabled:opacity-50 ${
+        ton === "amber" ? "bg-amber text-white hover:opacity-90" : "border border-hair text-amber hover:border-amber"
+      }`}
+    >
+      {pending ? "…" : etiket}
+    </button>
+  );
+}
+
 /**
  * Daire detay modalı — merkezi, scroll yaratmaz. Künye + şerefiye kırılımı + iz.
- * mod="uretici": durum/not değiştir. mod="emlakci": salt-okunur + WhatsApp paylaş (fiyat canlı).
+ * mod="uretici": durum/not değiştir. mod="emlakci": salt-okunur + paylaş + opsiyon (48s kilit).
  */
 export function DaireModal({
   birim,
@@ -97,7 +112,6 @@ export function DaireModal({
           </button>
         </div>
 
-        {/* Durum rozeti (emlakçı modunda görünür kalır) */}
         {mod === "emlakci" ? (
           <span className={`mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-medium text-white ${DURUM_BG[birim.durum]}`}>
             {DURUM_ETIKET[birim.durum]}
@@ -210,13 +224,25 @@ export function DaireModal({
             >
               WhatsApp ile Paylaş
             </a>
-            <button
-              disabled
-              title="Opsiyon kilidi bir sonraki adımda"
-              className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-gray opacity-60"
-            >
-              Opsiyon Al · 48s (yakında)
-            </button>
+
+            {birim.durum === "musait" && birim.satilabilir ? (
+              <form action={opsiyonAl}>
+                <input type="hidden" name="birim_id" value={birim.id} />
+                <input type="hidden" name="proje_id" value={projeId} />
+                <OpsiyonBtn etiket="Opsiyon Al · 48s" ton="amber" />
+              </form>
+            ) : birim.durum === "opsiyonlu" ? (
+              <form action={opsiyonBirak}>
+                <input type="hidden" name="birim_id" value={birim.id} />
+                <input type="hidden" name="proje_id" value={projeId} />
+                <OpsiyonBtn etiket="Opsiyonu bırak (yalnız kendi opsiyonun)" ton="outline" />
+              </form>
+            ) : (
+              <button disabled className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-gray opacity-60">
+                {DURUM_ETIKET[birim.durum]} — opsiyon alınamaz
+              </button>
+            )}
+
             <p className="inline-flex items-center gap-1 font-mono text-xs text-gray">
               <span className="size-1.5 rounded-full bg-green" />
               {zamanOnce(birim.son_guncelleme)} güncellendi
