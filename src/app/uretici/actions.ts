@@ -348,3 +348,73 @@ export async function projeTazele(formData: FormData) {
 
   revalidatePath(`/uretici/proje/${id}`);
 }
+
+// ── Proje dokümanları (ruhsat / iskan / yapı denetim — belge-doğrulanmış proje rozeti) ──
+export async function belgeEkle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const tip = String(formData.get("tip") ?? "diger");
+  const ad = String(formData.get("ad") ?? "").trim();
+  const url = String(formData.get("url") ?? "").trim();
+  if (!ad) hataya(`/uretici/proje/${proje_id}`, "Belge adı gerekli");
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("proje_belge").insert({ proje_id, tip, ad, url: url || null });
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Belge eklendi")}`);
+}
+
+export async function belgeSil(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("belge_id"));
+  const proje_id = String(formData.get("proje_id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  await supabase.from("proje_belge").delete().eq("id", id.data);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+}
+
+// ── Proje künyesi / imar (ada/parsel/emsal/taks + kunye jsonb) ──
+export async function projeKunyeGuncelle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const sayi = (v: FormDataEntryValue | null) => {
+    const s = String(v ?? "").trim();
+    return s === "" ? null : Number(s);
+  };
+  const metin = (v: FormDataEntryValue | null) => {
+    const s = String(v ?? "").trim();
+    return s === "" ? null : s;
+  };
+
+  const kunye = {
+    ruhsat_tarihi: metin(formData.get("ruhsat_tarihi")),
+    yapi_denetim: metin(formData.get("yapi_denetim")),
+    arsa_alani: sayi(formData.get("arsa_alani")),
+    toplam_insaat: sayi(formData.get("toplam_insaat")),
+    imar_durumu: metin(formData.get("imar_durumu")),
+    kat_karsiligi: formData.get("kat_karsiligi") === "on",
+    malzeme: String(formData.get("malzeme") ?? "")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    donati: String(formData.get("donati") ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+  };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("proje")
+    .update({
+      ada: metin(formData.get("ada")),
+      parsel: metin(formData.get("parsel")),
+      emsal: sayi(formData.get("emsal")),
+      taks: sayi(formData.get("taks")),
+      kunye,
+      son_guncelleme: new Date().toISOString(),
+    })
+    .eq("id", proje_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Künye güncellendi")}`);
+}
