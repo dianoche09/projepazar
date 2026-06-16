@@ -292,3 +292,122 @@ export async function parolaSifirla(formData: FormData) {
       : `/admin/kullanicilar/${id.data}?mesaj=${encodeURIComponent("Parola güncellendi")}`,
   );
 }
+
+// ── Hesap tanımlama: ÜRETİCİ firma + sahip kullanıcı (service-role) ──
+const UreticiEkleSchema = z.object({
+  ad: z.string().trim().min(2, "Firma adı en az 2 karakter"),
+  vergi_no: z.string().trim().max(20).optional(),
+  sahip_ad: z.string().trim().min(2, "Sahip ad-soyad"),
+  sahip_email: z.string().email("Geçerli e-posta"),
+  sahip_parola: z.string().min(8, "Parola en az 8 karakter"),
+});
+
+/** Admin yeni ÜRETİCİ hesabı açar: firma kaydı + sahip kullanıcı (rol=uretici, aktif, doğrulanmış). */
+export async function ureticiEkle(formData: FormData) {
+  await adminGuard();
+  const parsed = UreticiEkleSchema.safeParse({
+    ad: formData.get("ad"),
+    vergi_no: (formData.get("vergi_no") as string) || undefined,
+    sahip_ad: formData.get("sahip_ad"),
+    sahip_email: formData.get("sahip_email"),
+    sahip_parola: formData.get("sahip_parola"),
+  });
+  if (!parsed.success) {
+    redirect(`/admin/ureticiler?hata=${encodeURIComponent(parsed.error.issues[0].message)}`);
+  }
+  const d = parsed.data;
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch {
+    redirect(`/admin/ureticiler?hata=${encodeURIComponent("Service-role anahtarı tanımlı değil (.env + Vercel)")}`);
+  }
+
+  // 1) Sahip kullanıcı (auth) — rol=uretici, aktif
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email: d.sahip_email,
+    password: d.sahip_parola,
+    email_confirm: true,
+    user_metadata: { ad: d.sahip_ad },
+  });
+  if (error || !created.user) {
+    redirect(`/admin/ureticiler?hata=${encodeURIComponent(error?.message ?? "Sahip kullanıcı oluşturulamadı")}`);
+  }
+  await admin.from("profiles").update({ ad: d.sahip_ad, rol: "uretici", durum: "aktif" }).eq("id", created.user.id);
+
+  // 2) Üretici firma kaydı + sahip bağı (admin açtığı için doğrulanmış)
+  const { error: e2 } = await admin.from("uretici").insert({
+    ad: d.ad,
+    vergi_no: d.vergi_no ?? null,
+    sahip_id: created.user.id,
+    dogrulanmis: true,
+  });
+  if (e2) redirect(`/admin/ureticiler?hata=${encodeURIComponent(e2.message)}`);
+  revalidatePath("/admin/ureticiler");
+  redirect(`/admin/ureticiler?mesaj=${encodeURIComponent(`${d.ad} eklendi · sahip ${d.sahip_email}`)}`);
+}
+
+// ── Hesap tanımlama: OFİS + yetkili kullanıcı (service-role) ──
+const OfisEkleSchema = z.object({
+  ad: z.string().trim().min(2, "Ofis adı en az 2 karakter"),
+  marka: z.string().trim().max(60).optional(),
+  il: z.string().trim().max(40).optional(),
+  ilce: z.string().trim().max(40).optional(),
+  yetkili_ad: z.string().trim().min(2, "Yetkili ad-soyad"),
+  yetkili_email: z.string().email("Geçerli e-posta"),
+  yetkili_parola: z.string().min(8, "Parola en az 8 karakter"),
+});
+
+/** Admin yeni OFİS hesabı açar: ofis kaydı + yetkili kullanıcı (rol=ofis_yetkili, ofis_id, aktif). */
+export async function ofisEkle(formData: FormData) {
+  await adminGuard();
+  const parsed = OfisEkleSchema.safeParse({
+    ad: formData.get("ad"),
+    marka: (formData.get("marka") as string) || undefined,
+    il: (formData.get("il") as string) || undefined,
+    ilce: (formData.get("ilce") as string) || undefined,
+    yetkili_ad: formData.get("yetkili_ad"),
+    yetkili_email: formData.get("yetkili_email"),
+    yetkili_parola: formData.get("yetkili_parola"),
+  });
+  if (!parsed.success) {
+    redirect(`/admin/ofisler?hata=${encodeURIComponent(parsed.error.issues[0].message)}`);
+  }
+  const d = parsed.data;
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch {
+    redirect(`/admin/ofisler?hata=${encodeURIComponent("Service-role anahtarı tanımlı değil (.env + Vercel)")}`);
+  }
+
+  // 1) Ofis kaydı
+  const { data: ofis, error } = await admin
+    .from("ofis")
+    .insert({ ad: d.ad, marka: d.marka ?? null, il: d.il ?? null, ilce: d.ilce ?? null })
+    .select("id")
+    .single();
+  if (error || !ofis) {
+    redirect(`/admin/ofisler?hata=${encodeURIComponent(error?.message ?? "Ofis oluşturulamadı")}`);
+  }
+
+  // 2) Yetkili kullanıcı — rol=ofis_yetkili, ofise bağlı, aktif
+  const { data: created, error: e2 } = await admin.auth.admin.createUser({
+    email: d.yetkili_email,
+    password: d.yetkili_parola,
+    email_confirm: true,
+    user_metadata: { ad: d.yetkili_ad },
+  });
+  if (e2 || !created.user) {
+    redirect(`/admin/ofisler?hata=${encodeURIComponent(e2?.message ?? "Yetkili oluşturulamadı")}`);
+  }
+  await admin
+    .from("profiles")
+    .update({ ad: d.yetkili_ad, rol: "ofis_yetkili", ofis_id: ofis.id, durum: "aktif" })
+    .eq("id", created.user.id);
+
+  revalidatePath("/admin/ofisler");
+  redirect(`/admin/ofisler?mesaj=${encodeURIComponent(`${d.ad} eklendi · yetkili ${d.yetkili_email}`)}`);
+}

@@ -1,20 +1,33 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Berrak Güven tasarım tokenları (Devir Dokümanı Bölüm 8)
-   Sinyal renkleri: yeşil=müsait, amber=opsiyon, kırmızı=satıldı
+   Berrak Güven tasarım tokenları (ProjePazar-Ekranlar.html v2)
+   Sinyal: yeşil=müsait, amber=opsiyon, kırmızı=satıldı
    ========================================================= */
 @theme {
-  --color-ink: #0f2638; /* mürekkep / ana metin */
-  --color-navy: #13314b; /* lacivert / güven (ana renk) */
-  --color-teal: #1e9b8a; /* teal / berraklık */
-  --color-green: #2fb36b; /* sinyal: müsait / canlı */
-  --color-amber: #e3a12c; /* sinyal: opsiyon */
-  --color-red: #d15a4e; /* sinyal: satıldı */
-  --color-paper: #f4f2ee; /* sıcak kırık-beyaz zemin */
+  --color-ink: #0f2638;
+  --color-navy: #13314b;
+  --color-teal: #1e9b8a;
+  --color-teal-d: #137163;
+  --color-green: #2fb36b;
+  --color-amber: #e3a12c;
+  --color-red: #d15a4e;
+  --color-paper: #f4f2ee;
   --color-card: #ffffff;
-  --color-gray: #5e6b78; /* ikincil metin */
-  --color-hair: #e6ebef; /* hairline çizgi */
+  --color-gray: #5e6b78;
+  --color-hair: #e6ebef;
+
+  /* soft yüzeyler (rozet/çip/panel zeminleri) */
+  --color-soft: #f5f8fa;
+  --color-navy-soft: #eaf0f5;
+  --color-green-soft: #e5f5ec;
+  --color-amber-soft: #fbf0da;
+  --color-red-soft: #f8e7e4;
+  --color-teal-soft: #e2f3f0;
+
+  /* iki kademeli yumuşak gölge (Berrak Güven derinlik) */
+  --shadow-card: 0 1px 2px rgba(15, 38, 56, 0.06), 0 8px 24px rgba(15, 38, 56, 0.06);
+  --shadow-cardlg: 0 2px 8px rgba(15, 38, 56, 0.08), 0 24px 60px rgba(15, 38, 56, 0.12);
 
   --font-display: var(--font-bricolage); /* başlık / wordmark */
   --font-sans: var(--font-instrument); /* arayüz / metin */
@@ -25,4 +38,46 @@ body {
   background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tazelik nabzı — Berrak Güven imzası (canlılık sinyali) */
+@keyframes nabiz {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 179, 107, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(47, 179, 107, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 179, 107, 0);
+  }
+}
+.nabiz {
+  animation: nabiz 2s infinite;
+}
+
+/* Toast giriş */
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Bottom-sheet giriş (mobil daire detayı) */
+@keyframes sheetIn {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.sheet-in {
+  animation: sheetIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }

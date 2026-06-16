@@ -1,0 +1,794 @@
+ÜRÜN ANALİZ & ÇÖZÜM DOKÜMANI
+Çok-Müteahhitli Proje Satış & Dağıtım Ağı
+Üretici-Kontrollü · Canlı Stok · Kontrollü Dağıtım Ağı
+Strateji · Teknik Mimari · Süreç Akışları · Gelir Modeli · GTM · Risk
+Üretici-Kontrollü Çok-Taraflı Satış Ağı
+Hazırlanma Tarihi: 12 Haziran 2026
+
+İçindekiler
+
+
+
+1. Yönetici Özeti
+Sorun. Yeni konut projelerinde satış bilgisi dağınık, eski ve kontrolsüzdür. Müteahhit stoğunu Excel veya WhatsApp'ta tutar; emlakçı beş-on ayrı kaynaktan bayat bilgiyle satış yapar. Sonuç yanlış fiyat, çift satış, güven kaybı ve yavaşlayan satıştır.
+Çözüm. Ürün, birbirine bağlı iki yüzeyden oluşur. Bir yandan üretici, tüm satış sürecini tek noktadan yönetir — stoğunu, fiyatını, dağıtımını, lead'lerini ve tahsilatını tek ekrandan (Üretici Kokpiti). Öte yandan emlakçı, tüm yetkili projeleri tek canlı havuzdan görür ve müşterisine tek tıkla güncel bilgi paylaşır. İkisini bağlayan tek doğru kaynak ortada durur ve herkese tek doğru bilgiyi verir.
+Neden iki yüzey birlikte. Üretici Kokpiti yalnızca bir özellik değil, ürünün arz rampasıdır: üreticiyi içeri çeken ve canlı stoğu üreten yüzeydir. Emlakçı Havuzu ise talep tarafıdır. Kokpit olmadan stok girilmez; havuz olmadan stok değerlenmez. Bu yüzden üretici tarafı, sonradan eklenen bir modül değil, baştan tasarımın temel sütunudur (Bölüm 2.5).
+Çekirdek değer. “Bu daire hâlâ satılık mı, fiyatı ne?” sorusuna her an %100 doğru cevap. Ürünün tüm mimarisi bu tek cümleye hizmet eder; geri kalan her şey bu çekirdeği güçlendiren kancadır.
+Konumlama. Aracı veya broker değiliz; komisyona dokunmaz, sözleşmeye taraf olmayız. Saf satış altyapısıyız. Pazarda iki komşu kategori var: tek-müteahhit CRM'leri (Novo, Yapısoft, Yapıtaşı) ve açık dağıtım pazaryerleri (Topli). Biz ikisinin arasında, üretici-kontrollü çok-taraflı ağ olarak konumlanıyoruz — tekil CRM'in derinliğini değil, kontrollü ağı + hizmet edilmeyen küçük üreticiye radikal basitliği sunarak (Bölüm 2.6).
+Tek cümlelik tez
+Üretici tüm satışını tek noktadan yönetir, emlakçı tek canlı havuzdan satar. Çok-müteahhitli, üretici-kontrollü, canlı bir stok dağıtım ağıyız — tekil CRM değil, açık pazaryeri değil, broker değil.
+
+Bu dokümanın amacı. Bu bir yatırımcı sunumu değildir. Hedef kitleyi, somut sorunlarını, her soruna getirilen çözümü, çözümün nasıl çalıştığını ve altındaki teknoloji ile mimariyi anlatır. Ürünü kuracak ve anlayacak herkes için referanstır. Aşağıdaki bölümler kaynak konsepti analiz eder, tüm kritik süreçleri görsel akış diyagramlarıyla gösterir ve sonunda riskler ile öncelik önerilerini sunar.
+Bu sürüm (v8) — rakip manzarası + disiplinli alınacaklar + proje zaman çizelgesi
+Önceki turlar: çekirdek + Üretici Kokpiti (B.2.5–2.7), Kaçınılmazlık (B.25), Saha Derinliği (B.26), Güven Protokolü (B.27). Konum evrimi: “tek doğru bilgi” giriş kapısı → kazandıran konum “en hızlı satış yapılan ağ” / güven protokolü.
+Eklenen bölümler: Bölüm 28 — Yürütme Dokunuşları, Bölüm 29 — Kilitlenen Kararlar (en kritik 5 hamle), Bölüm 30 — Ürün Tanım Derinliği (birim segment/işlem tipi, satılabilir-değil ayrımı, satışa-açılış tarihi, tapu, komisyon görünürlüğü, dinamik fiyat, opsiyon talep+kod).
+Ayrıca yurtdışı proje hazırlığı (ülke/döviz/getiri/oturum/çok-dil) veri modeline ve vizyona işlendi. Tüm yapı devir paketiyle (PRD + Supabase şema/RLS) tutarlıdır.
+2. Stratejik Analiz & Ürün Çekirdeği
+2.1 Neden bu ürün kazanır — yapısal avantaj
+Konsept, gayrimenkul satış zincirindeki en temel ve en kronik veri problemini hedef alıyor: bilginin tazeliği. Sektörde fiyat ve stok günde birkaç kez değişebilirken, bu değişikliğin emlakçıya ulaşması saatler veya günler alır. Ürün, bu gecikmeyi sıfıra indirmeyi tek değer önermesi yapıyor. Bu odak, dağınık bir “her şeyi yapan platform” tuzağından kaçınması açısından doğru bir tercihtir.
+Üç yapısal güç: (1) Tek doğru kaynak — her birim tek kayıt, herkes aynı veriyi okur. (2) Üretici kontrolü — müteahhit kimin neyi hangi şartla satacağını belirler; bu, en büyük benimseme engelini (kontrol kaybı korkusunu) doğrudan çözer. (3) İki-mod ilkesi — aynı motor, profesyonele güç, dijitalleşmemişe aşırı basitlik sunar.
+2.2 Asıl moat: üretici kontrolü ve veri yerçekimi
+Rekabet avantajı (moat) tek bir özellikte değil, iki birikimli etkide yatıyor. Birincisi granüler tahsis: müteahhit projesini sisteme koyduğunda kontrolü kaybetmediğini görür; “projem rastgele yayılır” korkusu ortadan kalkar. Bu güven, müteahhiti platforma kilitler. İkincisi veri yerçekimi: zamanla biriken fiyat, talep ve satış izi verisi (AI-4 katmanı), hiçbir tek-müteahhit CRM'inin üretemeyeceği bir piyasa zekâsı yaratır. Bu iki etki birbirini besler — ne kadar çok müteahhit, o kadar zengin havuz; o kadar zengin havuz, o kadar değerli emlakçı; o kadar değerli emlakçı, o kadar fazla müteahhit talebi.
+Ağ etkisi döngüsü
+Daha çok müteahhit → daha zengin havuz → daha çok emlakçı → daha geniş satış erişimi → daha çok müteahhit.
+Bu iki-taraflı pazaryeri dinamiği, ilk likiditeyi (kritik kütle) yakaladıktan sonra rakiplerin kopyalamasını zorlaştırır.
+2.3 Değer önermesini “para diline” çevirmek
+Kritik içgörü. “Tek doğru bilgi” teknik olarak çekirdek değerdir, ancak piyasa veri doğruluğu satın almaz — piyasa para kazanmak ister. Emlakçının önceliği komisyon, müşteri kapma ve rakibinden hızlı olmaktır; müteahhitin önceliği satışın hızlanması ve yeni müşteridir. Bu yüzden tazelik, kullanıcıya “daha fazla satış” olarak yeniden çerçevelenmelidir. Doğruluk araçtır; para sonuçtur.
+Her segment için satış mesajı, soyut “doğruluk” yerine somut kazanca bağlanır:
+Kim
+Soyut (zayıf)
+Para dili (güçlü)
+Emlakçı
+“Güncel veri görürsün”
+“Masada fiyat tutar, satış iptal olmaz; herkesten önce yeni projeye erişir, hızlı kapatırsın”
+Müteahhit
+“Stoğun tek yerde”
+“Daha çok emlakçı, daha hızlı satış; hangi dairenin ne zaman satılacağına dair talep zekası”
+Ofis
+“Ekibini yönet”
+“Ekibin tek havuzdan satar, kim ne getirdi görünür; hakediş kavgası biter”
+Eklenen değer kancaları (sadece doğruluk değil)
+Lead üretimi & yönlendirme: paylaşılan linkten gelen sıcak müşteri, iz zinciriyle doğru emlakçıya bağlanır.
+Sıcak müşteri paylaşımı: uygun projesi olmayan emlakçı, müşteriyi ağ içinde yönlendirip değer (ve ileride hakediş) üretebilir.
+Hız avantajı: güncel materyal + tek-tık içerik, emlakçıyı rakibinden önce müşteriye ulaştırır.
+2.4 Konumlandırma — ne değiliz
+Sınır netliği bu ürünün stratejisinin merkezindedir. Aşağıdaki ayrım hem pazarlama mesajını hem de ürün kapsamını disipline eder:
+Kategori
+Onlar
+Biz
+Tekil CRM
+Novo / Yapısoft / Yapıtaşı: tek-müteahhit, kendi ekibi için derin CRM
+Çok-müteahhitli, paylaşımlı canlı havuz
+İlan portalı
+Sahibinden: açık B2C ilan
+B2B kontrollü dağıtım
+Açık pazaryeri
+Topli / Tapuva: geliştirici↔danışman açık ağ, başarı/komisyon temelli
+Üretici-kontrollü tahsis + sözleşmeye taraf olmayan altyapı
+Geliştirici Satış OS'u
+DomusHub / Kords / Nexprop: tek-geliştirici SaaS (kendi stoğu + kendi broker'ı)
+Çok-müteahhitli ağ + WhatsApp/concierge ile küçük müteahhit
+Görselleştirme / 3D stüdyo
+Relata / Flatter / UnitAtlas: 3D tur, immersive galeri motoru
+Biz stüdyo değiliz; üretici render/video yükler
+Not — Topli artık doğrudan bir rakiptir (Kasım 2025'te Türkiye'ye girdi). Geliştirici↔danışman ağı, güncel stok ve AI sunumda örtüşüyoruz. Fark, kontrol ve hizmet edilmeyen segmenttedir; detaylı pazar haritası ve savunma Bölüm 2.6 ve Bölüm 22'dedir.
+2.5 Üretici Kokpiti — Tek Noktadan Satış İşletim Sistemi
+Üretici tarafı bu ürünün arz moat'ıdır; orayı zenginleştirmek özellik şişirmesi değil, ağın yakıtını artırmaktır. Üreticinin gerçek talebi tek cümleyle özetlenir: “tüm satış sürecimi tek yerden çözeyim.” Kokpit, stoğun girişinden teslime kadar her adımı tek ekranda toplar — ve kritik fark şudur: bu tek ekran yalnızca üreticinin kendi stoğunu değil, kontrollü dağıtımını da (kendi satışı + tahsis ettiği emlakçı ağının satışı) aynı yerde gösterir.
+
+Şekil 1 — Üretici Kokpiti: stoktan teslime tek noktadan süreç; kendi satışı ve emlakçı satışı tek durum makinesinde.
+Tasarım testi — kapsam disiplini
+Eklenen her üretici aracı şu testi geçmeli: ya stoğu daha zengin/taze yapmalı ya da bize özel veri üretmeli. Geçiyorsa kur. Sadece genel CRM/ERP/muhasebe ise → entegre et veya geç. Bu test, kokpiti Novo gibi bir kurumsal ERP'ye dönüştürme tuzağından korur.
+Üreticinin sıkıntıları ve her birine kokpitin cevabı (Türkiye sahası):
+Üretici sıkıntısı
+İhtiyaç / araç
+Çekirdeğe katkısı
+Ödeme planı / taksit / senet kafada-Excel'de
+Ödeme planı üreteci + tahsilat takibi (döviz-endeksli)
+Birimi zenginleştirir; emlakçı da paylaşır
+Lead her kanaldan dağınık (QR, Instagram, Sahibinden, ofis)
+Tek lead kutusu: kendi kanalları + emlakçı lead'i aynı yerde
+Kokpit yapışkanlığı + talep verisi
+Döviz/maliyet baskısı → ne zaman zam?
+Döviz-endeksli fiyat + şerefiye motoru + otomatik güncelleme
+Tazelik + fiyat verisi (AI-4)
+Satış ofisi/showroom kaosu, kapora takibi
+Showroom modu + rezervasyon/kapora
+Opsiyon makinesini direkt satışa genişletir
+Kat karşılığı: arsa sahibi vs müteahhit payı
+Birim sahiplik etiketi + pay raporu
+Türkiye'ye özel, rakipte yok — anlaşma kapatan fark
+Ortağa/yatırımcıya raporlama
+Satış hızı / blok-tip bazlı dashboard
+Zaten veriden çıkar
+Şantiye/inşaat yönetimi, muhasebe/ERP
+(ayrı domain)
+Kapsam dışı → entegre et / geç
+2.6 Pazar haritası — üç oyuncu tipi ve nerede duruyoruz
+Saha araştırması üç ayrı oyuncu tipi gösteriyor. Üretici kokpiti tek başına farklılaşma değildir — tekil CRM'ler onu zaten derinlemesine yapıyor. Farklılaşma, kokpiti kontrollü bir çok-taraflı ağa bağlamak ve hizmet edilmeyen küçük üreticiye radikal basitlik sunmaktır.
+Boyut
+Tekil CRM (Novo/Yapısoft)
+Açık pazaryeri (Topli)
+BİZ
+Üretici kokpiti
+Derin (kurumsal)
+Sınırlı
+Yeterli + basit
+Çok-müteahhit ağı
+Yok (tek-tenant)
+Var (açık)
+Var (kontrollü)
+Üretici kontrolü/tahsis
+Kendi ekibi
+Zayıf
+Granüler (moat)
+Küçük üretici (Ü2)
+Ağır, almaz
+Profesyonel odak
+WhatsApp+concierge
+Ticari pozisyon
+Yazılım lisansı
+Başarı/komisyon
+Saf altyapı (komisyonsuz)
+2.7 CRM sorusu — replace etme, rampada dur ve entegre et
+Genel CRM kurma. Novo/Yapısoft o işi derinlemesine yapıyor ve “biz CRM değiliz” konumunu bozarsın. Onun yerine stoktan doğan bir satış kokpiti kur. İki segment, iki strateji:
+	•	Ü2 (geleneksel, çoğunluk): hiçbir aracı yok → onların ilk ve tek satış aracı ol. CRM'i bilmez; sade kokpit yeter. Asıl pazar payı buradadır.
+	•	Ü1 (CRM'i olan): replace etme, entegre et (API ile Novo/Yapıtaşı'ndan lead/stok senkronu). Çatışma yerine tamamlayıcı ol; onları havuza bağla.
+Neden bu yapışkan
+Genel CRM boş bir kutudur, üretici doldurur. Bizim kokpit zaten dolu (birim verisi var); üstüne lead + rezervasyon + ödeme planı eklemek doğal ve yapışkandır — ve AI-4 veri moat'ını besler. Üstelik tek ekranda kendi satışı + emlakçı ağının satışı birlikte görünür; bunu ne tekil CRM (ağ yok) ne de açık pazaryeri (kontrol yok) sunabilir.
+
+3. Hedef Kitle
+İki ana taraf vardır (üretici ve satıcı) ve her biri profesyonelden dijitalleşmemişe uzanan bir yelpazede konumlanır. Ürünün başarısı, bu yelpazenin iki ucunu da aynı anda tutabilmesine bağlıdır: profesyonele güç, dijitalleşmemişe aşırı basitlik.
+#
+Kitle
+Tanım
+Dijital olgunluk
+Ü1
+Kurumsal müteahhit
+Satış ofisi/CRM'i olan, çok projeli
+Yüksek
+Ü2
+Geleneksel müteahhit
+2-3 bina yapan, stoğu kafasında
+Düşük
+E1
+Profesyonel danışman
+Dijital, çok müteahhitle çalışan
+Yüksek
+E2
+Geleneksel danışman
+Telefon + WhatsApp'çı, teknolojiden uzak
+Çok düşük
+O
+Emlak ofisi
+Çok danışmanlı, projeyi dağıtan
+Orta
+M
+Global marka (Remax vb.)
+Kurumsal, şube ağı olan
+Yüksek
+
+Analiz — benimseme stratejisi
+Klasik pazaryeri çıkmazı geçerli: müteahhit olmadan emlakçı, emlakçı olmadan müteahhit gelmez. Çözüm, başlangıçta arz tarafına (Ü2 — geleneksel müteahhit) concierge ve WhatsApp ile sürtünmesiz giriş sunup havuzu hızla doldurmaktır. Havuz dolunca E2 (geleneksel danışman) için “tek ekranda her şey” değeri kendiliğinden ortaya çıkar.
+En zor ama en değerli segment çift uçtur: Ü2 ve E2'yi tutan ürün, Ü1 ve E1'i zaten tutar; tersi doğru değildir. Bu yüzden SIMPLE MODE varsayılan olmalıdır.
+
+4. Sorun → Çözüm → Nasıl Çalışır (Özet Harita)
+Aşağıdaki tablo dokümanın çekirdeğini bir bakışta özetler. Her satırın teknik akışı sonraki bölümlerde diyagramlarla açılır.
+#
+Sorun
+Çözüm
+Kim yaşıyor
+2.1
+Stok dağınık ve eski
+Tek canlı stok kaynağı; bir kez gir, her yerde anında yansı
+Ü1, Ü2
+2.2
+Veri girmek zahmetli
+Concierge onboarding + WhatsApp ile doğal dil girişi
+Ü2
+2.3
+5-10 dağınık kaynak
+Tüm yetkili projeler tek ekranda, filtrelenebilir
+E1, E2
+2.4
+Eski bilgiyle satış = rezalet
+Tazelik damgası + güncelle dürtmeleri
+E1, E2, Ü1
+2.5
+Kontrol kaybı korkusu
+Granüler tahsis (MOAT)
+Ü1
+2.6
+Çift satış felaketi
+Opsiyon kilidi + iki kademeli onay
+Ü1, E1
+2.7
+Kim sattı belirsiz
+“Kim getirdi” iz zinciri
+Ü1, E1
+2.8
+İçerik üretemiyor
+AI içerik üretimi (görsel + ilan metni)
+E1, E2
+2.9
+Proje-müşteri eşleştirme
+Kural-tabanlı, sonra AI sıralama
+E1
+2.10
+Ödeme planı/tahsilat dağınık
+Ödeme planı üreteci + tahsilat takibi (Üretici Kokpiti)
+Ü1, Ü2
+2.11
+Lead her kanaldan dağınık
+Tek lead kutusu: kendi kanalı + emlakçı lead'i
+Ü1, Ü2
+2.12
+Showroom/kapora kaosu
+Showroom modu + rezervasyon (opsiyon makinesi)
+Ü1
+2.13
+Kat karşılığı pay takibi
+Birim sahiplik etiketi + pay raporu (TR'ye özel)
+Ü1, Ü2
+Not — son dört satır (2.10–2.13) üretici tarafının tek-noktadan süreç ihtiyaçlarıdır; tasarım ve akış Bölüm 2.5 (Üretici Kokpiti)'te ele alınmıştır ve Faz 1'e çekilmiştir (Bölüm 16).
+
+5. Sistem Mimarisi (Genel Bakış)
+Sistem dört katmana ayrılır: kullanıcılar, ürün yüzeyleri (Next.js PWA), uygulama katmanı (Vercel serverless) ve veri/servisler (Supabase, Claude API, WhatsApp Cloud API). Supabase tek doğru kaynaktır; tüm okuma ve yazma, Row Level Security ile tahsis kurallarına göre filtrelenir.
+
+Şekil 2 — Uçtan uca sistem mimarisi: kullanıcılardan veri katmanına kadar.
+Mimari ilkeler
+Tek doğru kaynak: Supabase 'birim' tablosu. Hiçbir bilgi iki yerde tutulmaz.
+Stateless serverless: Vercel API route'ları yatay ölçeklenir; durum DB'de tutulur.
+Multi-tenant baştan: Şehir/marka eklemek veri izolasyonuyla kolaydır.
+Gerçek-zaman “nice to have”: Gayrimenkul temposu saat/gün; milisaniye senkron gerekmez, periyodik fetch + durum kilidi yeterlidir.
+6. Çekirdek Akış — Canlı Stok Senkronu
+Bu, ürünün kalbidir. Müteahhit bir değişiklik yaptığında (“5. kat %5 zam”), tek kayıt güncellenir ve tüm yetkili emlakçı ekranları güncel veriyi okur. Her kayıtta bir son_guncelleme zaman damgası tutulur ve arayüzde “son güncelleme: 2 saat önce” olarak gösterilir — bu, değer önermesinin görünür kanıtıdır.
+
+Şekil 3 — Canlı stok senkronu: tek kaynak, çok tüketici, tazelik damgası.
+2.1 ve 2.4 — Dağınık stok ve tazelik garantisi
+Nasıl çalışır. Müteahhit projeyi generator ile kurar (blok → kat → tip kuralı → birimler otomatik doğar) veya Excel import eder. Her birim tek kayıttır. Durum veya fiyat değişince kayıt güncellenir; emlakçı ekranı bu kaydı canlı okur. N gün güncellenmeyen projeye “teyit edin” uyarısı çıkar; kur oynayınca üreticiye “fiyatları gözden geçir” hatırlatması gönderilir. Bu tarama, zamanlanmış bir cron işiyle yapılır.
+
+7. Akış — WhatsApp ile Doğal Dil Girişi (AI-1) — Teyit-Merkezli
+Geleneksel müteahhit (Ü2) panel öğrenmek istemez. Çözüm, WhatsApp'a sıradan bir cümle yazmaktır: “B blok 7. kat 3+1 satıldı, 2+1'lere %5 zam.” AI bu metnin niyetini çıkarır — ancak burada kritik bir tasarım kararı vardır: AI asla doğrudan stoğu güncellemez.
+⚠ En büyük teknik risk: yanlış parse = yanlış stok = yıkılan değer önermesi
+Ürünün tek değer önermesi tazelik ve doğruluktur. AI yanlış parse ederse, ürünün kalbi zarar görür. Somut tehlike: müteahhit “B blok 7. kat 3+1 satıldı” yazar ama projede iki B blok vardır ya da 7. katta iki adet 3+1 vardır. AI yanlış daireyi “satıldı” işaretlerse, ya satılmamış daire müsait görünmez (emlakçı satamaz) ya da satılmış daire müsait görünür (çift satış). İkisi de “tek doğru bilgi” vaadini yıkar.
+Bu yüzden teyit yan önlem değil, tasarımın merkezidir. Akış, serbest metni anlamak için AI kullanır; fakat eylemi her zaman yarı-yapılandırılmış bir teyitle kapatır. AI, niyeti çıkarır ve stoktaki gerçek kayıtlarla eşleştirir. Tek net eşleşme varsa bile sistem WhatsApp'ın buton mesajıyla “B blok 7. kat D.12 3+1 → SATILDI? [Evet] [Hayır]” sorar. Birden fazla aday varsa önce WhatsApp liste mesajıyla doğru birimi seçtirir. Müteahhit [Evet] demeden hiçbir kayıt değişmez — yani en kötü durumda stok bozulmaz, sadece güncelleme yapılmaz.
+
+Şekil 4 — AI-1 teyit-merkezli akış: niyet çıkarımı → gerçek kayıtla eşleştir → (gerekirse liste) → zorunlu buton teyidi → güncelle.
+Güvenlik tasarımı — özet
+Zorunlu teyit (her zaman): tek net eşleşmede bile buton onayı; kritik alanlarda (fiyat/durum) düşük güven eşiği.
+Belirsizlikte liste: birden fazla aday → WhatsApp liste mesajıyla müteahhit seçer; AI tahmin etmez.
+Fallback UI: parse başarısızsa basit butonlu mini-akışa düşer; manuel concierge her zaman yedektedir.
+İz + güven skoru: her güncelleme events'e kaynak=whatsapp ve güven skoruyla loglanır; düşük güvenli girişler denetlenebilir.
+2026 WhatsApp gerçeği — teknik notlar
+Cloud API tek seçenek: on-premise kaldırıldı; kendi WABA'mız (WhatsApp Business Account) gerekir.
+Webhook zorunlu: gelen mesaj → Meta webhook → Next.js API route. Giden mesaj doğrudan HTTP/JSON çağrısıyla yapılır (resmi SDK yok).
+Maliyet: şablon mesajlar konuşma-başı ücretlidir; AI çağrıları için önbellek + kota uygulanmalıdır.
+Başlangıç tercihi: BSP (Wati / Kommo vb.) ile hızlı başlanıp sonra maliyet için doğrudan Cloud API'ye geçilebilir.
+8. Akış — Onboarding (Üç Yol)
+Veri girme zahmeti (sorun 2.2), benimsemenin önündeki en büyük engeldir. Üç paralel giriş yolu, her dijital olgunluk seviyesini karşılar: profesyonel kendi kurar, dijitalleşmemiş için ya biz kurarız (concierge) ya da WhatsApp'tan konuşarak girer.
+
+Şekil 5 — Üç onboarding yolu, tek hedef: canlı stok hazır.
+
+9. Akış — Opsiyon Kilidi & Çift-Satış Kalkanı (Durum Makinesi)
+Çift satış, itibar ve hukuk açısından felakettir (sorun 2.6). Çözüm, her birimin bir durum makinesi olmasıdır. Bir emlakçı satışa başlayınca daireyi süreli (örn. 48 saat) opsiyonlar; o süre boyunca birim yalnız ona kilitlidir (DB seviyesinde optimistic lock). Satış gerçekleşince emlakçı “sattım” der, durum “satış beklemede” olur ve üretici onaylayınca “satıldı” olur. Süre dolarsa birim otomatik “müsait”e döner (cron).
+
+Şekil 6 — Birim durum makinesi: müsait → opsiyonlu → satış beklemede → satıldı (+ zaman aşımı).
+Neden websocket gerekmez
+Gayrimenkul saat/gün temposunda çalışır. Çift-satış koruması için milisaniye senkron değil, DB seviyesinde kilit (durum + kilit_bitis alanları) ve periyodik cron yeterlidir. İki emlakçı aynı anda opsiyon almaya çalışırsa optimistic lock ikincisini reddeder.
+
+10. Akış — Granüler Tahsis & Görünürlük (MOAT)
+Müteahhitin kontrol kaybı korkusunu çözen mekanizma budur (sorun 2.5). Üretici kimin neyi hangi şartla satacağına karar verir: kapsam (tüm proje / blok / kat aralığı / tip / belirli birimler), hedef (tüm ağ / belirli marka / ofis / danışman) ve şartlar (münhasırlık, kontenjan, süre, fiyat görünürlüğü). Görünürlük tahsisten doğar: tahsis edilmeyen birim emlakçıya hiç görünmez. Bu, Supabase Row Level Security ile veritabanı seviyesinde uygulanır — yani bir güvenlik politikası, sadece bir arayüz filtresi değil.
+
+Şekil 7 — Tahsis: kapsam × hedef × şart → tahsis tablosu → RLS filtresi → emlakçı görünürlüğü.
+İlk sürüm sadeleştirmesi — ama moat'ı zayıflatmadan. Tam granülerlik (kat/blok/tip/kontenjan/fiyat maskesi) Faz 2'dedir. Ancak ilk sürüm saf ikili (açık/kapalı) olmamalıdır. Müteahhitin asıl istediği kontrol “Çankaya'daki şu üç ofise ver” gibi hedefli bir dağıtımdır. Bu yüzden ilk sürümde bile “kapalı” seçeneğinin altında bir ofis listesi bulunmalıdır: “herkese açık” VEYA “yalnız şu ofis(ler)e açık”. Bu, MVP'yi hızlandırırken müteahhitin kontrol ihtiyacını gerçekten karşılar — saf ikili kalırsa moat zayıflar.
+Neden bu detay önemli
+Granüler tahsis bu ürünün asıl moat'ıdır (kontrol kaybı korkusunu o çözer). İlk büyük müteahhit anlaşması büyük olasılıkla saf “açık/kapalı” ile kapanmaz; müteahhit “kime verdiğimi seçmek istiyorum” der. Ofis-listesi seviyesindeki tahsis, bu anlaşmayı kapatacak minimum kontroldür ve teknik olarak ucuzdur (tahsis tablosuna hedef=ofis satırı eklemek).
+11. Akış — “Kim Getirdi” İz Zinciri
+Komisyon kavgası (“ben getirdim” / “benim ekibim kapattı”) klasik bir sorundur (2.7). Çözüm, paylaşımdan satışa kadar her olayı loglayan bir iz zinciridir. Her paylaşım, emlakçıya özel imzalı bir linktir; link açılışı, lead formu ve satış işareti birer olay olarak events tablosuna yazılır. Üretici hangi emlakçının ürettiğini objektif delille görür. İşlem ve komisyon Faz 2'dedir, ancak iz baştan tutulur — bu kritik bir karardır, çünkü veri geçmişe dönük üretilemez.
+
+Şekil 8 — İz zinciri: imzalı link → görüntüleme → lead → satış → events tablosu → üretici görünürlüğü.
+
+12. Akış — AI İçerik Üretimi (AI-5)
+Geleneksel danışman sosyal medya görseli veya ilan metni üretemez (sorun 2.8). Proje verisi zaten yapılandırılmış olduğundan, emlakçı tek tıkla markalı içerik üretir: sosyal medya postu, SEO uyumlu ilan metni, WhatsApp mesajı, PDF broşür. Metin Claude API ile, görsel ise bir şablon motoruyla (proje verisi + logo basılı HTML/Canvas → export) üretilir. En güçlü yanı: fiyat değişince görsel otomatik güncellenir, böylece eski fiyatlı materyal dolaşımda kalmaz.
+
+Şekil 9 — İçerik üretimi: yapılandırılmış proje verisi → Claude (metin) + şablon motoru (görsel) → markalı çıktı.
+12.1 Paylaşım Stüdyosu — emlakçı-markalı AI paylaşım (PREMIUM)
+Tüm proje görselleri, kat planları ve detaylar zaten üretici panelinden girilir (tek doğru kaynak). Emlakçı bunların üzerine kendi kimliğini giydirir: profilini bir kez kurar (fotoğraf, ad, telefon, ofis logosu/bilgisi), paylaş'a bastığında arka planda sistem üreticinin görseli + emlakçı kimliğini birleştirir. AI (Claude) ilan/sosyal metni yazar, şablon motoru görseli emlakçı foto+logosuyla kompoze eder ve watermark basar. Çıktı: paylaşılabilir markalı görsel + emlakçıya özel imzalı landing linki — lead formu o emlakçıya bağlıdır (kim-getirdi izi, Bölüm 11).
+Katmanlama ve gelir
+Ücretsiz: sade paylaşım (proje görseli + güncel fiyat).
+Premium: emlakçı-markalı görsel/landing, çoklu şablon, carousel/reels, video, kendi alan-adı landing. 
+Çift değer: emlakçı için somut satış kancası; platform için tekrarlayan abonelik geliri (Bölüm 19). Üretici görseli korunur, marka yalnız emlakçı katmanında değişir — tek doğru kaynak bozulmaz.
+13. Veri Modeli
+Veri modeli üç eksende kurulur: üretici hiyerarşisi (üretici → proje → blok → birim), satıcı hiyerarşisi (marka → ofis → danışman, veya bağımsız) ve bunları bağlayan ilişki tabloları (tahsis, opsiyon, events). Birim, modelin merkezindeki en zengin varlıktır.
+
+Şekil 10 — Varlık ilişki modeli (özet).
+Birim çekirdek alanları: blok, kat, daire no, tip, yön/cephe, brüt/net m², oda, durum (müsait / opsiyon / satış-beklemede / satıldı / stop), liste fiyatı, para birimi, şerefiye, ödeme planı, kampanya, sahiplik (arsa sahibi / müteahhit — kat karşılığı), son güncelleme.
+Üretici Kokpiti için eklenen tablolar (Bölüm 2.5): LEAD (birim/proje × kaynak: kendi-kanalı/emlakçı × durum × atanan), REZERVASYON/KAPORA (birim × alıcı × tutar × süre), ÖDEME PLANI (birim × taksit takvimi × tahsilat durumu), SAHİPLİK PAYI (kat karşılığı dağılımı). Bu tablolar mevcut ÜRETİCİ→PROJE→BİRİM ve OPSİYON/EVENTS yapısının üstüne oturur; ayrı bir sistem değildir.
+Proje zaman çizelgesi (off-plan için kritik, MVP): PROJE seviyesinde inşaat başlama tarihi, tahmini teslim, iskan/oturum tarihi, inşaat aşaması (planlama→temel→kaba→ince→çevre→tamamlandı), ilerleme %, ve çok-etaplı projelerde etap bilgisi. Yatırımcının ilk sorusu “ne zaman teslim/iskan?” — bu alanlar baştan modelde. (Fotoğraflı inşaat takibi / buyer portal Faz 2.)
+Yurtdışı proje hazırlığı (yapı baştan hazır, dolum Faz 2): PROJE seviyesinde ülke (default TR), çok-para birimi (TRY/USD/EUR/GBP) ve yatırım alanları (kira getirisi %, amortisman yılı, oturum/Golden Visa uygunluğu, çok-dilli ilan) nullable olarak modele eklenir. Coğrafya hiyerarşisi ülke seviyesine ölçeklenir. “Üretici” rolünü yabancı geliştirici veya TR master acentesi üstlenebilir; tahsis→emlakçı akışı aynen çalışır. Pazar gerekçesi ayrı raporda.
+Generator — ölçek anahtarı
+Daire Tipi Şablonu + Kat Şablonu + Şerefiye Kuralı → birimler otomatik doğar. 1000 daire tek tek girilmez. Bu, hem büyük projelerin onboarding'ini hem de Ü1 segmentinin benimsemesini mümkün kılar.
+
+14. AI Katmanları (Gömülü, Ayrı Portal Değil)
+AI, ürünün çekirdeği değil, çekirdeği (canlı stok + dağıtım) güçlendiren kancadır. Sıralama ilkesi nettir: onboarding'i mümkün kılan AI (AI-1, AI-5) önce; gösteriş AI'ı (AI-3, AI-4) sonra gelir.
+Katman
+İş
+Açıklama
+Ne zaman
+AI-1
+Doğal dil giriş
+WhatsApp'tan stok/fiyat güncelleme
+Erken
+AI-5
+İçerik üretimi (temel)
+Görsel + ilan metni
+Erken
+AI-2
+Eşleştirme
+Müşteri kriteri → uygun birim
+Önce kural, sonra AI
+AI-3
+Agentic iletişim
+Lead'i 7/24 niteleme/yanıt
+Sonra
+AI-4
+Fiyat & talep zekası
+Üreticiye satış içgörüsü (veri moat)
+Sonra
+15. İki-Mod İlkesi
+Aynı motor iki yüz sunar: SIMPLE MODE (varsayılan; geleneksel/dijitalleşmemiş kullanıcı için WhatsApp + birkaç buton, karmaşık güç arka planda) ve PRO MODE (profesyonel için tahsis paneli, toplu işlem, analitik). Bu, hedef kitlenin iki ucunu da tek üründe tutmanın anahtarıdır.
+Dil notu
+Saha jargonundaki kısa adlar (ör. “sokak/laz müteahhit”, “langur danışman”) ekip içi iletişimde pratiktir; bu dokümanda ve müşteriye dönük her yüzeyde nötr karşılıkları (geleneksel müteahhit / geleneksel danışman) kullanılır.
+
+Şekil 11 — Tek motor, iki yüz: SIMPLE ve PRO.
+Ürün yüzeyleri özeti
+Yüzey
+Kullanıcı
+Ne yapar
+Müteahhit Konsolu
+Ü1
+Proje kur/import, tahsis, fiyat, durum, onay, performans
+WhatsApp + Concierge
+Ü2
+Mesajla giriş/güncelleme; biz kurarız
+Emlakçı Havuzu
+E1
+Filtre, paylaş, opsiyon, içerik üret, lead
+Basit Mobil
+E2
+Bul → WhatsApp paylaş → ara (3 buton)
+Ofis Konsolu
+O
+İç dağıtım, ekip performansı
+Marka Konsolu
+M
+Şubelere dağıtım, kurumsal görünüm
+Admin
+Biz
+Doğrulama, concierge, denetim, güven rozeti
+
+16. Yapım Sırası — Fazlar
+Yol haritası üç fazda ilerler. Faz 1, tek başına satılabilir çalışan bir çekirdek üretir; Faz 2 derinlik katar; Faz 3 ölçek ve zekâ getirir. Sıralama doğru önceliklendirilmiştir: önce “tek doğru bilgi” çalışsın, sonra gösteriş özellikleri eklensin.
+
+Şekil 12 — Üç fazlı yol haritası (0-12 ay).
+Öncelik değerlendirmesi
+Doğru olan: Çift-satış kalkanı (opsiyon) ve tazelik damgası Faz 1'de. Bunlar olmadan platform güven üretemez.
+Üretici kokpiti öne çekildi: ödeme planı üreteci, tek lead kutusu, rezervasyon ve kat karşılığı etiketi Faz 1'dedir. Bunlar üreticiyi içeri çeken arz rampasıdır (Bölüm 2.5); ağır finansal/CRM derinliği ise Faz 2'ye bırakıldı (kapsam disiplini).
+Tahsis: Faz 1 “açık / ofis-listesine açık” seviyesinde; tam granülerlik (kat/tip/maske) Faz 2. İlk büyük üretici anlaşması bunu öne çekebilir.
+Akıllıca: İz zinciri (events) Faz 1'den itibaren toplanıyor, görünür raporlama Faz 2'de. Veri geçmişe dönük üretilemez — bu doğru bir karar.
+17. Başarı Ölçütleri
+En kritik metrik tazeliktir, çünkü değer önermesinin doğrudan ölçüsüdür. Diğerleri benimseme ve likidite sağlığını gösterir.
+Metrik
+Neden önemli
+Yön
+Ortalama stok güncelleme yaşı
+Değer önermesinin doğrudan ölçüsü — en kritik metrik
+DÜŞÜK ↓
+Günlük aktif emlakçı sayısı
+Talep tarafı likidite
+YÜKSEK ↑
+Platform üzerinden geçen lead/satış
+Gerçek değer üretimi
+YÜKSEK ↑
+Yetkili havuzu kullanan emlakçı oranı
+Ürün yapışkanlığı
+YÜKSEK ↑
+Müteahhit başına güncel proje oranı
+Arz tarafı sağlık
+YÜKSEK ↑
+
+18. Riskler, Açık Sorular ve Öneriler
+Aşağıdaki değerlendirme, kaynak konseptin ötesine geçerek uygulamada karşılaşılabilecek başlıca riskleri ve önerilen azaltıcı adımları içerir.
+Risk / Soru
+Etki
+Öneri / Azaltıcı adım
+Soğuk başlangıç (iki-taraflı pazar)
+Müteahhit yoksa emlakçı, emlakçı yoksa müteahhit gelmez
+Önce arz tarafını concierge ile yoğunlaştırıp havuzu kritik kütleye getir; sonra emlakçıyı davet et
+WhatsApp parse doğruluğu (EN YÜKSEK)
+Yanlış güncelleme = yanlış stok = güven kaybı; tek değer önermesini doğrudan yıkar
+Teyit-merkezli tasarım (Bölüm 7): AI asla doğrudan yazmaz; her zaman buton teyidi, belirsizlikte liste, fallback UI, güven skoru + denetim
+Tazelik teyidi müteahhide bağımlı
+Müteahhit güncellemezse “canlı” iddiası çöker
+Cron dürtmeleri + güncellenmeyen projeyi havuzda otomatik soldurma/uyarı rozeti
+KVKK uyumu (lead + WhatsApp mesaj saklama)
+Hukuki yükümlülük, ceza riski
+Açık rıza akışı, veri saklama politikası, mesaj minimizasyonu baştan tasarıma gömülmeli
+Sahte ilan / yetkisiz proje
+İtibar riski
+Doğrulanmış üretici rozeti (vergi no, ruhsat teyidi, admin onayı); veri kaynağı yalnız üretici
+Granüler tahsis erken talebi
+Ü1 anlaşması ikili tahsisle kapanmayabilir
+İlk büyük müteahhitin gerçek ihtiyacına göre Faz 2'den birkaç tahsis ekseni öne çekilebilir
+AI maliyeti ölçekte
+Konuşma-başı WhatsApp + Claude çağrıları marjı eritebilir
+Önbellek, kota, BSP→Cloud API geçişi; içerik üretiminde şablon önceliği
+Komisyon/hakediş Faz 2'de
+Emlakçı erken para görmek isteyebilir
+İz zinciri Faz 1'den şeffaf gösterilsin; “objektif delil” değeri parasal akıştan önce sunulur
+18.1 Öne çıkan güçlü yönler
+	•	Tek, ölçülebilir değer önermesi: “tek doğru bilgi” — odak dağılmıyor.
+	•	Doğru moat seçimi: üretici kontrolü + veri yerçekimi, kopyalanması zor birikimli avantajlar.
+	•	Gerçekçi teknik tercihler: websocket yerine cron + kilit; gayrimenkul temposuna uygun, maliyeti düşük.
+	•	Sürtünmesiz onboarding: concierge + WhatsApp, en zor segmenti (Ü2) doğrudan hedefliyor.
+	•	Net konumlama: CRM/portal/broker değiliz — hem pazarlama hem hukuki kapsam disiplini.
+18.2 Önerilen ilk 90 gün — kritik yol
+	•	Hedef pazarda üreticilerin stoğunu concierge ile sisteme al — arz tarafını yoğunlaştır (arz likiditesi).
+	•	Canlı stok + tazelik damgası + tek-ekran havuz + tek-tık WhatsApp paylaşımını çalışır hale getir (çekirdek değer).
+	•	Opsiyon kilidi + üretici onayını devreye al (çift-satış kalkanı — güvenin ön koşulu).
+	•	AI-1 (WhatsApp giriş) ve AI-5 (görsel + ilan metni) temel sürümlerini yayınla (benimseme kancaları).
+	•	Events iz zincirini sessizce toplamaya başla (görünür raporlama sonra).
+	•	Emlakçıları davetle içeri al; tek metriği takip et: ortalama stok güncelleme yaşı.
+
+19. Gelir Modeli (Para Kim, Ne Zaman, Neden Öder)
+Neden bu bölüm kritik
+Kaynak konseptin en büyük boşluğu buydu: “altyapıyız” demek, parasal modeli netleştirmeden startup mezarlığına giden yoldur. Altyapı olmak konumlandırmadır; gelir modeli ayrı bir karardır. İkisi çelişmez — komisyona dokunmadan da yazılım, erişim ve veriden para kazanılır.
+Ödeme isteği en düşük sürtünmeli yerden başlatılır. Emlakçıdan veya tek tek müteahhitten para almak zordur; en mantıklı ilk gelir ofis/franchise abonelikleridir, çünkü ofis hem bütçe sahibidir hem de ekip yönetimi ve havuz erişiminden somut fayda görür.
+
+Şekil 13 — Kademeli gelir modeli: önce ofis/franchise, sonra müteahhit ve veri, en son opsiyonel işlem ücreti.
+Ödeyen
+Ne için öder
+Neden öder / not
+① Ofis / Franchise
+Koltuk/ofis başı abonelik (SaaS)
+En mantıklı ilk gelir: bütçe sahibi, ekip yönetimi + havuz erişimi somut fayda
+② Müteahhit
+Proje yayını / premium tahsis / talep zekası (AI-4)
+Satış hızlanır + hangi daire ne zaman satılır içgörüsü; değer kanıtlanınca öder
+③ Emlakçı
+Freemium → içerik üretimi, öncelikli erişim
+Temel bedava (benimseme); güç özellikleri ücretli — tek başına zayıf gelir
+④ İşlem ücreti
+Satış-başı küçük pay (opsiyonel, Faz 3)
+Yalnız iz zinciri olgunlaşınca; komisyona taraf olmadan, isteğe bağlı
+Önerilen sıralama
+Faz 1-2 ana gelir: ofis/franchise aboneliği + müteahhit proje yayını. 
+Emlakçı: freemium ile büyümeyi besler, gelir değil benimseme kaynağıdır. 
+İlke korunur: komisyona dokunmayız, sözleşmeye taraf olmayız — gelir yazılım/erişim/veridir, işlem değil.
+
+20. Go-to-Market & Cold Start (İlk Kullanıcıyı “Zorla” Sokmak)
+Bu bir ürün problemi değil, dağıtım problemidir. En büyük risk mükemmel sistemi kurup kimsenin kullanmamasıdır. Network effect gerçektir ama geç gelir; kimse boş platforma gelmez. Bu yüzden ilk likidite elle ve teklifle “zorla” yaratılır — ölçek sınırlanmadan, ama doğru sırayla.
+
+Şekil 14 — İki adımlı cold-start: önce arz (concierge ile stok), sonra davetli talep (özel erişim).
+20.1 Pazara giriş sırası ve Topli faktörü
+Önemli olan ne kadar küçük başladığın değil, hangi sırayla yoğunlaştığındır. Tek metrik likiditedir: belirli bir pazarda arz ve talep aynı anda kritik kütleye ulaşmadan ağ çalışmaz. Bu yüzden coğrafi olarak kendini sınırlamak değil, seçtiğin pazarda yoğunluk yaratmak gerekir — havuz dolu hissettirmeli ki emlakçı için “tek ekranda her şey” değeri gerçek olsun. Aynı oyun kitabı paralel pazarlara kopyalanabilir; multi-tenant mimari (Bölüm 5) bunu baştan mümkün kılar.
+Rekabet açısından en yakın gerçek oyuncu Topli'dir (geliştirici↔danışman açık pazaryeri, başarı-temelli; Kasım 2025'te Türkiye'de). Onunla aynı sahada kafa kafaya yarışmak yerine, yoğunluk kurarak ve modeli kanıtlayarak ilerlemek daha güçlüdür. Açık pazaryeri bu alanda büyüse bile, bizim elimizde üretici-kontrollü granüler tahsis, hizmet edilmeyen küçük üretici (Ü2) ve birikmiş işlem verisi olur — açık modelin yapısal olarak veremeyeceği savunma (bkz. Bölüm 22). Avantaj coğrafi sınır değil, kontrol + segment + veri yerçekimidir.
+20.2 İlk müşteri — somut cold-start script
+Hedef
+Teklif (sürtünmeyi sıfırla)
+Neden kabul eder
+1. Müteahhit
+“Stoğunu BİZ gireriz, ÜCRETSİZ; ilk satış garantisi”
+Sıfır emek, sıfır risk; satış gelirse kalır
+1. Emlakçı
+“Herkesten ÖNCE proje, ÖZEL/davetli erişim”
+Rakibinden önce davranma = komisyon avantajı
+Cold-start ilkeleri
+Davetli sistem: herkese açık değil; kıtlık ve ayrıcalık benimsemeyi hızlandırır.
+Exclusive data: yalnız platformda olan projeler, emlakçıyı içeri çeken kanca.
+Tek metrik: ilk 90 günde takip edilecek tek şey ortalama stok güncelleme yaşıdır; gerisi gürültü.
+21. Davranış Psikolojisi (İnsan Faktörü)
+Temel gerçek: emlakçı için bilgi güçtür, bu yüzden paylaşmaz. “Bu projede şu daire kaldı” bilgisi, emlakçının rakibine karşı avantajıdır; doğal eğilimi saklamaktır. Sistem bu eğilimi kırmadıkça, “tek havuz” fikri kâğıt üstünde kalır. Müteahhit tarafında ise korku kontrol kaybıdır (Bölüm 10 bunu çözer).
+Ürünün insan tarafındaki tasarım soruları ve cevapları:
+Davranış / korku
+Neden olur
+Ürün cevabı
+Emlakçı bilgiyi saklar
+Bilgi = rakibe karşı güç
+Saklamak avantaj olmaktan çıkar: bilgi zaten herkeste güncel; avantaj artık HIZ ve İÇERİK üretmekte. İz zinciri “ilk getiren”i koruyunca paylaşmak güvenli olur
+Emlakçı lead'i paylaşmaz
+“Müşterimi kaparlar” korkusu
+Kim-getirdi izi + (ileride) hakediş; uygun projesi olmayan emlakçı yönlendirip yine kazanır
+Müteahhit panel açmaz
+Zaman/teknoloji bariyeri
+WhatsApp + concierge: panel öğrenmeden katılım
+Müteahhit kontrol kaybından korkar
+“Projem rastgele yayılır”
+Granüler tahsis: kime, neyi, hangi şartla verdiğini seçer
+
+22. Rekabet Savunması — Üç Cephe
+Saha araştırması üç farklı tehdit gösteriyor ve her birine ayrı savunma gerekir (pazar haritası Bölüm 2.6). Topli'nin Kasım 2025'te Türkiye'ye girmesiyle “rakip yok” varsayımı geçersizdir; dürüst soru her cephe için ayrıdır.
+Cephe
+Tehdit
+Savunmamız
+Açık pazaryeri (Topli)
+Geliştirici↔danışman ağı, güncel stok, AI sunum, başarı-temelli — en yakın rakip
+Üretici-kontrollü granüler tahsis (onlar açık ağ); hizmet edilmeyen küçük üretici (Ü2) + WhatsApp/concierge; komisyona dokunmayan saf altyapı pozisyonu
+Tekil CRM (Novo/Yapısoft)
+Lead'den tapuya derin tek-merkez + kendi broker ağı; AI
+Onlar tek-tenant (çapraz-üretici ağı yok). Biz çok-müteahhitli paylaşımlı havuz; Ü1 için replace değil API entegrasyonu
+İlan portalı (Sahibinden)
+Devasa trafik; yarın B2B modül ekleyebilir
+Kontrollü dağıtım, kendi açık-ilan gelir modeliyle çelişir; veri kullanıcıdan gelir ve bayatlar — “tek doğru bilgi” garantisi veremez
+Asıl savunma — neden kopyalanamaz
+1) Model uyumsuzluğu: açık pazaryeri kontrolü, portal açıklığı, tekil CRM ise ağı yapısal olarak veremez — her biri kendi modeliyle çelişir.
+2) Veri yerçekimi: events + işlem izi Faz 1'den birikir; geçmişe dönük üretilemez (AI-4).
+3) Hizmet edilmeyen segment: küçük/geleneksel üretici (Ü2) ne Novo'yu alır ne Topli'nin odağıdır; WhatsApp+concierge ile orayı biz tutarız.
+Bir özelliği kopyalamak kolay; iş modelini + birikmiş veriyi + en zor segmentin güvenini kopyalamak zordur.
+22.1 Güncel rakip manzarası — Türkiye'de ilk değiliz
+Saha taraması (8 oyuncu) net bir gerçeği gösterdi: kategori küresel olarak olgun ve Türkiye'de zaten yakın oyuncular var. Tapuva (İstanbul) modeli neredeyse birebir (geliştirici↔emlakçı B2B, kart üstünde komisyon, AI satış koçu, ücretsiz araçlar; ücretsiz/komisyon modeli, erken). EDAP (Ankara) belge-doğrulama merkezli (üyelik kademeli ₺0–15k); Ankara'da olması cold-start sahamızla çakışır. Global tarafta DomusHub (off-plan Sales OS, Türkçe dahil, $250–500/ay) olgun bir referans. Fark “fikir” değil; üretici-kontrolü + WhatsApp/concierge ile Ü2 + güven protokolü + Ankara saha derinliği.
+Rakiplerden disiplinle alınacaklar (kapsam şişirmeden)
+Al (çekirdeği güçlendirir): belge-doğrulanmış proje rozeti (EDAP), public proje microsite + paylaşım analitiği (DomusHub), otomatik eşleştirme-bildirimi (Tapuva), proje zaman çizelgesi/iskan, komisyonu eşik+hakediş defterine genişletme, ücretsiz hesap araçları (ayrı SEO mikrosite).
+Faz 2: interactive offer, AI satış koçu, buyer portal + inşaat takibi, EOI, smart booking, dinamik fiyat (kat katsayısı).
+Almayız (bizi planımızdan çıkarır): 3D/immersive stüdyo motoru, tam CRM/ERP, online ödeme/escrow + otomatik sözleşme, fuar araçları. Test: çekirdeği mi güçlendiriyor, yoksa beni Sales OS/CRM/3D stüdyo mu yapıyor? Detay: rakip-öğrenimler raporu.
+23. Büyüme Mekanizmaları (Ürüne Gömülü)
+Büyüme, ayrı bir pazarlama bütçesi yerine ürünün doğal kullanımından doğmalıdır. Her paylaşım, sistemi yaymalı; her satış, yeni kullanıcı çağırmalı.
+	•	Watermark'lı paylaşım: emlakçının ürettiği her görsel/ilan, ince bir platform imzası taşır — müşteri ve diğer emlakçılar kaynağı görür, organik merak yaratır.
+	•	Link-tracking viral yayılım: imzalı paylaşım linkleri zaten iz için var; aynı altyapı, paylaşımın nereye kadar yayıldığını gösterir ve viral katsayıyı ölçülebilir kılar.
+	•	Referans sistemi: emlakçı emlakçıyı, müteahhit müteahhiti davet ettiğinde her iki tarafa avantaj (öncelikli erişim / ücretsiz dönem).
+	•	Exclusive data kancası: yalnız platformda bulunan projeler, davetli emlakçıyı içeride tutar ve dışarıdakini çeker.
+	•	Satış-anlatı döngüsü: bir satış gerçekleşince müteahhit çevresine anlatır → yeni müteahhit → daha zengin havuz → daha çok emlakçı (Şekil 14'teki geri besleme).
+24. Vizyon & Büyük Resim
+Bugünkü ürün bir başlangıç noktasıdır, son durak değil. Canlı stok dağıtım ağı, zamanla Türkiye'nin yeni konut arz-talep verisinin altyapısına dönüşebilir. Bu, hem daha büyük bir vizyon hem de exit/değerleme hikâyesidir.
+
+Şekil 15 — Vizyon merdiveni: dağıtım ağı → veri altyapısı → fiyat/talep endeksi → yatırım platformu.
+Aşama
+Ne
+Neyi mümkün kılar
+Bugün
+Canlı stok dağıtım ağı
+Tek doğru bilgi; satış hızı
++12 ay
+Proje veri altyapısı
+Arz + talep izinin tek yerde toplanması
++24 ay
+Fiyat & talep endeksi
+Gerçek işlem verisinden piyasa göstergesi (kimsenin elinde yok)
++36 ay
+Yatırım platformu
+Veri → karar → sermaye yönlendirme
+
+25. Kaçınılmazlık Katmanı — İyi Üründen Vazgeçilmez Ürüne
+Dürüst değerlendirme: fikir güçlü ama otomatik kazanan değildir. Execution doğruysa çok büyük olur, yanlışsa kimse kullanmaz. Bu işin kaderi bir özellik değil, momentum ve alışkanlıktır — çünkü aslında insanların çalışma şeklini değiştiriyoruz. Bu yüzden hedef “bilgi daha doğru” olmaktan çıkıp şu olmalı: 
+Konum değişimi
+Bugünkü hâl: “iyi çalışan bir sistem.” Olması gereken: “bu sistemde değilsen satış kaçırırsın.” Kaçınılmazlık, doğruluktan değil; özel stok, talep, veri ve kilitlenmeden gelir.
+25.1 Dürüst yatırımcı skorkartı
+Boyut
+Skor
+Not
+Problem gücü
+9/10
+Yanlış fiyat / çift satış / dağınıklık — her gün yaşanan kriz (hair-on-fire)
+Çözüm doğruluğu
+8/10
+CRM ve portal arası boşluk; doğru wedge
+Pazar büyüklüğü
+9/10
+Winner-takes-most potansiyeli
+Execution zorluğu
+9/10 (zor)
+Davranış değişimi + güven + cold start
+Başarı ihtimali
+6.5/10
+Default başarılı değil; execution belirler
+Uçar: ilk üreticiler girer ve gerçekten aktif kullanır → emlakçı “burada proje var” diye gelir → veri ve alışkanlık oluşur → çıkması zorlaşır. Ölür: üretici girer ama güncellemez → veri bayatlar → emlakçı güvenmez → biter. En kritik cümle: üretici sistemden çıkamaz hâle gelirse, bu iş unicorn olur.
+25.2 Beş kaçınılmazlık kaldıracı
+Ürünü “sistem”den “zorunluluk”a çeviren, çekirdeğin üstüne eklenecek beş kaldıraç:
+Kaldıraç
+Ne
+Sonuç
+① Özel Stok
+Üretici “bu daireler yalnızca platformda” diyebilir (exclusive inventory)
+Emlakçı: “buraya girmek zorundayım”
+② Lead Engine
+Platform talebi kendi üretir: landing + reklam + yabancı/yatırımcı lead'i → içerideki emlakçıya dağıt
+Üretici ve emlakçı: “müşteri geliyor” → platform para makinesi
+③ Fiyat/Talep Zekası
+Hangi tip/kat/fiyat hızlı satıyor (AI-4)
+Üretici: “bu bana para kazandırıyor”
+④ Paylaşım = Kazanç
+Her paylaşım izlenir; getiren kazanır; ilk paylaşan avantajlı
+Bilgi-saklama kırılır → viral paylaşım
+⑤ Lock-in
+Tüm satış geçmişi + müşteri + performans + tahsilat burada
+Çıkarsa her şeyi kaybeder → kilitlenme
+En büyük içgörü — bu bir yazılım işi değil
+Asıl kurulan şey “kim neyi, hangi şartla satabilir” ağ-kontrol sistemidir. Bu bir özellik değil; güç, para akışı ve kontrol noktasıdır. Yazılım sadece bunu mümkün kılan araçtır.
+25.3 Büyük vizyon genişlemesi — finansal katman
+Doğru yapılırsa ürün sadece bir platform olmaz; gayrimenkulün “Bloomberg”ine dönüşür: gerçek işlem verisinden fiyat endeksi, arz-talep zekası, yatırım içgörüsü. Üstüne bir finansal katman oturur — kredi eşleştirme, yatırım, fractional ownership (kısmi mülkiyet). Burası unicorn bölgesidir ve veri yerçekimi olmadan kurulamaz; bu yüzden iz/veri Faz 1'den toplanır.
+Yakın-vadeli genişleme ekseni — yurtdışı projeler (Faz 2)
+Türklerin yurtdışı konut yatırımı hızla büyüyor (2022 ~0,7 → 2023 ~2,1 milyar $, +%173). En çok satılan rotalar: Dubai, Yunanistan, ABD/Miami, KKTC, İspanya. Bu projeleri Türkiye'de master acenteler alıp alt-emlakçılara dağıtıyor — yani aynı üretici→tahsis→emlakçı modeli. Yurtdışı bilgi daha da dağınık/eski olduğundan “tek doğru bilgi” değeri orada daha yüksek. Veri modeli ülke/döviz/getiri/oturum alanlarına baştan hazır; MVP'yi yurt içiyle kanıtlayıp bu ekseni Faz 2'de açmak doğal büyüme yoludur.
+Yeni pitch (tek paragraf)
+“Müteahhitler satışlarını kontrol edemez, emlakçılar doğru bilgiye ulaşamaz. Biz, projelerin tek doğru kaynaktan yönetildiği ve satışın kontrol edildiği altyapıyı kuruyoruz. Bu sistemde olmayan satış kaybeder.”
+
+26. Saha Derinliği — Müteahhit ve Emlakçı Zihni
+İkinci bir derin değerlendirme, konseptin “kağıt üstünde” güçlü olduğunu ama sahada kazanmayı belirleyecek şeyin ürün değil davranış kırma stratejisi olduğunu netleştirdi. En kritik düzeltme bir konum sorusudur (Bölüm 26.3). Aşağıdaki dertler ve “killer” çözümler bu değerlendirmeden süzüldü.
+26.1 Müteahhit zihni — gerçek öncelik: kontrol + nakit akışı
+Müteahhitin gerçek cümlesi: “Benim problemim stok değil; kontrol ve nakit akışı.” Öncelik sırası: (1) nakit ne zaman geliyor, (2) hangi daire hızlı gider, (3) kim bana gerçekten müşteri getiriyor, (4) kim fiyatı bozuyor. Onu satın aldıracak şey “stok doğru olsun” değil, “daha hızlı ve daha pahalı satmamı sağla.”
+Killer çözüm
+Ne yapar
+Neden satın aldırır
+Fiyat Sapma Alarmı
+Aynı daire farklı danışmanlarca farklı fiyatla pazarlanıyorsa uyarır
+Kaybedilen kontrolü geri verir — bunu yapan yok
+Satış Hızı Paneli
+“Bu tip daire 17 günde satılıyor; bu fiyat bandı yavaş”
+Sezgiden dataya; müteahhit para kazanır → öder
+Emlakçı Skor Sistemi
+Kim lead getirdi / kim kapattı / kim boş müşteri getirdi
+İyi emlakçıya daha çok stok, kötüye kesinti = güç merkezi
+Tahsilat Radar
+Kim ödeme geciktirdi, hangi müşteri riskli
+Nakit akışı görünür — müteahhit için altın
+Satılabilirlik Skoru (AI)
+Kat/cephe/fiyat/geçmişe göre daireye skor: “zor gider → fiyatı düzelt”
+Kör satışı bitirir
+26.2 Emlakçı zihni — gerçek değer: müşteri + hız
+Emlakçının gerçek cümlesi: “Benim işim bilgi değil; müşteri ve hız.” En büyük acı müşteri bulmak (ilan siteleri pahalı, sosyal medya yorucu), sonra aynı müşteriye 10 kişinin teklif vermesi ve “satışa yaklaşırken stoğun gitmesi.” Onu içeri sokan şey stok görmek değil, “bu platform bana müşteri kazandırıyor.”
+	•	Lead Engine (en kritik): platform müşteri üretir ve dağıtır — “sana 5 sıcak lead verdim.” Bağımlılık asıl burada doğar.
+	•	Opsiyon/ilk-paylaşan avantajı: ilk paylaşan 48 saat öncelik → rekabet ve motivasyon.
+	•	“Kazanma ihtimali” skoru: müşteri-daire eşleşmesi → “bunu satma ihtimalim %70.”
+	•	1-tık satış kiti: WhatsApp + story + ilan metni (zaten çözüldü).
+	•	Mini CRM ama BASİT: müşteri notu + hatırlatma yeter; derine girme, kullanmazlar.
+26.3 Konum evrimi — kazandıran cümle
+En kritik stratejik düzeltme
+Mevcut konum: “tek doğru bilgi.” Bu çekirdek değer ve giriş kapısıdır — ama kazandıran konum değildir. Kazandıran konum: “en hızlı satış yapılan ağ.” Ve işin kaderini belirleyen tek soru: 
+“Platform müşteri getiriyor mu?” Getirirse herkes gelir; getirmezse en iyi ürün bile ölür.
+Sonuç: Lead Engine bir “kaçınılmazlık kaldıracı” (Bölüm 25.2) olmaktan çıkıp yol haritasının merkezine yaklaşmalıdır — başlangıçta basit bir lead dağıtımı bile çarpan etkisi yaratır.
+26.4 Cold start — rafine hamle
+Önce müteahhit — ama doğru sebeple: “stok lazım” değil, “özel stok lazım.” İlk kırılma hamlesi bir kapalı satış ağı: 3 müteahhit + 20 iyi emlakçı, ve bu stok başka hiçbir yerde yok.
+Taraf
+Teklif
+Emlakçıya
+“Sana özel stok + müşteri (lead) vereceğim.”
+Müteahhite
+“Sana en iyi 20 emlakçıyı getiriyorum + kontrol tamamen sende.”
+26.5 MVP netleştirme — tut / kes / çarpan
+Tut (çekirdek): stok + fiyat (tek doğru), tahsis, opsiyon kilidi, paylaşım (WhatsApp), basit lead takibi.
+Kes (MVP'den çıkar): ileri AI özellikleri, kompleks tahsilat/senet, derin CRM. (Bölüm 26.1'deki killer özellikler değerlidir ama MVP sonrasıdır; veri olgunlaşınca güçlenir.)
+Çarpan (eklenirse fark yaratır): temel lead dağıtımı — MVP'ye sığacak en küçük Lead Engine. Bu, “bilgi platformu”ndan “müşteri getiren ağ”a geçişin ilk adımıdır.
+Saha değerlendirmesinin özeti
+Güçlü: problem gerçek, çözüm mantıklı, farklılaşma net. 
+Zayıf: “nice-to-have”a kayma riski, davranış değişimi zorluğu, lead üretmeden büyümenin zorluğu. 
+Karar: kaderi belirleyen tek şey — platform müşteri getiriyor mu?
+
+27. Güven Protokolü — Somut Mekanizmalar (3. Tur)
+İki ek saha değerlendirmesi, en güçlü çerçeveyi netleştirdi: bu bir emlak yazılımı değil, gayrimenkul sektörünün güven protokolüdür. Aşağıdakiler bu protokolü kuran, build'e hazır somut mekanizmalardır.
+27.1 “Emlakçı terörü” ve marka değeri — Syndication Engine
+Müteahhitin gerçek yarası: projeyi 20 emlakçıya açıyor, ertesi gün portalda aynı daire 20 farklı fiyatla, kötü fotoğrafla, “Müteahhitten Acil” başlığıyla — prestijli proje pazar tezgâhına dönüyor. Çözüm bir ilan portalı değil, bir içerik ve fiyat dağıtım merkezi (syndication): müteahhit %10 zam yaptığı an tüm emlakçıların PWA'sında fiyat saniyeler içinde güncellenir ve eski fiyatın üstüne kırmızı çizgi çekilir. Emlakçı yalnızca onaylı/markalı materyali paylaşır — çöp başlık ve bozuk görsel dolaşıma giremez.
+27.2 Kat karşılığı derinleştirme — arsa sahibi salt-okunur erişim
+Yeni rol
+Arsa sahibi kendi WhatsApp'ından yalnızca kendi paylarının durumunu görür (hangi daire satıldı/opsiyonlu) — ama müteahhitin dairelerinin fiyatını veya tahsisini değiştiremez. Sahiplik matrisi (Arsa Sahibi Payı / Müteahhit Payı) panelde net kırılır. Bu, kat karşılığı kaosunu ve ortak-mülkiyet anlaşmazlığını bitirir.
+27.3 Emlakçının can damarı — “İlk Bayrağı Ben Diktim” (Lead Protection)
+Emlakçının en büyük korkusu emek hırsızlığı: müşteriyi showroom'a götürür, müteahhitin temsilcisi arkadan arayıp “araya emlakçıyı sokma, indirim yapayım” der. Çözüm bir lead koruma protokolü: emlakçı kendi markasıyla sunum linkini paylaştığı an, sistem o müşterinin telefon numarasını (ilk haneleriyle) emlakçıya eşler. Müşteri showroom'a tek başına gitse bile, müteahhit numarayı girince “Bu lead'i X emlakçı getirdi” uyarısı çıkar. Bu, hem “müşteri çalma” korkusunu bitirir hem de emlakçının platforma sadakatini (lock-in) en güçlü şekilde sağlar.
+27.4 Tazelik Sigortası (Stale-Data Fuse)
+Ölüm döngüsü: emlakçı bir kez eski fiyat görürse platformu bir daha açmaz. Sigorta: bir projede 15 gün hareket olmazsa (güncelleme/opsiyon/teyit yok), sistem müteahhite WhatsApp botuyla “A Blok No:5 hâlâ 4.5M TL mi? [Evet]/[Hayır]” sorar. Cevap yoksa emlakçı ekranındaki yeşil “Canlı” rozeti sarıya döner ve “Son teyit 15 gün önce — satıcıdan teyit isteyin” uyarısı basılır. Dürüstlük, platformun güvenilirliğini kurtarır.
+27.5 2-dokunuş paylaşım (Paylaşım Stüdyosu UX)
+Sahadaki emlakçının sadece iki dokunuşu olmalı: Projeyi Seç → WhatsApp'ta Paylaş. Sistem arka planda emlakçının logosunu/telefonunu görsel/PDF üzerine basar, kişiselleştirilmiş landing linkiyle gönderir (lead o emlakçıya bağlı — Bölüm 27.3). Sahada PDF arama, çözünürlük derdi biter.
+27.6 Cold start — butik müteahhitle başla
+Büyük müteahhit kaprislidir; ilk hamleyi orta/küçük (butik) müteahhitle yap. Teklif: “Sana yazılım satmıyoruz; dağınık emlakçı ağını hizaya sokacak ücretsiz bir asistanlık (concierge) veriyoruz. Sen veriyi WhatsApp'tan at, gerisini sistem halletsin.” Arzı içeri kilitlediğin an emlakçı “özel stok” kokusunu alıp kendi gelir.
+27.7 Uyum & maliyet — KVKK ve WhatsApp API
+Konu
+Kritik not
+KVKK
+Lead/müşteri verisi: açık rıza + aydınlatma + veri saklama politikası; yurt dışı sunucu/aktarımda ek şart; veri sorumlusu/işleyen ilişkisi (müteahhit↔platform) sözleşmeyle netleşmeli.
+WhatsApp Cloud API
+Konuşma/şablon-başı ücret → hacim arttıkça maliyet; onaylı şablon mesaj zorunluluğu; spam algısı → hesap kısıtı riski. Maliyet gelir modeline (abonelik) yansıtılmalı, BSP→Cloud API geçişi planlanmalı.
+Ek saha pain'leri
+Emlakçı: artan dolandırıcılıkla müşteri güvenini kazanma zorlaşıyor → şeffaf/doğrulanmış stok bunu onarır. Davranış değişimi için hafif gamification (rozet/sıralama) ve anında görünür fayda.
+27.8 MVP'yi yalın tut (üç değerlendirmenin ortak kararı)
+Erken kapsamda kalsın: stok+fiyat (tek doğru), granüler tahsis, opsiyon kilidi, WhatsApp paylaşım + 2-dokunuş, Lead Protection (temel), Tazelik Sigortası, basit lead takibi/dağıtımı, arsa sahibi salt-okunur.
+MVP sonrası: Paylaşım Stüdyosu (premium), kat karşılığı detaylı pay-raporu, ileri finansal (döviz/şerefiye motoru), fiyat/talep zekası, Bölüm 26.1'deki ileri “killer” paneller (fiyat sapma alarmı, emlakçı skoru, tahsilat radar, satılabilirlik skoru). Bunlar veri olgunlaşınca güçlenir.
+Konum cümlesi (kalıcı)
+“ProjePazar bir emlak yazılımı değil; gayrimenkul sektörünün güven protokolüdür. Bu sistemde olmayan satış kaybeder.”
+
+28. Yürütme Dokunuşları — Vibecoding Öncesi Son Tur
+Dördüncü değerlendirme, mimariyi kodlamaya geçmeden önce yürütme riskini azaltacak beş somut kararı netleştirdi. Bu bölüm doğrudan devir paketine (build girdisi) beslenir.
+28.1 Arsa sahibi = Truva Atı (viral büyüme kaldıracı)
+Salt-okunur erişim (Bölüm 27.2) yetmez; arsa sahibini büyüme kaldıracına çevir. Ankara'da arsa sahibi genelde yaşça büyük, “müteahhit benim dairelerimi arkamdan ucuza mı eritiyor?” şüphesiyle yaşar. Pay Bildirimi: müteahhit bir daireyi sattığında/opsiyonladığında arsa sahibine otomatik WhatsApp gider — “Sayın Ahmet Yılmaz, hak sahipliğiniz olan 12 no'lu daire X Ofis tarafından 5.2M TL'ye opsiyonlandı.” Bu şeffaflığı gören arsa sahibi bir sonraki arsasını yine bu sistemi kullanan müteahhide verir → platform, müteahhit için arsa bulma aşamasında bir güven-satışı kancası olur.
+28.2 Topli defansı — “Mülkiyet ve Hak Koruma”
+Emlakçı pragmatiktir: “bana kim müşteri/portföy getirirse oradayım.” Topli açık pazaryeridir; emlakçı portföyü ve daireyi herkese açık gördüğü için sürekli by-pass edilme korkusu yaşar. GTM vurgumuz “mülkiyet ve hak koruma” olmalı ve Lead Protection (Bölüm 27.3) pazarlamanın en önüne çıkmalı: ProjePazar'da müşteri sisteme işlendiği an emlakçı hukuki bir zırh kuşanır.
+Topli (açık pazaryeri)
+ProjePazar (güven protokolü)
+“Herkes herkese satsın; başarırsan komisyondan pay alırım.”
+“Müteahhit kime yetki verirse o satsın; komisyona dokunmam, fiyatı ve müşteriyi kilitlerim.”
+28.3 WhatsApp maliyet — Hibrit bot tasarımı
+Kritik teknik karar (maliyet sigortası)
+Emlakçı paylaşımı = sıfır maliyet: 2-dokunuş paylaşımda Meta üzerinden yeni session açma; emlakçının PWA'sındaki paylaş butonu telefonun yerel WhatsApp'ını deep-link ile tetikler (whatsapp://send?text=…). İlk sunum linki emlakçının kendi telefonundan, ücretsiz gider.
+Cloud API yalnız kritik teyit: ücretli Cloud API + şablon mesaj sadece müteahhitin stok teyitleri (Tazelik Sigortası, Bölüm 27.4) için kullanılır. Müteahhit zaten abonelik/yayın ücreti ödediğinden bu maliyet orada absorbe edilir. Ölçekte marjı koruyan tasarım budur.
+28.4 MVP radikal kesinti + Lead Engine V0.1 (çarpan)
+Kes (Faz 2'ye ötele): (a) detaylı ödeme planı üreteci (döviz/senet motoru) — müteahhit ödeme planını text veya PDF eki olarak koysun yeter; (b) arsa sahibi paneli — ilk 50 müteahhiti test ederken rol yönetimini karmaşıklaştırma.
+MVP'de kalması ZORUNLU çarpan — Lead Engine V0.1
+Proje detay linkinin altında bir form: “Bu projeyle ilgileniyorum, uzman danışmanın beni aramasını istiyorum.” Form dolduğu an, linki paylaşan emlakçının paneline “Sıcak Lead” olarak düşer. Dışarıdan gelen jenerik lead'ler ise havuzdaki aktif ve ilan güncelliği yüksek emlakçılara algoritmayla/sırayla dağıtılır. Bu, “platform müşteri getiriyor mu?” sorusuna ilk EVET'i verir ve emlakçıyı platforma bağlar.
+28.5 İlk 90 gün — operasyonel cold-start script (Ankara)
+Hedef akslar: Çankaya, İncek, Çayyolu (butik/lüks konut yoğun). Sahadaki diyalog tam şu netlikte olmalı:
+Müteahhit (Ü2) script'i
+“Ahmet Bey, projenizdeki daireler Sahibinden'de 5 farklı emlakçı tarafından 5 farklı fiyatla girilmiş — bu marka değerinizi düşürüyor. Size panel satmıyoruz. Projenizin güncel Excel'ini verin, sisteme yükleyelim. Güvendiğiniz 10 emlakçıya telefondan açalım; siz fiyatı güncellediğiniz an onların ekranı anında değişsin, yanlış fiyatla ilan girmelerini sistem engellesin. Tamamen ücretsiz, kontrol sizde.”
+Emlakçı (E1/E2) script'i
+“Mehmet Bey, X Müteahhitlik'in İncek projesindeki canlı, fiyat-korumalı tek yetkili havuz bu uygulamada. Proje sahibinin anlık onayladığı daireler burada. Müşterine buradan sunum linki attığında, o müşteri showroom'a tek başına gitse bile sistem ‘Bu müşteriyi Mehmet Bey getirdi’ diye kilitler — komisyonun uçmaz. Üstelik görseli ve ilan metnini sistem senin adına tek tıkla üretir.”
+28.6 Operasyonel notlar (5. tur)
+	•	Köprü-mod (aşamalı geçiş): kullanıcıyı Excel/WhatsApp'tan koparmak yerine onlarla köprü kur — kolay Excel import + WhatsApp tek-tık. Sistem mevcut iş akışının üstüne otursun, yerine değil.
+	•	WhatsApp'ı çift yönlü kullan: yalnız veri girişi değil; sorgu (“şu projede boş daireleri listele”) ve bildirim (“yeni lead geldi”) de WhatsApp'tan — ama maliyet için hibrit tasarıma (Bölüm 28.3) sadık kal.
+	•	Para dili = somut metrik: mesajlarda rakam kullan — müteahhite “çift satış riski sıfır + X gün daha hızlı satış”, emlakçıya “komisyon kaybı yok + tek-tık içerik”. Soyut “doğruluk” değil.
+	•	Değer-odaklı paketler: abonelik ofis büyüklüğü ve kullanım (proje sayısı, AI içerik limiti, gelişmiş rapor) ile orantılı esnek kademeler.
+	•	Modüler mimari + veri altyapısı: gelecekteki finansal/Bloomberg katmanı için sistem modüler kurulsun; fiyat/talep verisi baştan temiz toplansın (odağı dağıtma, ama kapıyı kapatma).
+	•	Güven inşası: erken-benimseyen programı, referans/case-study, inşaat odaları & müteahhit dernekleriyle ortaklık, ve hedef kitleyle (Ü2/E2) sürekli kullanıcı testi.
+
+29. En Kritik 5 Hamle — Kilitlenen Kararlar (Build Önceliği)
+Altı bağımsız saha değerlendirmesinin ortak vardığı sonuç. Bu beş hamle, devir paketinin MVP kapsamını ve pazarlama çekirdeğini kilitler — yoruma açık değildir.
+#
+Hamle
+Kilitlenen karar
+Kapsam
+1
+Lead Engine V0.1
+Landing + form + WhatsApp lead yakalama + manuel/sıra dağıtım (AI şart değil). “Platform müşteri getiriyor mu?” sorusuna ilk EVET.
+MVP İÇİNDE
+2
+Konum: “en hızlı satış”
+Pitch “en doğru stok”tan “en hızlı satış yapılan ağ”a. Dashboard'a: ort. satış süresi (örn. 21 gün), daire-tipi dönüşüm oranı (%).
+MVP (temel metrik)
+3
+Closed Deal Club
+3 müteahhit + 15–20 top broker + %100 exclusive stok. İlk-satış teşviki: bonus lead + ekstra görünürlük + “top closer” rozeti + leaderboard. Hedef: ilk 10 satış = momentum.
+GTM · gün-1
+4
+Fiyat Sapma Alarmı
+On-platform tek fiyat sapmayı zaten engeller (neredeyse ücretsiz, hemen). Off-platform (Sahibinden) tarama Faz 2.
+MVP-lite İÇİNDE
+5
+WhatsApp = ana yüzey
+Sadece girdi değil: çıktı (sunum gönder) + lead yakalama + opsiyon alma. “Panel kullanmadan satış.” Hibrit maliyet tasarımına sadık (B.28.3).
+MVP İÇİNDE
+İki pazarlama çekirdeği (erkene çek)
+Opsiyon kilidi = mesaj: “Bu sistemde çift satış olmaz; opsiyon = gerçek rezervasyon.” Güveni ve benimsemeyi hızlandıran en görünür vaat.
+Paylaş = kazanç (erken + leaderboard): ilk paylaşan 48s öncelik + satış olunca görünür kredi + sıralama. Bilgi-saklama davranışını kırar, viral döngü kurar.
+
+30. Ürün Tanım Derinliği — Birim, İşlem, Komisyon, Opsiyon
+Gerçek projeler tek-tip daire değildir. Üretici her birimi net tanımlamalı; sistem segment, işlem tipi, satılabilirlik, tapu, komisyon ve opsiyon yöntemini ayrı ayrı taşımalı. Bu bölüm bu tanım derinliğini kilitler (veri modeli Bölüm 13 + devir paketi).
+30.1 Segment & işlem tipi
+Üretici her birimi tek tek tanımlar; ticari/ofis/villa daireden ayrı ele alınır ve farklı emlakçıya tahsis edilebilir (tahsis kapsamına “tür” filtresi).
+Boyut
+Değerler
+Segment / tür
+daire · ofis · dükkan · villa · depo · otopark
+İşlem tipi
+satılık · kiralık · satılık+kiralık · pay satışı (ticari) · satışa kapalı
+Kiralık/ticari
+kira bedeli + kira şartları (süre, depozito, artış); bazı ticari alanlar yalnız kiralık olabilir
+30.2 Üç net satış durumu (kat karşılığı kritik)
+Durum
+Anlamı
+Satılabilir
+Üretici satabilir; normal akış.
+Planlı (kapalı→açılır)
+Şu an satışta değil; “satışa açılış tarihi” gelince cron otomatik açar. Kademeli açılım.
+Kalıcı satılamaz
+Arsa sahibi payı / mal sahibi birimi → üretici satamaz. Havuzda görünebilir ama satışa kapalı. (sahiplik='arsa', satilabilir=false)
+Net ayrım şart
+Kat karşılığı projelerde satılamayan stok (arsa payı) ile geçici satışa-kapalı / planlı birbirine karıştırılmamalı. Ayrıca her birimde tapu durumu (kat irtifakı / kat mülkiyeti / arsa tapusu / koçan; KKTC için Türk koçanı) gösterilir.
+30.3 Komisyon görünürlüğü
+Emlakçının o satıştan ne kazanacağını görmesi benimseme için kritiktir. Üretici her projeye/tahsise komisyon tanımlar: % oran veya sabit TL (projeye göre değişir). Emlakçı havuzda/detayda kendi kazancını görür; başka emlakçının komisyonunu görmez (RLS).
+30.4 Dinamik / otomatik fiyatlama (Faz 2)
+Fiyat listesi farklı durumlara göre otomatik güncellenebilir: tarih tetikli (kademeli zam takvimi), satış-adedi tetikli (her N satışta %x zam), doluluk tetikli. Her güncellemede son_guncelleme yenilenir; tazelik korunur. (fiyat_kurali tablosu, Faz 2.)
+30.5 Opsiyon yöntemi — doğrudan / talep + kod (Faz 2)
+Üretici-kontrolünü güçlendiren mekanizma
+Doğrudan (MVP): emlakçı uygun birime doğrudan opsiyon alır (DB kilidi).
+Talep + kod (Faz 2): opsiyon rastgele değil — emlakçı talep eder, üretici onaylayıp bir kod verir; emlakçı kodu girince birim süreli opsiyonlanır. Üretici ile emlakçı arasındaki “telefonla opsiyon isteme”yi resmî, izlenebilir, kontrollü hale getirir. Yöntem proje bazında seçilir.
+İlke
+Her şey üreticide tanımlanır. Emlakçı yalnızca kendine tahsisli + satılabilir + komisyonu görünür birimleri satar. Üretici neyi, kimin, hangi şartla, hangi fiyatla, hangi tarihte satabileceğini tek noktadan belirler — bu, ürünün kontrol ve güven moat'ının özüdür.
+
+Sonuç
+Konsept stratejik olarak tutarlı ve teknik olarak gerçekçidir; bu sürümde gelir modeli, go-to-market, davranış psikolojisi, rekabet savunması ve vizyon eklenerek “ürün tutar mı?” sorusunun dağıtım tarafı da kapatıldı. Çekirdek tez değişmedi: 
+havuzu kritik kütleye getirip stok tazeliğini sürekli yüksek tutmak. 
+Ama asıl risk teknik değil dağıtımsaldır — mükemmel sistemi kurup kimsenin kullanmaması. Başarı anahtarı ilk 50 kullanıcıyı elle, teklifle ve davetle “zorla” içeri sokmaktır; gerisi ürünün kendisi tarafından getirilir.
