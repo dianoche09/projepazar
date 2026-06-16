@@ -5,7 +5,11 @@ import { usePathname } from "next/navigation";
 
 const NAV = [
   { href: "/admin", etiket: "Genel Bakış" },
+  { href: "/admin/onay", etiket: "Onay Kuyruğu" },
   { href: "/admin/kullanicilar", etiket: "Kullanıcılar" },
+  { href: "/admin/ureticiler", etiket: "Üreticiler" },
+  { href: "/admin/ofisler", etiket: "Ofisler" },
+  { href: "/admin/uyelik", etiket: "Üyelik" },
 ];
 
 export function AdminNav() {
