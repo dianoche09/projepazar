@@ -171,4 +171,36 @@ export async function hesapDurumDegistir(formData: FormData) {
     .update({ durum: parsed.data.durum })
     .eq("id", parsed.data.kullanici_id);
   revalidatePath("/admin");
+  revalidatePath("/admin/kullanicilar");
+}
+
+// ── Kullanıcı düzenleme (rol + ofis + durum tek formda) ──
+const KullaniciSchema = z.object({
+  kullanici_id: z.string().uuid(),
+  rol: z.enum(["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi", "admin"]),
+  ofis_id: z.union([z.string().uuid(), z.literal("")]),
+  durum: z.enum(["onay_bekliyor", "aktif", "pasif", "askida", "arsivli"]),
+});
+
+/** Kullanıcıyı düzenle (rol/ofis/durum) — admin user yönetimi. */
+export async function kullaniciGuncelle(formData: FormData) {
+  const parsed = KullaniciSchema.safeParse({
+    kullanici_id: formData.get("kullanici_id"),
+    rol: formData.get("rol"),
+    ofis_id: formData.get("ofis_id") ?? "",
+    durum: formData.get("durum"),
+  });
+  if (!parsed.success) return;
+
+  const supabase = await createClient();
+  await supabase
+    .from("profiles")
+    .update({
+      rol: parsed.data.rol,
+      ofis_id: parsed.data.ofis_id || null,
+      durum: parsed.data.durum,
+    })
+    .eq("id", parsed.data.kullanici_id);
+  revalidatePath("/admin/kullanicilar");
+  revalidatePath("/admin");
 }

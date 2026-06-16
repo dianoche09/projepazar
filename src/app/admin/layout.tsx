@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { cikisYap } from "@/app/(auth)/login/actions";
 import { GridMark } from "@/components/GridMark";
+import { AdminNav } from "./AdminNav";
 
 /** Admin alanı — yalnız 'admin' (BİZ/platform işletmecisi). Üretici/emlakçı giremez. */
 export default async function AdminLayout({
@@ -45,6 +46,7 @@ export default async function AdminLayout({
             </form>
           </div>
         </div>
+        <AdminNav />
       </header>
       <main className="flex-1 bg-paper">{children}</main>
     </div>

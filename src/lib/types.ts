@@ -123,6 +123,25 @@ export const ABONELIK_DURUM_ETIKET: Record<AbonelikDurum, string> = {
   iptal: "İptal",
 };
 
+// ── Hesap yaşam döngüsü (kayıt → onay → aktif → arşiv) ──
+export type HesapDurum = "onay_bekliyor" | "aktif" | "pasif" | "askida" | "arsivli";
+
+export const HESAP_DURUM_ETIKET: Record<HesapDurum, string> = {
+  onay_bekliyor: "Onay bekliyor",
+  aktif: "Aktif",
+  pasif: "Pasif",
+  askida: "Askıda",
+  arsivli: "Arşivli",
+};
+
+export const HESAP_DURUM_ROZET: Record<HesapDurum, string> = {
+  onay_bekliyor: "bg-amber/10 text-amber",
+  aktif: "bg-green/10 text-green",
+  pasif: "bg-gray/10 text-gray",
+  askida: "bg-red/10 text-red",
+  arsivli: "bg-gray/10 text-gray",
+};
+
 /** Para birimine göre kısa biçim (1.5M ₺ / 7.500 ₺). */
 export function fmtPara(n: number, birim = "TRY"): string {
   const sembol = birim === "TRY" ? "₺" : birim === "USD" ? "$" : birim === "EUR" ? "€" : birim;
