@@ -56,9 +56,12 @@ export default async function ProjeDetay({
 
   const { data: birimler } = await supabase
     .from("birim")
-    .select("id, blok_id, kat, daire_no, durum, liste_fiyati, satilabilir")
+    .select(
+      "id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, para_birimi, satilabilir, net_m2, brut_m2, yon, manzara, serefiye, durum_notu, son_guncelleme",
+    )
     .eq("proje_id", id);
 
+  const tipMap = new Map((tipler ?? []).map((t) => [t.id, t]));
   const toplam = birimler?.length ?? 0;
 
   return (
@@ -154,18 +157,34 @@ export default async function ProjeDetay({
                       <div key={kat} className="flex items-center gap-2">
                         <span className="w-12 shrink-0 font-mono text-xs text-gray">{kat}. kat</span>
                         <div className="flex gap-1.5">
-                          {kb.map((b) => (
-                            <BirimHucre
-                              key={b.id}
-                              projeId={id}
-                              birim={{
-                                id: b.id,
-                                daire_no: b.daire_no,
-                                durum: b.durum as BirimDurum,
-                                satilabilir: b.satilabilir,
-                              }}
-                            />
-                          ))}
+                          {kb.map((b) => {
+                            const tip = b.tip_id ? tipMap.get(b.tip_id) : null;
+                            return (
+                              <BirimHucre
+                                key={b.id}
+                                projeId={id}
+                                birim={{
+                                  id: b.id,
+                                  daire_no: b.daire_no,
+                                  kat: b.kat,
+                                  durum: b.durum as BirimDurum,
+                                  satilabilir: b.satilabilir,
+                                  liste_fiyati: b.liste_fiyati,
+                                  para_birimi: b.para_birimi,
+                                  net_m2: b.net_m2,
+                                  brut_m2: b.brut_m2,
+                                  yon: b.yon,
+                                  manzara: b.manzara,
+                                  durum_notu: b.durum_notu,
+                                  son_guncelleme: b.son_guncelleme,
+                                  serefiye: b.serefiye as { kat?: number; manzara?: number } | null,
+                                  taban_fiyat: tip?.taban_fiyat ?? null,
+                                  tip_ad: tip?.ad ?? null,
+                                  oda: tip?.oda ?? null,
+                                }}
+                              />
+                            );
+                          })}
                         </div>
                       </div>
                     );
