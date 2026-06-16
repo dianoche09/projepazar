@@ -79,9 +79,16 @@ export default async function Home() {
               </>
             ) : null}
           </p>
-          <p className="text-xs text-gray">
-            Paneller (üretici kokpiti / emlakçı havuzu) PR-3 ve PR-5&apos;te gelecek.
-          </p>
+          {profil?.rol === "uretici" || profil?.rol === "admin" ? (
+            <Link
+              href="/uretici"
+              className="rounded-lg bg-teal px-5 py-2 font-medium text-white transition-colors hover:bg-ink"
+            >
+              Üretici kokpitine git →
+            </Link>
+          ) : (
+            <p className="text-xs text-gray">Emlakçı havuzu PR-5&apos;te gelecek.</p>
+          )}
           <form action={cikisYap}>
             <button className="rounded-lg border border-hair bg-card px-5 py-2 font-medium text-navy transition-colors hover:border-teal">
               Çıkış yap
