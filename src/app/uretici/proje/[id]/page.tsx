@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { blokEkle, daireTipiEkle, birimGenerator, excelImport } from "@/app/uretici/actions";
+import { blokEkle, daireTipiEkle, birimGenerator, excelImport, tahsisSil } from "@/app/uretici/actions";
+import { TahsisForm } from "./TahsisForm";
 import {
   ASAMA_ETIKET,
   zamanOnce,
@@ -61,7 +62,15 @@ export default async function ProjeDetay({
     )
     .eq("proje_id", id);
 
+  const { data: tahsisler } = await supabase
+    .from("tahsis")
+    .select("id, hedef_tip, hedef_id, kapsam, komisyon_tip, komisyon_deger, munhasir, kontenjan, fiyat_gorunur")
+    .eq("proje_id", id);
+  const { data: ofisler } = await supabase.from("ofis").select("id, ad").order("ad");
+
   const tipMap = new Map((tipler ?? []).map((t) => [t.id, t]));
+  const blokMap = new Map((bloklar ?? []).map((b) => [b.id, b.ad]));
+  const ofisMap = new Map((ofisler ?? []).map((o) => [o.id, o.ad]));
   const toplam = birimler?.length ?? 0;
 
   return (
@@ -195,6 +204,54 @@ export default async function ProjeDetay({
           );
         })}
       </div>
+
+      {/* ===== TAHSİS (MOAT) ===== */}
+      <section className="mt-12 border-t border-hair pt-8">
+        <h2 className="font-display text-lg font-semibold text-ink">Tahsis — dağıtım (MOAT)</h2>
+        <p className="mt-1 text-sm text-gray">
+          Hangi kapsam kime açık, komisyon ne. Emlakçı yalnız tahsisli + satılabilir birimi görür/satar.
+        </p>
+
+        <div className="mt-4 space-y-2">
+          {(tahsisler ?? []).map((t) => {
+            const bloklarKapsam = ((t.kapsam as { bloklar?: string[] } | null)?.bloklar ?? [])
+              .map((bid) => blokMap.get(bid) ?? "?")
+              .join(", ");
+            return (
+              <div key={t.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-hair bg-card p-3">
+                <span className="rounded-full bg-teal/10 px-2.5 py-1 text-xs font-medium text-teal">
+                  {t.hedef_tip === "herkes" ? "Herkese açık" : ofisMap.get(t.hedef_id) ?? "Ofis"}
+                </span>
+                <span className="text-sm text-gray">{bloklarKapsam || "tüm proje"}</span>
+                <span className="font-mono text-xs text-gray">
+                  {t.komisyon_tip === "yok"
+                    ? "komisyon yok"
+                    : t.komisyon_tip === "yuzde"
+                      ? `%${t.komisyon_deger}`
+                      : `${Number(t.komisyon_deger).toLocaleString("tr-TR")}₺`}
+                  {t.munhasir ? " · münhasır" : ""}
+                  {t.kontenjan ? ` · kont. ${t.kontenjan}` : ""}
+                  {!t.fiyat_gorunur ? " · fiyat gizli" : ""}
+                </span>
+                <form action={tahsisSil} className="ml-auto">
+                  <input type="hidden" name="tahsis_id" value={t.id} />
+                  <input type="hidden" name="proje_id" value={id} />
+                  <button className="rounded-lg border border-hair px-3 py-1 text-sm text-red transition-colors hover:border-red">
+                    Kaldır
+                  </button>
+                </form>
+              </div>
+            );
+          })}
+          {(tahsisler?.length ?? 0) === 0 ? (
+            <p className="text-sm text-gray">Henüz tahsis yok — kimse göremez. Aşağıdan ekle.</p>
+          ) : null}
+        </div>
+
+        <div className="mt-4">
+          <TahsisForm projeId={id} bloklar={bloklar ?? []} ofisler={ofisler ?? []} />
+        </div>
+      </section>
 
       {/* ===== STOK YÖNETİMİ ===== */}
       <section className="mt-12 border-t border-hair pt-8">

@@ -251,3 +251,64 @@ export async function excelImport(formData: FormData) {
     `/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(`${birimler.length} birim eklendi${atlanan ? `, ${atlanan} satır atlandı` : ""}`)}`,
   );
 }
+
+// ── Tahsis (MOAT — granüler dağıtım: kim hangi kapsamı görür/satar) ──
+const tahsisSemasi = z.object({
+  proje_id: z.string().uuid(),
+  hedef_tip: z.enum(["herkes", "ofis"]),
+  hedef_id: z.union([z.string().uuid(), z.literal("")]),
+  komisyon_tip: z.enum(["yuzde", "sabit", "yok"]),
+  komisyon_deger: z.coerce.number().nonnegative().nullable(),
+  munhasir: z.boolean(),
+  kontenjan: z.coerce.number().int().positive().nullable(),
+  fiyat_gorunur: z.boolean(),
+});
+
+export async function tahsisEkle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const komRaw = String(formData.get("komisyon_deger") ?? "").trim();
+  const kotRaw = String(formData.get("kontenjan") ?? "").trim();
+  const parsed = tahsisSemasi.safeParse({
+    proje_id: formData.get("proje_id"),
+    hedef_tip: formData.get("hedef_tip"),
+    hedef_id: formData.get("hedef_id") ?? "",
+    komisyon_tip: formData.get("komisyon_tip") ?? "yuzde",
+    komisyon_deger: komRaw === "" ? null : komRaw,
+    munhasir: formData.get("munhasir") === "on",
+    kontenjan: kotRaw === "" ? null : kotRaw,
+    fiyat_gorunur: formData.get("fiyat_gorunur") === "on",
+  });
+  if (!parsed.success) hataya(`/uretici/proje/${proje_id}`, "Geçersiz tahsis bilgisi");
+  const d = parsed.data;
+  if (d.hedef_tip === "ofis" && !d.hedef_id) {
+    hataya(`/uretici/proje/${proje_id}`, "Ofis tahsisinde ofis seçilmeli");
+  }
+
+  const bloklar = formData.getAll("bloklar").map(String).filter(Boolean);
+  const kapsam = bloklar.length ? { bloklar } : {};
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("tahsis").insert({
+    proje_id: d.proje_id,
+    hedef_tip: d.hedef_tip,
+    hedef_id: d.hedef_tip === "ofis" ? d.hedef_id || null : null,
+    kapsam,
+    komisyon_tip: d.komisyon_tip,
+    komisyon_deger: d.komisyon_deger,
+    munhasir: d.munhasir,
+    kontenjan: d.kontenjan,
+    fiyat_gorunur: d.fiyat_gorunur,
+  });
+  if (error) hataya(`/uretici/proje/${d.proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${d.proje_id}`);
+  redirect(`/uretici/proje/${d.proje_id}?mesaj=${encodeURIComponent("Tahsis eklendi")}`);
+}
+
+export async function tahsisSil(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("tahsis_id"));
+  const proje_id = String(formData.get("proje_id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  await supabase.from("tahsis").delete().eq("id", id.data);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+}
