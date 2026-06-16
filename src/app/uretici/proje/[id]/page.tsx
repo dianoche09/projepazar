@@ -69,6 +69,9 @@ export default async function ProjeDetay({
   const { data: ofisler } = await supabase.from("ofis").select("id, ad").order("ad");
 
   const tipMap = new Map((tipler ?? []).map((t) => [t.id, t]));
+  const tahsisKatlar = [
+    ...new Set((birimler ?? []).map((b) => b.kat).filter((k): k is number => k != null)),
+  ].sort((a, b) => a - b);
   const blokMap = new Map((bloklar ?? []).map((b) => [b.id, b.ad]));
   const ofisMap = new Map((ofisler ?? []).map((o) => [o.id, o.ad]));
   const toplam = birimler?.length ?? 0;
@@ -257,7 +260,13 @@ export default async function ProjeDetay({
         </div>
 
         <div className="mt-4">
-          <TahsisForm projeId={id} bloklar={bloklar ?? []} ofisler={ofisler ?? []} />
+          <TahsisForm
+            projeId={id}
+            bloklar={bloklar ?? []}
+            katlar={tahsisKatlar}
+            tipler={tipler ?? []}
+            ofisler={ofisler ?? []}
+          />
         </div>
       </section>
 

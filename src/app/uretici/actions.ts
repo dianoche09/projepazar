@@ -284,8 +284,21 @@ export async function tahsisEkle(formData: FormData) {
     hataya(`/uretici/proje/${proje_id}`, "Ofis tahsisinde ofis seçilmeli");
   }
 
+  // Granüler kapsam: blok × kat × tip × tür (boş = tüm proje). RLS emlakci_birim_gorebilir kontrol eder.
   const bloklar = formData.getAll("bloklar").map(String).filter(Boolean);
-  const kapsam = bloklar.length ? { bloklar } : {};
+  const katlar = formData.getAll("katlar").map(String).filter(Boolean);
+  const tipler = formData.getAll("tipler").map(String).filter(Boolean);
+  const turler = formData.getAll("turler").map(String).filter(Boolean);
+  const kapsam: Record<string, string[]> = {};
+  if (bloklar.length) kapsam.bloklar = bloklar;
+  if (katlar.length) kapsam.katlar = katlar;
+  if (tipler.length) kapsam.tipler = tipler;
+  if (turler.length) kapsam.turler = turler;
+
+  // Münhasırlık süresi (gün) → bitiş tarihi
+  const sureRaw = String(formData.get("munhasir_sure") ?? "").trim();
+  const bitis =
+    d.munhasir && sureRaw ? new Date(Date.now() + Number(sureRaw) * 86_400_000).toISOString() : null;
 
   const supabase = await createClient();
   const { error } = await supabase.from("tahsis").insert({
@@ -298,6 +311,7 @@ export async function tahsisEkle(formData: FormData) {
     munhasir: d.munhasir,
     kontenjan: d.kontenjan,
     fiyat_gorunur: d.fiyat_gorunur,
+    bitis,
   });
   if (error) hataya(`/uretici/proje/${d.proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${d.proje_id}`);
