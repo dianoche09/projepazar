@@ -124,6 +124,7 @@ create table birim (
   net_m2 numeric, brut_m2 numeric,
   sahiplik       sahiplik default 'muteahhit',   -- kat karşılığı etiketi (basit)
   odeme_plani_url text,                     -- MVP: text/PDF eki
+  durum_notu     text,                      -- durum değişimi notu (opsiyon: kim/ne zaman; satış: alıcı vb.)
   son_guncelleme timestamptz default now(),
   stale          boolean default false,     -- Tazelik Sigortası
   created_at     timestamptz default now()

@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { cikisYap } from "@/app/(auth)/login/actions";
 import { GridMark } from "@/components/GridMark";
 
-/** Üretici alanı — yalnız 'uretici' veya 'admin' rolü erişebilir (rol guard). */
-export default async function UreticiLayout({
+/** Admin alanı — yalnız 'admin' (BİZ/platform işletmecisi). Üretici/emlakçı giremez. */
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -22,22 +22,19 @@ export default async function UreticiLayout({
     .eq("id", user.id)
     .single();
 
-  // Üretici alanı yalnız 'uretici' rolüne. admin'in kendi paneli var (/admin) — üretici ekranı görmez.
-  if (!profil || profil.rol !== "uretici") {
-    redirect(profil?.rol === "admin" ? "/admin" : "/");
-  }
+  if (!profil || profil.rol !== "admin") redirect("/");
 
   return (
     <div className="flex min-h-full flex-col">
       <header className="border-b border-hair bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           <Link
-            href="/uretici"
+            href="/admin"
             className="flex items-center gap-2 font-display text-lg font-semibold text-navy"
           >
             <GridMark />
             ProjePazar
-            <span className="text-sm font-normal text-gray">· Üretici</span>
+            <span className="text-sm font-normal text-gray">· Yönetim</span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-gray sm:inline">{profil.ad ?? user.email}</span>

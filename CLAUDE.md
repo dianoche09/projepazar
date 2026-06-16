@@ -1,6 +1,11 @@
 # CLAUDE.md — ProjePazar repo kuralları
 
-Bu dosya Claude Code'un her oturumda okuduğu kalıcı kurallardır. Detay: `ProjePazar-Devir-Dokumani.md`.
+Bu dosya Claude Code'un her oturumda okuduğu kalıcı kurallardır.
+
+## ⚠️ BAĞLAYICI YAPI — HER GELİŞTİRMEDEN ÖNCE OKU
+**`ProjePazar-Sistem-Kurallari.md`** = tüm dokümanların (35 sayfalık ürün analizi, Ekranlar.html, Marka Panosu, gelir modeli, roller) damıtılmış **DEĞİŞMEZ** özüdür. Her geliştirme bu yapıyı **bozmadan, farklı yöne sapmadan** yapılır; bir özellik/karar onunla çelişiyorsa **YAPILMAZ** (önce orada güncellenir). Build sırası planı: `ProjePazar-Devir-Dokumani.md`.
+
+**Roller AYRI panel görür** (Sistem Kuralları B.1-2): `admin` = **BİZ/platform işletmecisi** (üyelik/abonelik/hesap tanımlama/kapasite-kota/doğrulama-güven rozeti/concierge/denetim/gelir) — **asla üretici değildir, üretici ekranı görmez**. `uretici`/`ofis`/`emlakci` = müşteri. Gelir modeli kademesi: ① ofis/franchise abonelik (ana) → ② üretici → ③ emlakçı freemium.
 
 ## Ürün (tek cümle)
 Çok-müteahhitli, üretici-kontrollü, **canlı konut stoğu dağıtım ağı**. Üretici stoğu/fiyatı/dağıtımı tek noktadan yönetir; emlakçı yalnız kendisine tahsisli projeleri tek canlı havuzdan görür ve paylaşır. Konum: "en hızlı satış yapılan ağ" / güven protokolü. Tekil CRM/portal/broker değil — saf altyapı.

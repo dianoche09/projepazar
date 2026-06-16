@@ -48,6 +48,7 @@ export interface Birim {
   net_m2: number | null;
   yon: string | null;
   manzara: string | null;
+  durum_notu: string | null;
 }
 
 // Sinyal renkleri (Berrak Güven): yeşil=müsait, amber=opsiyon, kırmızı=satıldı

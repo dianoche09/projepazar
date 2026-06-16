@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { cikisYap } from "@/app/(auth)/login/actions";
+import { panelYolu, ROL_ETIKET, type Rol } from "@/lib/roller";
 
 /** Berrak Güven imza öğesi: 3×3 ızgara, ortadaki yeşil (tazelik sinyali). */
 function GridMark() {
@@ -79,16 +80,14 @@ export default async function Home() {
               </>
             ) : null}
           </p>
-          {profil?.rol === "uretici" || profil?.rol === "admin" ? (
+          {profil?.rol ? (
             <Link
-              href="/uretici"
+              href={panelYolu(profil.rol)}
               className="rounded-lg bg-teal px-5 py-2 font-medium text-white transition-colors hover:bg-ink"
             >
-              Üretici kokpitine git →
+              {ROL_ETIKET[profil.rol as Rol] ?? "Panel"} →
             </Link>
-          ) : (
-            <p className="text-xs text-gray">Emlakçı havuzu PR-5&apos;te gelecek.</p>
-          )}
+          ) : null}
           <form action={cikisYap}>
             <button className="rounded-lg border border-hair bg-card px-5 py-2 font-medium text-navy transition-colors hover:border-teal">
               Çıkış yap
