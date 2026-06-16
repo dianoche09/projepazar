@@ -122,3 +122,22 @@ insert into tahsis (proje_id, kapsam, hedef_tip, hedef_id, komisyon_tip, komisyo
   ('77777777-7777-7777-7777-777777777777',
    '{"bloklar":["99999999-9999-9999-9999-999999999999"]}'::jsonb,
    'ofis', '55555555-5555-5555-5555-555555555555', 'yuzde', 3);
+
+-- =========================================================
+-- ADMIN (concierge / doğrulama — DEĞİŞMEZ: minimal admin)
+-- =========================================================
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at, confirmation_token, email_change,
+  email_change_token_new, recovery_token
+) values
+  ('00000000-0000-0000-0000-000000000000','a0000000-0000-0000-0000-000000000001','authenticated','authenticated','admin@projepazar.test',crypt('ProjePazar123!',gen_salt('bf')),now(),'{"provider":"email","providers":["email"]}','{"ad":"ProjePazar Admin"}',now(),now(),'','','','')
+on conflict (id) do nothing;
+
+insert into auth.identities (provider_id, user_id, identity_data, provider, created_at, updated_at, last_sign_in_at)
+select u.id::text, u.id, jsonb_build_object('sub', u.id::text, 'email', u.email), 'email', now(), now(), now()
+from auth.users u where u.id = 'a0000000-0000-0000-0000-000000000001'
+on conflict do nothing;
+
+update profiles set rol='admin', ad='ProjePazar Admin' where id='a0000000-0000-0000-0000-000000000001';
