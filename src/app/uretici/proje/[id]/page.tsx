@@ -14,6 +14,7 @@ import {
 } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { BinaGorseli } from "@/components/BinaGorseli";
 import {
   ASAMA_ETIKET,
   zamanOnce,
@@ -99,7 +100,11 @@ export default async function ProjeDetay({
         ← Kokpit
       </Link>
 
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
+      <div className="mt-3 h-40 overflow-hidden rounded-2xl border border-hair sm:h-52">
+        <BinaGorseli seed={[...id].reduce((a, c) => a + c.charCodeAt(0), 0)} />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">{proje.ad}</h1>
           <p className="mt-1 text-sm text-gray">
