@@ -6,6 +6,7 @@ function herkeseAcik(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname.startsWith("/login") ||
+    pathname.startsWith("/kayit") || // self-registration
     pathname.startsWith("/p/") || // imzalı paylaşım landing
     pathname.startsWith("/proje/") // public proje microsite (PR-7)
   );
@@ -43,11 +44,26 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const pathname = request.nextUrl.pathname;
 
-  if (!user && !herkeseAcik(request.nextUrl.pathname)) {
+  if (!user && !herkeseAcik(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // Pasif / onay bekleyen kullanıcı panellere giremez → bekleme ekranı
+  if (user && !herkeseAcik(pathname) && pathname !== "/hesap-bekliyor") {
+    const { data: profil } = await supabase
+      .from("profiles")
+      .select("durum")
+      .eq("id", user.id)
+      .single();
+    if (profil && profil.durum !== "aktif") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/hesap-bekliyor";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

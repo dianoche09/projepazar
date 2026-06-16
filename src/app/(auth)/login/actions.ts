@@ -11,45 +11,35 @@ const girisSemasi = z.object({
   password: z.string().min(6, "Parola en az 6 karakter olmalı"),
 });
 
-function pars(formData: FormData) {
-  return girisSemasi.safeParse({
+export async function girisYap(formData: FormData) {
+  const sonuc = girisSemasi.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
-}
-
-export async function girisYap(formData: FormData) {
-  const sonuc = pars(formData);
   if (!sonuc.success) {
     redirect(`/login?hata=${encodeURIComponent(sonuc.error.issues[0].message)}`);
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword(sonuc.data);
-  if (error) {
-    redirect(`/login?hata=${encodeURIComponent(error.message)}`);
+  const { data, error } = await supabase.auth.signInWithPassword(sonuc.data);
+  if (error || !data.user) {
+    redirect(`/login?hata=${encodeURIComponent(error?.message ?? "Giriş başarısız")}`);
   }
+
+  // Son giriş izi + hesap durumu: pasif/onay-bekleyen kullanıcı panele giremez
+  await supabase
+    .from("profiles")
+    .update({ son_giris: new Date().toISOString() })
+    .eq("id", data.user.id);
+  const { data: profil } = await supabase
+    .from("profiles")
+    .select("durum")
+    .eq("id", data.user.id)
+    .single();
 
   revalidatePath("/", "layout");
+  if (profil && profil.durum !== "aktif") redirect("/hesap-bekliyor");
   redirect("/");
-}
-
-export async function kayitOl(formData: FormData) {
-  const sonuc = pars(formData);
-  if (!sonuc.success) {
-    redirect(`/login?hata=${encodeURIComponent(sonuc.error.issues[0].message)}`);
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signUp(sonuc.data);
-  if (error) {
-    redirect(`/login?hata=${encodeURIComponent(error.message)}`);
-  }
-
-  redirect(
-    "/login?mesaj=" +
-      encodeURIComponent("Onay e-postası gönderildi, gelen kutunu kontrol et."),
-  );
 }
 
 export async function cikisYap() {

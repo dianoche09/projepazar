@@ -6,6 +6,7 @@
 -- ENUMS
 -- =========================================================
 create type rol            as enum ('uretici','emlakci','ofis_yetkili','arsa_sahibi','marka_yetkili','admin');
+create type hesap_durum    as enum ('onay_bekliyor','aktif','pasif','askida','arsivli');
 create type birim_durum    as enum ('musait','opsiyonlu','satis_beklemede','satildi','stop','planli','kiralandi');
 create type birim_tur      as enum ('daire','ofis','dukkan','villa','depo','otopark');
 create type islem_tipi     as enum ('satilik','kiralik','satilik_kiralik','pay_satisi','satisa_kapali');
@@ -30,6 +31,13 @@ create table profiles (
   foto_url    text,
   logo_url    text,
   aktif       boolean default true,
+  -- Hesap yaşam döngüsü (kayıt → onay kuyruğu → aktif → arşiv)
+  durum         hesap_durum not null default 'onay_bekliyor',
+  son_giris     timestamptz,
+  onaylayan_id  uuid references profiles(id),   -- onaylayan admin
+  onay_tarihi   timestamptz,
+  talep_rol     rol,                            -- talep edilen rol; admin onayda atar
+  kayit_meta    jsonb,                          -- kayıt ekstra (vergi_no / ofis_adi)
   created_at  timestamptz default now()
 );
 
@@ -242,8 +250,16 @@ $$;
 create or replace function handle_new_user() returns trigger
   language plpgsql security definer set search_path = public as $$
 begin
-  insert into public.profiles (id, ad)
-  values (new.id, new.raw_user_meta_data->>'ad')
+  insert into public.profiles (id, ad, telefon, durum, talep_rol, kayit_meta)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'ad',
+    new.raw_user_meta_data->>'telefon',
+    'onay_bekliyor',
+    (case when new.raw_user_meta_data->>'talep_rol' in ('uretici','emlakci','ofis_yetkili')
+          then (new.raw_user_meta_data->>'talep_rol')::rol else null end),
+    new.raw_user_meta_data->'kayit_meta'
+  )
   on conflict (id) do nothing;
   return new;
 end; $$;
@@ -267,9 +283,10 @@ alter table opsiyon    enable row level security;
 alter table lead       enable row level security;
 alter table events     enable row level security;
 
--- profiles: herkes kendini görür/günceller; admin hepsi
+-- profiles: herkes kendini görür/günceller; admin tüm profilleri yönetir (onay/rol/ofis/durum)
 create policy profiles_self on profiles for select using (id = auth.uid() or is_admin());
 create policy profiles_self_upd on profiles for update using (id = auth.uid());
+create policy profiles_admin on profiles for all using (is_admin()) with check (is_admin());
 
 -- uretici/proje/blok/tip/birim: üretici sahibi tam yetki
 create policy uretici_owner on uretici for all

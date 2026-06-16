@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { girisYap, kayitOl } from "./actions";
+import { girisYap } from "./actions";
 
 export default async function LoginPage({
   searchParams,
@@ -77,13 +77,13 @@ export default async function LoginPage({
             >
               Giriş yap
             </button>
-            <button
-              formAction={kayitOl}
-              className="rounded-lg border border-hair bg-card px-4 py-2.5 font-medium text-navy transition-colors hover:border-teal"
-            >
-              Kayıt ol
-            </button>
           </form>
+          <p className="mt-4 text-center text-sm text-gray">
+            Hesabın yok mu?{" "}
+            <Link href="/kayit" className="font-medium text-teal hover:underline">
+              Kayıt ol
+            </Link>
+          </p>
         </div>
       </div>
     </main>
