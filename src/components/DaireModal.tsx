@@ -41,15 +41,22 @@ function Kaydet() {
   );
 }
 
-/** Daire detay modalı — merkezi, scroll yaratmaz. Şerefiye kırılımı + künye + durum/not + iz. */
+/**
+ * Daire detay modalı — merkezi, scroll yaratmaz. Künye + şerefiye kırılımı + iz.
+ * mod="uretici": durum/not değiştir. mod="emlakci": salt-okunur + WhatsApp paylaş (fiyat canlı).
+ */
 export function DaireModal({
   birim,
   projeId,
   onKapat,
+  mod = "uretici",
+  projeAd = "",
 }: {
   birim: ModalBirim;
   projeId: string;
   onKapat: () => void;
+  mod?: "uretici" | "emlakci";
+  projeAd?: string;
 }) {
   const [durum, setDurum] = useState<BirimDurum>(birim.durum);
 
@@ -60,6 +67,17 @@ export function DaireModal({
   const katKatki = taban != null && sKat ? Math.round((taban * sKat) / 100) : null;
   const manzaraKatki = taban != null && sManzara ? Math.round((taban * sManzara) / 100) : null;
   const fark = taban != null && liste != null ? liste - taban : null;
+
+  // Paylaşımda fiyat CANLI değerden basılır (DEĞİŞMEZ #2)
+  const paylasMetni = [
+    projeAd,
+    `Daire ${birim.daire_no ?? ""}`.trim(),
+    birim.oda ?? birim.tip_ad ?? "",
+    liste != null ? `${fmt(liste)} ${birim.para_birimi === "TRY" ? "₺" : birim.para_birimi}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const waLink = `https://wa.me/?text=${encodeURIComponent(paylasMetni)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -78,6 +96,13 @@ export function DaireModal({
             ✕
           </button>
         </div>
+
+        {/* Durum rozeti (emlakçı modunda görünür kalır) */}
+        {mod === "emlakci" ? (
+          <span className={`mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-medium text-white ${DURUM_BG[birim.durum]}`}>
+            {DURUM_ETIKET[birim.durum]}
+          </span>
+        ) : null}
 
         {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara ? (
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
@@ -129,51 +154,75 @@ export function DaireModal({
           <p className="mt-4 font-mono text-lg text-ink">{fmt(liste)} ₺</p>
         ) : null}
 
-        <form
-          action={async (fd) => {
-            await birimDurumGuncelle(fd);
-            onKapat();
-          }}
-          className="mt-4"
-        >
-          <input type="hidden" name="birim_id" value={birim.id} />
-          <input type="hidden" name="proje_id" value={projeId} />
-          <p className="text-sm font-medium text-ink">Durum</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {DURUMLAR.map((d) => (
-              <label
-                key={d}
-                className={`cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                  durum === d ? `border-transparent text-white ${DURUM_BG[d]}` : "border-hair text-gray hover:border-teal"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="durum"
-                  value={d}
-                  checked={durum === d}
-                  onChange={() => setDurum(d)}
-                  className="sr-only"
-                />
-                {DURUM_ETIKET[d]}
-              </label>
-            ))}
-          </div>
-          <textarea
-            name="durum_notu"
-            defaultValue={birim.durum_notu ?? ""}
-            rows={2}
-            placeholder="Durum notu — opsiyon: kim/ne zaman; satış: alıcı vb."
-            className="mt-3 w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal"
-          />
-          <div className="mt-3 flex items-center justify-between">
-            <span className="inline-flex items-center gap-1 font-mono text-xs text-gray">
+        {mod === "uretici" ? (
+          <form
+            action={async (fd) => {
+              await birimDurumGuncelle(fd);
+              onKapat();
+            }}
+            className="mt-4"
+          >
+            <input type="hidden" name="birim_id" value={birim.id} />
+            <input type="hidden" name="proje_id" value={projeId} />
+            <p className="text-sm font-medium text-ink">Durum</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {DURUMLAR.map((d) => (
+                <label
+                  key={d}
+                  className={`cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                    durum === d ? `border-transparent text-white ${DURUM_BG[d]}` : "border-hair text-gray hover:border-teal"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="durum"
+                    value={d}
+                    checked={durum === d}
+                    onChange={() => setDurum(d)}
+                    className="sr-only"
+                  />
+                  {DURUM_ETIKET[d]}
+                </label>
+              ))}
+            </div>
+            <textarea
+              name="durum_notu"
+              defaultValue={birim.durum_notu ?? ""}
+              rows={2}
+              placeholder="Durum notu — opsiyon: kim/ne zaman; satış: alıcı vb."
+              className="mt-3 w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal"
+            />
+            <div className="mt-3 flex items-center justify-between">
+              <span className="inline-flex items-center gap-1 font-mono text-xs text-gray">
+                <span className="size-1.5 rounded-full bg-green" />
+                {zamanOnce(birim.son_guncelleme)}
+              </span>
+              <Kaydet />
+            </div>
+          </form>
+        ) : (
+          <div className="mt-4 space-y-2">
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-lg bg-green px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            >
+              WhatsApp ile Paylaş
+            </a>
+            <button
+              disabled
+              title="Opsiyon kilidi bir sonraki adımda"
+              className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-gray opacity-60"
+            >
+              Opsiyon Al · 48s (yakında)
+            </button>
+            <p className="inline-flex items-center gap-1 font-mono text-xs text-gray">
               <span className="size-1.5 rounded-full bg-green" />
-              {zamanOnce(birim.son_guncelleme)}
-            </span>
-            <Kaydet />
+              {zamanOnce(birim.son_guncelleme)} güncellendi
+            </p>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );

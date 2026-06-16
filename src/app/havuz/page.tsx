@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { zamanOnce } from "@/lib/types";
 
@@ -47,7 +48,7 @@ export default async function Havuz() {
     <div className="mx-auto max-w-5xl px-6 py-10">
       <h1 className="font-display text-2xl font-semibold text-ink">Emlakçı Havuzu</h1>
       <p className="mt-1 text-sm text-gray">
-        Sana tahsisli yetkili projeler — tek canlı havuz. Filtre ve paylaşım sonraki adımda.
+        Sana tahsisli yetkili projeler — tek canlı havuz. İncelemek için projeye tıkla.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -55,7 +56,11 @@ export default async function Havuz() {
           const o = ozet.get(p.id);
           const yuzde = (n: number) => (o && o.toplam ? (n / o.toplam) * 100 : 0);
           return (
-            <div key={p.id} className="rounded-2xl border border-hair bg-card p-5">
+            <Link
+              key={p.id}
+              href={`/havuz/proje/${p.id}`}
+              className="block rounded-2xl border border-hair bg-card p-5 transition-colors hover:border-teal"
+            >
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className="font-display text-base font-semibold text-ink">{p.ad}</h3>
@@ -93,7 +98,7 @@ export default async function Havuz() {
               ) : (
                 <p className="mt-3 text-sm text-gray">Bu projede sana tahsisli birim yok.</p>
               )}
-            </div>
+            </Link>
           );
         })}
         {!projeler || projeler.length === 0 ? (

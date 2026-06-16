@@ -4,8 +4,18 @@ import { useState } from "react";
 import { DURUM_BG, DURUM_ETIKET } from "@/lib/types";
 import { DaireModal, type ModalBirim } from "./DaireModal";
 
-/** Izgara hücresi — tıklanınca merkezi Daire MODAL açar (künye + şerefiye + durum/not). */
-export function BirimHucre({ birim, projeId }: { birim: ModalBirim; projeId: string }) {
+/** Izgara hücresi — tıklanınca merkezi Daire MODAL açar. mod: üretici (durum/not) | emlakçı (paylaş). */
+export function BirimHucre({
+  birim,
+  projeId,
+  mod = "uretici",
+  projeAd = "",
+}: {
+  birim: ModalBirim;
+  projeId: string;
+  mod?: "uretici" | "emlakci";
+  projeAd?: string;
+}) {
   const [acik, setAcik] = useState(false);
 
   return (
@@ -19,7 +29,15 @@ export function BirimHucre({ birim, projeId }: { birim: ModalBirim; projeId: str
         {birim.daire_no}
       </button>
 
-      {acik ? <DaireModal birim={birim} projeId={projeId} onKapat={() => setAcik(false)} /> : null}
+      {acik ? (
+        <DaireModal
+          birim={birim}
+          projeId={projeId}
+          mod={mod}
+          projeAd={projeAd}
+          onKapat={() => setAcik(false)}
+        />
+      ) : null}
     </>
   );
 }
