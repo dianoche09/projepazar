@@ -81,13 +81,20 @@ export const ASAMA_ETIKET: Record<InsaatAsama, string> = {
   tamamlandi: "Tamamlandı",
 };
 
-// ── Abonelik / gelir (Admin = platform işletmecisi; gelir modeli ①/②) ──
+// ── Abonelik / gelir (üyelik tipleri/fiyatları %100 admin-kontrollü; üç hedef) ──
 export type AbonelikDurum = "deneme" | "aktif" | "askida" | "iptal";
+export type AbonelikHedef = "ofis" | "uretici" | "emlakci";
+
+export const HEDEF_ETIKET: Record<AbonelikHedef, string> = {
+  ofis: "Ofis / Franchise",
+  uretici: "Üretici",
+  emlakci: "Emlakçı",
+};
 
 export interface AbonelikPaketi {
   id: string;
   ad: string;
-  hedef: "ofis" | "uretici";
+  hedef: AbonelikHedef;
   fiyat_aylik: number;
   para_birimi: string;
   kota_proje: number | null;

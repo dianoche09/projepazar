@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import { fmtPara, ABONELIK_DURUM_ETIKET, type AbonelikDurum } from "@/lib/types";
-import { ureticiDogrula, ofiseAbonelikAta, paketEkle } from "./actions";
+import { fmtPara, ABONELIK_DURUM_ETIKET, type AbonelikDurum, type AbonelikPaketi } from "@/lib/types";
+import { ureticiDogrula, ofiseAbonelikAta } from "./actions";
+import { PaketYonetimi } from "@/components/PaketYonetimi";
 
 function Kpi({ etiket, deger, renk = "text-ink" }: { etiket: string; deger: number; renk?: string }) {
   return (
@@ -164,49 +165,13 @@ export default async function AdminPanel() {
 
       {/* Abonelik paketleri (gelir modeli ① kademeleri) */}
       <section className="mt-10">
-        <h2 className="font-display text-lg font-semibold text-ink">Abonelik paketleri</h2>
-        <p className="mt-1 text-sm text-gray">Ofis/franchise SaaS kademeleri — değer-odaklı esnek paketler.</p>
-        <div className="mt-3 grid gap-4 sm:grid-cols-3">
-          {(paketler ?? []).map((p) => (
-            <div key={p.id} className="rounded-2xl border border-hair bg-card p-5">
-              <p className="font-display text-base font-semibold text-ink">{p.ad}</p>
-              <p className="mt-1 font-mono text-xl text-ink">
-                {fmtPara(p.fiyat_aylik, p.para_birimi)}
-                <span className="text-xs font-normal text-gray">/ay</span>
-              </p>
-              <ul className="mt-3 space-y-1 text-xs text-gray">
-                <li>{p.kota_koltuk != null ? `${p.kota_koltuk} koltuk` : "Sınırsız koltuk"}</li>
-                <li>{p.kota_ai != null ? `${p.kota_ai} AI içerik/ay` : "AI içerik yok"}</li>
-                <li>{p.gelismis_rapor ? "✓ Gelişmiş rapor" : "Temel rapor"}</li>
-              </ul>
-            </div>
-          ))}
-          {!paketler || paketler.length === 0 ? (
-            <p className="text-sm text-gray">Henüz paket yok. Aşağıdan ekle.</p>
-          ) : null}
+        <h2 className="font-display text-lg font-semibold text-ink">Üyelik paketleri & fiyatlandırma</h2>
+        <p className="mt-1 text-sm text-gray">
+          Tip, fiyat ve kotalar tamamen burada tanımlanır — ofis, üretici, emlakçı. Sabit/varsayılan fiyat yok.
+        </p>
+        <div className="mt-4">
+          <PaketYonetimi paketler={(paketler ?? []) as AbonelikPaketi[]} />
         </div>
-
-        <form action={paketEkle} className="mt-4 flex flex-wrap items-end gap-2 rounded-2xl border border-dashed border-hair bg-card/50 p-4">
-          <label className="flex flex-col text-xs text-gray">
-            Paket adı
-            <input name="ad" required maxLength={60} placeholder="ör. Premium" className="mt-1 rounded-lg border border-hair bg-paper px-2 py-1.5 text-sm text-ink" />
-          </label>
-          <label className="flex flex-col text-xs text-gray">
-            Aylık ₺
-            <input name="fiyat_aylik" type="number" min={0} step={100} placeholder="3500" className="mt-1 w-28 rounded-lg border border-hair bg-paper px-2 py-1.5 text-sm text-ink" />
-          </label>
-          <label className="flex flex-col text-xs text-gray">
-            Koltuk (boş=sınırsız)
-            <input name="kota_koltuk" type="number" min={1} placeholder="10" className="mt-1 w-28 rounded-lg border border-hair bg-paper px-2 py-1.5 text-sm text-ink" />
-          </label>
-          <label className="flex items-center gap-2 pb-1.5 text-sm text-ink">
-            <input type="checkbox" name="gelismis_rapor" className="size-4" />
-            Gelişmiş rapor
-          </label>
-          <button className="rounded-lg bg-teal px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90">
-            Paket ekle
-          </button>
-        </form>
       </section>
     </div>
   );

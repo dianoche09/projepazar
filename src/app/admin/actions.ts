@@ -9,7 +9,6 @@ export async function ureticiDogrula(formData: FormData) {
   const supabase = await createClient();
   const uretici_id = String(formData.get("uretici_id"));
   const dogrula = formData.get("dogrula") === "true";
-
   await supabase.from("uretici").update({ dogrulanmis: dogrula }).eq("id", uretici_id);
   revalidatePath("/admin");
 }
@@ -20,9 +19,8 @@ const AtaSchema = z.object({
 });
 
 /**
- * Ofise abonelik paketi ata (gelir modeli ① — tek aktif abonelik).
- * Boş paket = aboneliği kaldır. Önce mevcut aktif/deneme aboneliği iptal eder
- * (unique partial index ihlalini önlemek için), sonra yeni 'aktif' satır ekler.
+ * Ofise abonelik paketi ata (tek aktif abonelik). Boş paket = aboneliği kaldır.
+ * Önce mevcut aktif/deneme aboneliği iptal eder (unique partial index ihlalini önler).
  */
 export async function ofiseAbonelikAta(formData: FormData) {
   const parsed = AtaSchema.safeParse({
@@ -38,32 +36,77 @@ export async function ofiseAbonelikAta(formData: FormData) {
     .update({ durum: "iptal" })
     .eq("ofis_id", ofis_id)
     .in("durum", ["deneme", "aktif"]);
-
   if (paket_id) {
     await supabase.from("abonelik").insert({ ofis_id, paket_id, durum: "aktif" });
   }
   revalidatePath("/admin");
 }
 
+// ── Üyelik paketi CRUD (tip/fiyat/kota %100 admin-kontrollü; üç hedef) ──
+const bosNull = (v: FormDataEntryValue | null) => {
+  const s = String(v ?? "").trim();
+  return s === "" ? null : s;
+};
+
 const PaketSchema = z.object({
   ad: z.string().trim().min(1).max(60),
+  hedef: z.enum(["ofis", "uretici", "emlakci"]),
   fiyat_aylik: z.coerce.number().min(0),
+  para_birimi: z.enum(["TRY", "USD", "EUR"]),
+  kota_proje: z.coerce.number().int().positive().nullable(),
   kota_koltuk: z.coerce.number().int().positive().nullable(),
+  kota_ai: z.coerce.number().int().nonnegative().nullable(),
   gelismis_rapor: z.boolean(),
+  aktif: z.boolean(),
 });
 
-/** Yeni abonelik paketi tanımla (ofis SaaS kademesi — admin). */
-export async function paketEkle(formData: FormData) {
-  const kotaRaw = String(formData.get("kota_koltuk") ?? "").trim();
-  const parsed = PaketSchema.safeParse({
+function paketGirdi(formData: FormData) {
+  return PaketSchema.safeParse({
     ad: formData.get("ad"),
+    hedef: formData.get("hedef"),
     fiyat_aylik: formData.get("fiyat_aylik") ?? 0,
-    kota_koltuk: kotaRaw === "" ? null : kotaRaw,
+    para_birimi: formData.get("para_birimi") ?? "TRY",
+    kota_proje: bosNull(formData.get("kota_proje")),
+    kota_koltuk: bosNull(formData.get("kota_koltuk")),
+    kota_ai: bosNull(formData.get("kota_ai")),
     gelismis_rapor: formData.get("gelismis_rapor") === "on",
+    aktif: formData.get("aktif") !== "false",
   });
-  if (!parsed.success) return;
+}
 
+/** Yeni üyelik paketi tanımla — ad/fiyat/kota tamamen admin girer (hardcode yok). */
+export async function paketEkle(formData: FormData) {
+  const parsed = paketGirdi(formData);
+  if (!parsed.success) return;
   const supabase = await createClient();
-  await supabase.from("abonelik_paketi").insert({ hedef: "ofis", ...parsed.data });
+  await supabase.from("abonelik_paketi").insert(parsed.data);
+  revalidatePath("/admin");
+}
+
+/** Mevcut paketi düzenle (fiyat/kota/özellik/aktiflik). */
+export async function paketDuzenle(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("id"));
+  const parsed = paketGirdi(formData);
+  if (!id.success || !parsed.success) return;
+  const supabase = await createClient();
+  await supabase.from("abonelik_paketi").update(parsed.data).eq("id", id.data);
+  revalidatePath("/admin");
+}
+
+/** Paketi sil — atanmış aktif abonelik varsa silmek yerine pasifleştirir. */
+export async function paketSil(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("abonelik")
+    .select("id", { count: "exact", head: true })
+    .eq("paket_id", id.data)
+    .in("durum", ["deneme", "aktif"]);
+  if (count && count > 0) {
+    await supabase.from("abonelik_paketi").update({ aktif: false }).eq("id", id.data);
+  } else {
+    await supabase.from("abonelik_paketi").delete().eq("id", id.data);
+  }
   revalidatePath("/admin");
 }

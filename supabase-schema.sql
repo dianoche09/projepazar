@@ -366,8 +366,8 @@ create policy proje_belge_read on proje_belge for select using (emlakci_proje_ta
 -- =========================================================
 create table abonelik_paketi (
   id             uuid primary key default gen_random_uuid(),
-  ad             text not null,                 -- "Başlangıç" | "Profesyonel" | "Kurumsal"
-  hedef          text not null default 'ofis',  -- 'ofis' | 'uretici'
+  ad             text not null,                 -- tip adı (admin tanımlar)
+  hedef          text not null default 'ofis',  -- 'ofis' | 'uretici' | 'emlakci'
   fiyat_aylik    numeric not null default 0,
   para_birimi    text not null default 'TRY',
   kota_proje     int,                           -- null = sınırsız

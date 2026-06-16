@@ -161,10 +161,15 @@ export async function birimDurumGuncelle(formData: FormData) {
   const durum = durumSemasi.safeParse(formData.get("durum"));
   if (!durum.success) hataya(`/uretici/proje/${proje_id}`, "Geçersiz durum");
 
+  // Duruma göre not (opsiyon: kim/ne zaman; satış: alıcı vb.). Boş = notu temizle.
+  const notRaw = formData.get("durum_notu");
+  const durum_notu =
+    typeof notRaw === "string" && notRaw.trim() ? notRaw.trim().slice(0, 280) : null;
+
   // Tek doğru kaynak: her yazışta son_guncelleme=now() (DEĞİŞMEZ #5)
   const { error } = await supabase
     .from("birim")
-    .update({ durum: durum.data, son_guncelleme: new Date().toISOString() })
+    .update({ durum: durum.data, durum_notu, son_guncelleme: new Date().toISOString() })
     .eq("id", birim_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
