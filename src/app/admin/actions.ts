@@ -1,8 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+/** Çağıran oturumun admin olduğunu doğrula (service-role işlemleri öncesi şart). */
+async function adminGuard() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { data: profil } = await supabase.from("profiles").select("rol").eq("id", user.id).single();
+  if (profil?.rol !== "admin") redirect("/");
+}
 
 /** Üretici doğrulama / güven rozeti (admin yetkisi — RLS is_admin owner). */
 export async function ureticiDogrula(formData: FormData) {
@@ -171,7 +184,7 @@ export async function hesapDurumDegistir(formData: FormData) {
     .update({ durum: parsed.data.durum })
     .eq("id", parsed.data.kullanici_id);
   revalidatePath("/admin");
-  revalidatePath("/admin/kullanicilar");
+  revalidatePath("/admin/kullanicilar", "layout");
 }
 
 // ── Kullanıcı düzenleme (rol + ofis + durum tek formda) ──
@@ -203,4 +216,79 @@ export async function kullaniciGuncelle(formData: FormData) {
     .eq("id", parsed.data.kullanici_id);
   revalidatePath("/admin/kullanicilar");
   revalidatePath("/admin");
+}
+
+// ── Admin kullanıcı oluşturma (service-role) ──
+const OlusturSchema = z.object({
+  email: z.string().email("Geçerli e-posta"),
+  ad: z.string().trim().min(2, "Ad-soyad"),
+  telefon: z.string().trim().max(20).optional(),
+  rol: z.enum(["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi", "admin"]),
+  ofis_id: z.union([z.string().uuid(), z.literal("")]),
+  parola: z.string().min(8, "Parola en az 8 karakter"),
+});
+
+/** Admin yeni kullanıcı oluşturur (createUser + profil rol/ofis/aktif). Service-role. */
+export async function kullaniciOlustur(formData: FormData) {
+  await adminGuard();
+  const parsed = OlusturSchema.safeParse({
+    email: formData.get("email"),
+    ad: formData.get("ad"),
+    telefon: (formData.get("telefon") as string) || undefined,
+    rol: formData.get("rol"),
+    ofis_id: formData.get("ofis_id") ?? "",
+    parola: formData.get("parola"),
+  });
+  if (!parsed.success) {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent(parsed.error.issues[0].message)}`);
+  }
+  const { email, ad, telefon, rol, ofis_id, parola } = parsed.data;
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent("Service-role anahtarı tanımlı değil (.env + Vercel)")}`);
+  }
+
+  const { data: created, error } = await admin.auth.admin.createUser({
+    email,
+    password: parola,
+    email_confirm: true,
+    user_metadata: { ad, telefon: telefon ?? null },
+  });
+  if (error || !created.user) {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent(error?.message ?? "Oluşturulamadı")}`);
+  }
+
+  // Admin oluşturduğu için doğrudan aktif + rol/ofis atanmış
+  await admin
+    .from("profiles")
+    .update({ ad, telefon: telefon ?? null, rol, ofis_id: ofis_id || null, durum: "aktif" })
+    .eq("id", created.user.id);
+  revalidatePath("/admin/kullanicilar");
+  redirect(`/admin/kullanicilar?mesaj=${encodeURIComponent(`${email} oluşturuldu`)}`);
+}
+
+/** Kullanıcının parolasını sıfırla (admin → yeni geçici parola). Service-role. */
+export async function parolaSifirla(formData: FormData) {
+  await adminGuard();
+  const id = z.string().uuid().safeParse(formData.get("kullanici_id"));
+  const parola = z.string().min(8).safeParse(formData.get("parola"));
+  if (!id.success || !parola.success) {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent("Parola en az 8 karakter")}`);
+  }
+
+  let admin: ReturnType<typeof createAdminClient>;
+  try {
+    admin = createAdminClient();
+  } catch {
+    redirect(`/admin/kullanicilar/${id.data}?hata=${encodeURIComponent("Service-role anahtarı tanımlı değil")}`);
+  }
+  const { error } = await admin.auth.admin.updateUserById(id.data, { password: parola.data });
+  redirect(
+    error
+      ? `/admin/kullanicilar/${id.data}?hata=${encodeURIComponent(error.message)}`
+      : `/admin/kullanicilar/${id.data}?mesaj=${encodeURIComponent("Parola güncellendi")}`,
+  );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import { kullaniciGuncelle } from "@/app/admin/actions";
 import { ROL_ETIKET, type Rol } from "@/lib/roller";
@@ -88,7 +89,12 @@ export function KullanicilarTablo({
           <div key={k.id} className="border-t border-hair first:border-t-0">
             <div className="flex flex-wrap items-center gap-3 px-4 py-3">
               <div className="min-w-44 flex-1">
-                <p className="font-medium text-ink">{k.ad ?? "—"}</p>
+                <Link
+                  href={`/admin/kullanicilar/${k.id}`}
+                  className="font-medium text-ink transition-colors hover:text-teal hover:underline"
+                >
+                  {k.ad ?? "—"}
+                </Link>
                 <p className="text-xs text-gray">
                   {k.telefon ?? "tel —"} · ofis: {ofisAd(k.ofis_id)} · son giriş{" "}
                   {k.son_giris ? zamanOnce(k.son_giris) : "hiç"}
