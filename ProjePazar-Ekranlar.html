@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProjePazar — Ürün Ekranları v2 · Berrak Güven</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap');
+:root{
+  --ink:#0F2638;--navy:#13314B;--teal:#1E9B8A;--teal-d:#137163;
+  --green:#2FB36B;--amber:#E3A12C;--red:#D15A4E;
+  --paper:#F4F2EE;--card:#FFFFFF;--gray:#5E6B78;--hair:#E6EBEF;
+  --soft:#F5F8FA;--navy-soft:#EAF0F5;--green-soft:#E5F5EC;--amber-soft:#FBF0DA;
+  --red-soft:#F8E7E4;--teal-soft:#E2F3F0;
+  --sh:0 1px 2px rgba(15,38,56,.06),0 8px 24px rgba(15,38,56,.06);
+  --sh-lg:0 2px 8px rgba(15,38,56,.08),0 24px 60px rgba(15,38,56,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Instrument Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
+.wrap{max-width:1340px;margin:0 auto;padding:50px 26px 100px}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+.brand{display:flex;align-items:center;gap:15px}
+.logo{display:grid;grid-template-columns:repeat(3,12px);grid-auto-rows:12px;gap:3px}
+.logo i{border-radius:3px;background:var(--navy)}
+.logo i.o{background:transparent;box-shadow:inset 0 0 0 2px var(--navy)}
+.logo i.g{background:var(--green)}.logo i.a{background:var(--amber)}.logo i.r{background:var(--red)}
+.wm{font-family:'Bricolage Grotesque';font-weight:800;font-size:29px;letter-spacing:-.5px}
+.wm b{color:var(--teal)}
+.meta{font-size:12px;letter-spacing:2px;color:var(--gray)}.meta b{color:var(--teal)}
+.intro{color:var(--gray);font-size:15px;max-width:820px;margin:16px 0 8px}
+.pwa{display:flex;align-items:center;gap:14px;background:var(--navy);color:#fff;border-radius:14px;padding:14px 18px;margin:18px 0 8px}
+.pwa .ic{width:34px;height:34px;flex:none}
+.pwa b{font-weight:700}.pwa .s{opacity:.8;font-size:13px}
+.pwa .badge{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:'Geist Mono';font-size:12px;background:rgba(255,255,255,.12);border-radius:20px;padding:6px 13px}
+.pwa .badge .pulse{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.slabel{display:flex;align-items:center;gap:12px;margin:58px 0 14px;font-family:'Geist Mono';font-size:12.5px;letter-spacing:2px;text-transform:uppercase}
+.slabel .n{color:var(--teal);font-weight:700}
+.slabel .tag{margin-left:auto;font-size:10.5px;letter-spacing:1.5px;color:var(--gray);border:1px solid var(--hair);border-radius:20px;padding:4px 11px;background:var(--card)}
+.scap{color:var(--gray);font-size:13.5px;margin:-4px 0 16px}
+.browser{border-radius:16px;overflow:hidden;box-shadow:var(--sh-lg);background:var(--card);border:1px solid var(--hair)}
+.chrome{display:flex;align-items:center;gap:8px;padding:11px 16px;background:#EDF1F4;border-bottom:1px solid var(--hair)}
+.dot{width:11px;height:11px;border-radius:50%}
+.url{flex:1;margin-left:12px;background:#fff;border:1px solid var(--hair);border-radius:8px;padding:6px 12px;font-family:'Geist Mono';font-size:12px;color:var(--gray);max-width:460px}
+.url b{color:var(--ink);font-weight:500}
+.app{background:var(--soft)}
+.topbar{display:flex;align-items:center;gap:20px;padding:13px 22px;background:var(--card);border-bottom:1px solid var(--hair)}
+.topbar .logo{transform:scale(.9)}
+.wm2{font-family:'Bricolage Grotesque';font-weight:800;font-size:18px}.wm2 b{color:var(--teal)}
+.nav{display:flex;gap:3px;margin-left:6px}
+.nav a{font-size:13px;color:var(--gray);text-decoration:none;padding:7px 12px;border-radius:8px;font-weight:500}
+.nav a.on{color:var(--ink);background:var(--navy-soft);font-weight:600}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.tb-search{background:var(--soft);border:1px solid var(--hair);border-radius:9px;padding:8px 13px;font-size:13px;color:var(--gray);width:180px}
+.avatar{width:33px;height:33px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600}
+.body{display:flex;min-height:520px}
+.side{width:236px;border-right:1px solid var(--hair);padding:18px 16px;background:var(--card)}
+.side h4{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gray);margin:16px 0 8px;font-weight:700}
+.side h4:first-child{margin-top:0}
+.selct{width:100%;border:1px solid var(--hair);border-radius:8px;padding:9px 11px;font-size:13px;color:var(--ink);background:var(--card);margin-bottom:7px;font-family:inherit}
+.selct .mut{color:var(--gray)}
+.crumbline{display:flex;align-items:center;gap:6px;font-family:'Geist Mono';font-size:11px;color:var(--gray);margin-top:4px}
+.crumbline b{color:var(--teal-d)}
+.frow{display:flex;flex-wrap:wrap;gap:7px}
+.tagb{font-size:12.5px;border:1px solid var(--hair);background:var(--card);color:var(--ink);border-radius:8px;padding:6px 11px;cursor:pointer}
+.tagb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.main{flex:1;padding:20px 22px;overflow:hidden}
+.mhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.mhead h2{font-family:'Bricolage Grotesque';font-size:21px;margin:0;font-weight:800}
+.mhead .sub{color:var(--gray);font-size:13px}
+.sortpill{font-size:12.5px;color:var(--ink);border:1px solid var(--hair);background:var(--card);border-radius:8px;padding:7px 12px}
+.fresh{display:inline-flex;align-items:center;gap:6px;font-family:'Geist Mono';font-size:11.5px;color:var(--ink);border:1px solid var(--green);background:var(--green-soft);border-radius:20px;padding:4px 10px;white-space:nowrap}
+.fresh .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:p 2s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(47,179,107,.5)}70%{box-shadow:0 0 0 7px rgba(47,179,107,0)}100%{box-shadow:0 0 0 0 rgba(47,179,107,0)}}
+.verif{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--teal-d);background:var(--teal-soft);border-radius:20px;padding:3px 9px;font-weight:600;white-space:nowrap}
+/* havuz cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--sh)}
+.pcard .thumb{position:relative;height:150px}
+.pcard .thumb .ovl{position:absolute;left:11px;bottom:11px;display:flex;gap:6px}
+.pcard .thumb .tr{position:absolute;right:11px;top:11px}
+.pcard .galn{position:absolute;right:11px;bottom:11px;font-family:'Geist Mono';font-size:10.5px;background:rgba(15,38,56,.7);color:#fff;border-radius:7px;padding:3px 8px;backdrop-filter:blur(4px)}
+.pcard .bd{padding:14px}
+.pcard h3{font-family:'Bricolage Grotesque';font-size:17px;margin:0 0 2px;font-weight:700}
+.loc{font-size:12.5px;color:var(--gray)}
+.typchips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.typchip{display:flex;align-items:center;gap:7px;border:1px solid var(--hair);border-radius:8px;padding:4px 8px 4px 4px;font-size:11.5px;color:var(--ink)}
+.typchip .mini{width:26px;height:22px;border-radius:4px;border:1px solid var(--hair);background:var(--soft)}
+.statline{display:flex;gap:13px;font-size:12px;color:var(--gray);margin:6px 0 11px}
+.statline b{color:var(--ink);font-weight:600}.dots{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+.price{font-family:'Geist Mono';font-size:14.5px;font-weight:500}
+.btns{display:flex;gap:8px}
+.btn{flex:1;text-align:center;font-size:13px;font-weight:600;border-radius:9px;padding:10px;cursor:pointer;border:1px solid transparent}
+.btn.pri{background:var(--green);color:#fff}.btn.sec{background:var(--card);color:var(--ink);border-color:var(--hair)}.btn.navy{background:var(--navy);color:#fff}.btn.gho{background:var(--card);color:var(--teal-d);border-color:var(--teal)}
+/* kpi (kokpit) */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:14px 15px;box-shadow:var(--sh)}
+.kpi .k{font-size:12px;color:var(--gray)}.kpi .v{font-family:'Bricolage Grotesque';font-size:26px;font-weight:800;margin-top:3px;letter-spacing:-.5px}
+.kpi .d{font-family:'Geist Mono';font-size:11px;margin-top:2px}.up{color:var(--green)}
+.alert{display:flex;align-items:center;gap:12px;background:var(--amber-soft);border:1px solid var(--amber);border-radius:12px;padding:12px 15px;margin-bottom:16px;font-size:13.5px;color:#7a5712}
+.alert .ai{width:25px;height:25px;border-radius:50%;background:var(--amber);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.alert .ab{margin-left:auto;font-size:12.5px;font-weight:600;border:1px solid var(--amber);border-radius:8px;padding:7px 12px;background:#fff}
+.two{display:grid;grid-template-columns:1.15fr 1fr;gap:14px}
+.panel{background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:15px;box-shadow:var(--sh)}
+.panel h3{font-family:'Bricolage Grotesque';font-size:15px;margin:0 0 11px;font-weight:700}
+.prj{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--hair);font-size:13px}.prj:first-of-type{border-top:0}
+.prj .nm{font-weight:600;min-width:120px}.bar{flex:1;height:9px;border-radius:6px;background:#EEF2F5;overflow:hidden;display:flex}
+.bar i{height:100%}.bar .g{background:var(--green)}.bar .a{background:var(--amber)}.bar .r{background:var(--red)}.prj .pct{font-family:'Geist Mono';font-size:12px;color:var(--gray);min-width:40px;text-align:right}
+.lead{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--hair);font-size:13px}.lead:first-of-type{border-top:0}
+.chip{font-size:10.5px;font-weight:600;border-radius:6px;padding:3px 8px}.chip.own{background:var(--green-soft);color:var(--teal-d)}.chip.net{background:var(--navy-soft);color:var(--navy)}.lead .st{margin-left:auto;font-family:'Geist Mono';font-size:11px;color:var(--gray)}
+.legend{display:flex;gap:15px;font-size:12px;color:var(--gray)}.legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:6px;vertical-align:middle}
+/* PROJE DETAY */
+.pd{padding:0}
+.pdhero{position:relative;height:300px}
+.pdhero .ginfo{position:absolute;left:24px;bottom:20px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.4)}
+.pdhero .crumb{font-family:'Geist Mono';font-size:11.5px;opacity:.95;margin-bottom:8px}
+.pdhero h1{font-family:'Bricolage Grotesque';font-size:34px;margin:0;font-weight:800}
+.pdhero .chips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.hchip{background:rgba(255,255,255,.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:12px;border-radius:20px;padding:5px 12px}
+.pdhero .cta{position:absolute;right:24px;bottom:20px;display:flex;gap:9px}
+.pdhero .cta .b{background:rgba(255,255,255,.92);color:var(--ink);font-size:12.5px;font-weight:600;border-radius:9px;padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.pdhero .cta .b.g{background:var(--green);color:#fff}
+.gallery{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding:14px 18px;background:var(--card);border-bottom:1px solid var(--hair)}
+.gthumb{position:relative;height:74px;border-radius:8px;overflow:hidden;cursor:pointer;border:1px solid var(--hair)}
+.gthumb span{position:absolute;left:6px;bottom:5px;font-family:'Geist Mono';font-size:9.5px;background:rgba(15,38,56,.66);color:#fff;border-radius:5px;padding:2px 6px}
+.gthumb.more{display:grid;place-items:center;background:var(--navy-soft);color:var(--navy);font-weight:700;font-size:13px}
+.pdbody{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;padding:18px}
+.sec{background:var(--card);border:1px solid var(--hair);border-radius:13px;padding:16px;box-shadow:var(--sh);margin-bottom:16px}
+.sec h3{font-family:'Bricolage Grotesque';font-size:15px;margin:0 0 12px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sec h3 .i{width:18px;height:18px;color:var(--teal)}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--hair);font-size:13px}
+.kv span{color:var(--gray)}.kv b{font-weight:600;text-align:right}.kv .mono{font-size:12.5px}
+.kgrid .kv:nth-child(1),.kgrid .kv:nth-child(2){border-top:0}
+.mats{display:flex;flex-direction:column;gap:0}
+.mat{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--hair);font-size:13px}.mat:first-child{border-top:0}
+.mat .mi{width:30px;height:30px;border-radius:8px;background:var(--teal-soft);color:var(--teal-d);display:grid;place-items:center;flex:none}
+.mat .ml{color:var(--gray)}.mat .mb{margin-left:auto;font-weight:600}
+.amen{display:flex;flex-wrap:wrap;gap:8px}
+.amchip{display:flex;align-items:center;gap:7px;background:var(--soft);border:1px solid var(--hair);border-radius:9px;padding:7px 11px;font-size:12.5px}
+.amchip .i{width:16px;height:16px;color:var(--teal-d)}
+.poi{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--hair);font-size:13px}.poi:first-child{border-top:0}
+.poi .pi{width:26px;height:26px;border-radius:7px;background:var(--navy-soft);color:var(--navy);display:grid;place-items:center;flex:none}
+.poi .pd{margin-left:auto;font-family:'Geist Mono';font-size:12px;color:var(--teal-d)}
+/* stacking / non-uniform */
+.stack{display:flex;flex-direction:column;gap:6px}
+.srow{display:flex;align-items:center;gap:8px}
+.srow .fl{width:54px;font-family:'Geist Mono';font-size:11px;color:var(--gray);text-align:right;flex:none}
+.srow .units{flex:1;display:flex;gap:6px}
+.u{flex:1;min-height:38px;border-radius:7px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;padding:5px 9px;color:#fff;position:relative}
+.u .un{font-family:'Geist Mono';font-size:11px;opacity:.85}.u .ut{font-size:11.5px;font-weight:600;line-height:1.1}
+.u.g{background:var(--green)}.u.a{background:var(--amber);color:#5a3d09}.u.r{background:var(--red)}.u.o{background:#C7D0D8;color:#46535f}
+.u.com{background:var(--navy)}
+.u:hover{outline:3px solid var(--ink);outline-offset:2px}
+.u .kindi{position:absolute;right:7px;top:6px;font-size:10px;opacity:.8}
+/* tip kataloğu */
+.types{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tcard{border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer}
+.tcard .pl{height:120px;background:var(--soft);border-bottom:1px solid var(--hair)}
+.tcard .ti2{padding:11px 12px}
+.tcard h4{font-family:'Bricolage Grotesque';margin:0;font-size:15px;font-weight:700}
+.tcard .ts{font-size:11.5px;color:var(--gray);margin-top:2px}
+.tcard .tp{font-family:'Geist Mono';font-size:12.5px;margin-top:7px;font-weight:500}
+.tcard .av{font-size:11px;color:var(--teal-d);background:var(--teal-soft);border-radius:6px;padding:2px 7px;display:inline-block;margin-top:6px}
+/* allocation */
+.alloc{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px}
+.modecard{border:1px solid var(--hair);border-radius:12px;padding:15px;background:var(--card);cursor:pointer}
+.modecard.on{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal-soft)}
+.modecard .mt{font-weight:700;font-size:14.5px}.modecard .ms{font-size:12.5px;color:var(--gray);margin-top:3px}
+.office{display:flex;align-items:center;gap:11px;padding:10px 0;border-top:1px solid var(--hair);font-size:13.5px}
+.cbx{width:20px;height:20px;border-radius:6px;border:2px solid var(--hair);display:grid;place-items:center;flex:none}.cbx.on{background:var(--teal);border-color:var(--teal);color:#fff;font-size:12px}
+.office .role{margin-left:auto;font-size:11px;color:var(--gray);font-family:'Geist Mono'}
+.seg{display:flex;gap:6px;flex-wrap:wrap}.seg b{font-size:12.5px;font-weight:500;border:1px solid var(--hair);border-radius:8px;padding:6px 11px;cursor:pointer}.seg b.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* phones */
+.phones{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;align-items:start}
+.phone{width:300px;margin:0 auto;border-radius:40px;background:#0c1f2e;padding:11px;box-shadow:var(--sh-lg)}
+.screen{background:var(--soft);border-radius:30px;overflow:hidden;height:640px;display:flex;flex-direction:column}
+.notch{height:24px;display:flex;justify-content:center}.notch::after{content:"";width:110px;height:20px;background:#0c1f2e;border-radius:0 0 15px 15px}
+.mtop{background:var(--card);padding:12px 16px;border-bottom:1px solid var(--hair);display:flex;align-items:center;gap:10px}
+.mtop .logo{transform:scale(.7);transform-origin:left}
+.mtop .ofl{margin-left:auto;font-family:'Geist Mono';font-size:9.5px;color:var(--teal-d);background:var(--teal-soft);border-radius:12px;padding:3px 8px;display:flex;align-items:center;gap:5px}
+.mtop .ofl i{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.mbody{padding:13px;flex:1;overflow:hidden;display:flex;flex-direction:column;gap:11px}
+.mh{font-family:'Bricolage Grotesque';font-size:17px;font-weight:800}
+.mcard{background:var(--card);border:1px solid var(--hair);border-radius:14px;overflow:hidden;box-shadow:var(--sh)}
+.mcard .mt2{height:96px;position:relative}
+.mcard .mt2 .f2{position:absolute;right:8px;top:8px}
+.mcard .bd2{padding:11px}
+.mbig{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.mbtn{display:flex;align-items:center;gap:12px;padding:15px 16px;border-radius:14px;font-size:15.5px;font-weight:700}
+.mbtn .ic{width:26px;height:26px;flex:none}
+.mbtn.g{background:var(--green);color:#fff}.mbtn.n{background:var(--navy);color:#fff}.mbtn.t{background:var(--teal);color:#fff}
+.install{background:var(--navy);color:#fff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:11px;font-size:13px}
+.install .ic{width:30px;height:30px;flex:none}.install b{font-weight:700}.install .x{margin-left:auto;opacity:.6}
+.miniu{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.miniu i{aspect-ratio:1;border-radius:2px;background:var(--green)}.miniu i.a{background:var(--amber)}.miniu i.r{background:var(--red)}.miniu i.o{background:#D3DBE1}
+.mrow{display:flex;align-items:center;gap:8px;font-size:12px}
+.mkv{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-top:1px solid var(--hair)}.mkv span{color:var(--gray)}.mkv b{font-weight:600}
+/* whatsapp */
+.watop{background:#0c5a4a;color:#fff;padding:12px 15px;display:flex;align-items:center;gap:10px}
+.watop .wav{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.watop .wn{font-weight:700;font-size:14px}.watop .ws{font-size:10.5px;opacity:.8}
+.wa{background:#E7E2DB;flex:1;display:flex;flex-direction:column;padding:12px;gap:8px;overflow:hidden}
+.bub{max-width:82%;padding:8px 11px;border-radius:12px;font-size:13px;line-height:1.4;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.bub.in{background:#fff;align-self:flex-start;border-top-left-radius:3px}.bub.out{background:#D6F5C8;align-self:flex-end;border-top-right-radius:3px}
+.bub .t{font-family:'Geist Mono';font-size:9px;color:var(--gray);text-align:right;margin-top:3px}
+.walist{align-self:flex-start;max-width:86%;border-radius:10px;overflow:hidden;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.waopt{background:#fff;border-top:1px solid #eee;padding:10px 12px;font-size:12.5px;color:var(--teal-d);font-weight:600;text-align:center}.waopt:first-child{border-top:0}
+.confirm{background:#fff;border-radius:12px;padding:11px;align-self:flex-start;max-width:88%;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.confirm .cq{font-size:13px;font-weight:600;margin-bottom:9px}.confirm .cq .mono{font-size:11.5px;color:var(--navy)}
+.cbtns{display:flex;gap:8px}.cbtns b{flex:1;text-align:center;padding:9px;border-radius:9px;font-size:13px;font-weight:700}.cbtns .yes{background:var(--green);color:#fff}.cbtns .no{background:#F0F0F0;color:var(--gray)}
+.done{align-self:center;background:var(--green-soft);color:var(--teal-d);font-weight:600;font-size:12px;border-radius:20px;padding:6px 13px;border:1px solid var(--green)}
+.capm{text-align:center;font-family:'Geist Mono';font-size:11px;color:var(--gray);margin-top:11px}
+.ftr{margin-top:60px;padding-top:20px;border-top:2px solid var(--ink);display:flex;justify-content:space-between;font-family:'Geist Mono';font-size:12px;color:var(--gray)}.ftr b{color:var(--ink)}
+/* modal */
+.ovl{position:fixed;inset:0;background:rgba(12,28,42,.55);display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+.ovl.show{display:flex}
+.modal{background:var(--card);border-radius:18px;max-width:920px;width:100%;max-height:90vh;overflow:auto;box-shadow:var(--sh-lg)}
+.mxhead{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--hair);position:sticky;top:0;background:var(--card)}
+.mxhead .du{font-family:'Geist Mono';font-size:12px;color:var(--gray)}
+.mxhead h3{font-family:'Bricolage Grotesque';font-size:20px;margin:0;font-weight:800}
+.mxhead .cls{margin-left:auto;width:34px;height:34px;border-radius:9px;border:1px solid var(--hair);display:grid;place-items:center;cursor:pointer;font-size:18px;color:var(--gray)}
+.mxbody{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:20px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:20px;padding:4px 11px}
+.badge.g{background:var(--green-soft);color:var(--teal-d)}.badge.a{background:var(--amber-soft);color:#7a5712}.badge.r{background:var(--red-soft);color:#922}
+.sheri{background:var(--soft);border-radius:10px;padding:11px 13px;margin:12px 0;font-size:12.5px}
+.sheri .sl{display:flex;justify-content:space-between;padding:3px 0;color:var(--gray)}.sheri .sl b{color:var(--ink)}
+.plan{background:var(--soft);border-radius:10px;padding:11px 13px;margin:12px 0;font-size:12.5px;color:var(--gray)}.plan b{color:var(--ink)}
+.trace{display:flex;gap:8px;font-family:'Geist Mono';font-size:11px;color:var(--gray);margin-top:8px;flex-wrap:wrap}
+.trace span{background:var(--soft);border-radius:6px;padding:4px 8px}
+@media(max-width:920px){.cards,.two,.pdbody,.alloc,.kpis,.types,.kgrid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:repeat(3,1fr)}.phones{grid-template-columns:1fr}.mxbody{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="phead">
+    <div class="brand"><div class="logo"><i class="o"></i><i class="o"></i><i class="g"></i><i class="o"></i><i class="a"></i><i class="o"></i><i class="r"></i><i class="o"></i><i class="o"></i></div><div class="wm">proje<b>pazar</b></div></div>
+    <div class="meta">ÜRÜN EKRANLARI v2 · <b>BERRAK GÜVEN</b></div>
+  </div>
+  <p class="intro">Gerçek bir konut projesinin tüm zenginliğiyle — ölçeklenebilir konum, eşit-olmayan kat dizimi, daire-tipi planları, künye/parsel/imar, malzeme kalitesi, çevre bilgisi ve görsel galeri. Mobil-önce kurgulandı.</p>
+  <div class="pwa">
+    <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+    <div><b>PWA — saha-önce</b><div class="s">Kurulabilir uygulama · çevrimdışı çalışır · son senkron rozeti. Emlakçıların çoğu sahada; mobilde tam işlevsel.</div></div>
+    <div class="badge"><span class="pulse"></span> çevrimdışı · son senkron 2sn</div>
+  </div>
+
+  <!-- 01 HAVUZ -->
+  <div class="slabel"><span class="n">01</span> EMLAKÇI HAVUZU — ÖLÇEKLENEBİLİR KONUM<span class="tag">PRO · MASAÜSTÜ</span></div>
+  <div class="scap">Ülke › İl › İlçe › Mahalle hiyerarşik filtre (Ankara varsayılan, tüm Türkiye'ye hazır). Kartlarda render + daire-tipi görselleri.</div>
+  <div class="browser">
+    <div class="chrome"><span class="dot" style="background:#E2675E"></span><span class="dot" style="background:#E3B23C"></span><span class="dot" style="background:#54B06E"></span><span class="url">app.<b>projepazar.com</b>/havuz</span></div>
+    <div class="app">
+      <div class="topbar"><div class="logo"><i class="o"></i><i class="o"></i><i class="g"></i><i class="o"></i><i class="a"></i><i class="o"></i><i class="r"></i><i class="o"></i><i class="o"></i></div><div class="wm2">proje<b>pazar</b></div>
+        <div class="nav"><a class="on">Havuz</a><a>Lead'ler</a><a>İçerik</a><a>Performans</a></div>
+        <div class="tb-right"><span class="tb-search">Proje, ada/parsel ara…</span><div class="avatar">EK</div></div></div>
+      <div class="body">
+        <div class="side">
+          <h4>Konum</h4>
+          <div class="selct">Türkiye <span class="mut">▾</span></div>
+          <div class="selct">Ankara <span class="mut">▾</span></div>
+          <div class="selct">İlçe: Çankaya <span class="mut">▾</span></div>
+          <div class="selct">Mahalle: Tümü <span class="mut">▾</span></div>
+          <div class="crumbline">Türkiye › Ankara › <b>Çankaya</b></div>
+          <h4>Daire Tipi</h4>
+          <div class="frow"><span class="tagb">1+1</span><span class="tagb on">2+1</span><span class="tagb on">3+1</span><span class="tagb">4+1</span><span class="tagb">Dubleks</span></div>
+          <h4>Birim Türü</h4>
+          <div class="frow"><span class="tagb on">Daire</span><span class="tagb">Dükkan</span><span class="tagb">Ofis</span></div>
+          <h4>Durum & Teslim</h4>
+          <div class="frow"><span class="tagb on">Müsait</span><span class="tagb">2026</span><span class="tagb">Hazır</span></div>
+        </div>
+        <div class="main">
+          <div class="mhead"><div><h2>Çankaya · Yetkili Projeler</h2><div class="sub">8 proje · 940 birim canlı</div></div><span class="sortpill">En taze ▾</span></div>
+          <div class="cards">
+            <div class="pcard">
+              <div class="thumb" id="thumb1">
+                <span class="tr"><span class="verif">✓ Doğrulanmış</span></span>
+                <div class="ovl"><span class="fresh"><span class="pulse"></span> 2 saat önce</span></div>
+                <span class="galn">◳ 24 görsel · video</span>
+              </div>
+              <div class="bd">
+                <h3>Vadi Çankaya</h3><div class="loc">Çankaya · Çukurambar Mah. · Teslim 2026</div>
+                <div class="typchips">
+                  <span class="typchip"><span class="mini" id="m1"></span> 2+1 · 96m²</span>
+                  <span class="typchip"><span class="mini" id="m2"></span> 3+1 · 142m²</span>
+                  <span class="typchip"><span class="mini" id="m3"></span> 4+1 Dubleks</span>
+                </div>
+                <div class="statline"><span><i class="dots" style="background:var(--green)"></i><b>34</b> müsait</span><span><i class="dots" style="background:var(--amber)"></i><b>9</b> opsiyon</span><span><i class="dots" style="background:var(--red)"></i><b>5</b> satıldı</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px"><span class="price">4.25M – 7.8M ₺</span><span style="font-size:11px;color:var(--gray)" class="mono">KDV %1 · USD endeksli</span></div>
+                <div class="btns"><span class="btn pri" onclick="openUnit({no:'A1·K7·D12',t:'3+1',st:'g'})">İncele</span><span class="btn gho">WhatsApp Paylaş</span></div>
+              </div>
+            </div>
+            <div class="pcard">
+              <div class="thumb" id="thumb2">
+                <span class="tr"><span class="verif">✓ Doğrulanmış</span></span>
+                <div class="ovl"><span class="fresh"><span class="pulse"></span> 5 saat önce</span></div>
+                <span class="galn">◳ 18 görsel</span>
+              </div>
+              <div class="bd">
+                <h3>Park Yenimahalle</h3><div class="loc">Yenimahalle · Mehmet Akif Mah. · Teslim 2027</div>
+                <div class="typchips">
+                  <span class="typchip"><span class="mini" id="m4"></span> 1+1 · 58m²</span>
+                  <span class="typchip"><span class="mini" id="m5"></span> 2+1 · 88m²</span>
+                  <span class="typchip"><span class="mini" id="m6"></span> 3+1 · 124m²</span>
+                </div>
+                <div class="statline"><span><i class="dots" style="background:var(--green)"></i><b>41</b> müsait</span><span><i class="dots" style="background:var(--amber)"></i><b>4</b> opsiyon</span><span><i class="dots" style="background:var(--red)"></i><b>3</b> satıldı</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px"><span class="price">2.90M – 5.1M ₺</span><span style="font-size:11px;color:var(--gray)" class="mono">KDV %10</span></div>
+                <div class="btns"><span class="btn pri">İncele</span><span class="btn gho">WhatsApp Paylaş</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 PROJE DETAYI -->
+  <div class="slabel"><span class="n">02</span> PROJE DETAYI — KÜNYE · KONUM · MALZEME · GALERİ<span class="tag">PRO · MASAÜSTÜ</span></div>
+  <div class="scap">İnşaat & proje künyesi (ada/parsel, imar, emsal), konum + çevre (POI mesafe), malzeme/marka kalitesi, sosyal donatılar ve görsel galeri tek sayfada.</div>
+  <div class="browser">
+    <div class="chrome"><span class="dot" style="background:#E2675E"></span><span class="dot" style="background:#E3B23C"></span><span class="dot" style="background:#54B06E"></span><span class="url">app.<b>projepazar.com</b>/proje/vadi-cankaya</span></div>
+    <div class="app pd">
+      <div class="pdhero" id="hero">
+        <div class="ginfo">
+          <div class="crumb">Türkiye › Ankara › Çankaya › Çukurambar Mah.</div>
+          <h1>Vadi Çankaya</h1>
+          <div class="chips"><span class="hchip">✓ Doğrulanmış üretici · Vadi Yapı</span><span class="hchip">Teslim Q4 2026</span><span class="hchip">3 blok · 186 bağımsız bölüm</span><span class="hchip">Deprem Yön. 2018 ✓</span></div>
+        </div>
+        <div class="cta"><span class="b">◳ Galeri</span><span class="b">⛶ Sanal Tur 360°</span><span class="b g">⭳ Broşür (PDF)</span></div>
+      </div>
+      <div class="gallery" id="gallery"></div>
+      <div class="pdbody">
+        <div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg> Künye · Parsel & İmar</h3>
+            <div class="kgrid">
+              <div class="kv"><span>Ada / Parsel</span><b class="mono">8421 / 17</b></div>
+              <div class="kv"><span>İmar durumu</span><b>Konut (E:2.07)</b></div>
+              <div class="kv"><span>Emsal (KAKS)</span><b class="mono">2.07</b></div>
+              <div class="kv"><span>TAKS</span><b class="mono">0.35</b></div>
+              <div class="kv"><span>Arsa alanı</span><b class="mono">6.480 m²</b></div>
+              <div class="kv"><span>Toplam inşaat</span><b class="mono">21.400 m²</b></div>
+              <div class="kv"><span>Yapı ruhsatı</span><b>14.03.2025 ✓</b></div>
+              <div class="kv"><span>Yapı denetim</span><b>Akkon YDK</b></div>
+              <div class="kv"><span>İskan durumu</span><b>İnşaat hâlinde</b></div>
+              <div class="kv"><span>Kat karşılığı</span><b>Evet · pay etiketli</b></div>
+            </div>
+          </div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 21s-7-6-7-11a7 7 0 1114 0c0 5-7 11-7 11z"/></svg> Konum & Çevre</h3>
+            <div id="map" style="border-radius:10px;overflow:hidden;margin-bottom:12px"></div>
+            <div class="poi"><span class="pi">M</span> Metro (Çukurambar)<span class="pd">400 m · 5 dk</span></div>
+            <div class="poi"><span class="pi">O</span> İlkokul & Anaokulu<span class="pd">300 m</span></div>
+            <div class="poi"><span class="pi">+</span> Şehir Hastanesi<span class="pd">2,1 km</span></div>
+            <div class="poi"><span class="pi">◧</span> Atlantis AVM<span class="pd">900 m</span></div>
+          </div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6v11H3z"/><path d="M9 21v-7h6v7"/></svg> Birim Dizimi — Kat Planı (eşit değil)</h3>
+            <p style="font-size:12px;color:var(--gray);margin:0 0 10px">Her kat ayrı planlanır: zemin dükkan, ara katlar 4 daire, üst katlar 2 dubleks. Bir birime tıkla → detay.</p>
+            <div class="stack" id="stack"></div>
+            <div class="legend" style="margin-top:12px"><span><i style="background:var(--green)"></i>Müsait</span><span><i style="background:var(--amber)"></i>Opsiyon</span><span><i style="background:var(--red)"></i>Satıldı</span><span><i style="background:#C7D0D8"></i>Stop</span><span><i style="background:var(--navy)"></i>Ticari</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg> Malzeme & Kalite</h3>
+            <div class="mats">
+              <div class="mat"><span class="mi">⊞</span><span class="ml">Pencere / doğrama</span><span class="mb">Schüco</span></div>
+              <div class="mat"><span class="mi">⇅</span><span class="ml">Asansör</span><span class="mb">Schindler</span></div>
+              <div class="mat"><span class="mi">⊟</span><span class="ml">Ankastre set</span><span class="mb">Bosch</span></div>
+              <div class="mat"><span class="mi">◍</span><span class="ml">Vitrifiye / armatür</span><span class="mb">VitrA</span></div>
+              <div class="mat"><span class="mi">≈</span><span class="ml">Isıtma</span><span class="mb">Yerden ısıtma · doğalgaz</span></div>
+              <div class="mat"><span class="mi">⌂</span><span class="ml">Akıllı ev</span><span class="mb">KNX altyapı</span></div>
+              <div class="mat"><span class="mi">▤</span><span class="ml">Yalıtım</span><span class="mb">Isı + ses · A sınıfı</span></div>
+            </div>
+          </div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h16M4 6h16M4 18h16"/></svg> Sosyal Donatılar</h3>
+            <div class="amen">
+              <span class="amchip">◯ Yüzme havuzu</span><span class="amchip">▤ Kapalı otopark</span><span class="amchip">♦ 7/24 güvenlik</span>
+              <span class="amchip">⬚ Fitness & SPA</span><span class="amchip">❀ Peyzaj bahçe</span><span class="amchip">⚇ Çocuk oyun</span>
+              <span class="amchip">⚡ Jeneratör</span><span class="amchip">⛐ Şarj istasyonu</span>
+            </div>
+          </div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> Vaziyet Planı</h3>
+            <div id="site"></div>
+            <p style="font-size:11.5px;color:var(--gray);margin:9px 0 0">Blok seç → o bloğun kat dizimine geç.</p>
+          </div>
+          <div class="sec"><h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg> Daire Tipleri</h3>
+            <div class="types" id="types"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 03 DAİRE DETAYI (inline) -->
+  <div class="slabel"><span class="n">03</span> DAİRE DETAYI<span class="tag">TIKLANINCA AÇILIR · MODAL</span></div>
+  <div class="scap">Izgarada/tipte bir daireye tıklayınca açılır: kat planı + daire planı, m²/oda/yön/manzara, şerefiye kırılımı, ödeme planı, durum+aksiyon, iz geçmişi. Aşağıda örnek açık hâli — üstteki ızgaradan da tıklayabilirsin.</div>
+  <div class="browser"><div class="app" style="padding:18px"><div id="inlineDetail"></div></div></div>
+
+  <!-- 04 TAHSİS -->
+  <div class="slabel"><span class="n">04</span> TAHSİS — KİMLER SATABİLİR?<span class="tag">PRO · MOAT</span></div>
+  <div class="scap">Üretici kontrolü: kapsam (blok/kat/tip) × hedef (ofis listesi) × şart (münhasırlık/kontenjan/fiyat maskesi).</div>
+  <div class="browser">
+    <div class="chrome"><span class="dot" style="background:#E2675E"></span><span class="dot" style="background:#E3B23C"></span><span class="dot" style="background:#54B06E"></span><span class="url">app.<b>projepazar.com</b>/tahsis/vadi-cankaya</span></div>
+    <div class="app"><div style="padding:16px 20px 0"><div class="mhead"><div><h2 style="font-family:'Bricolage Grotesque';font-size:21px;margin:0;font-weight:800">Tahsis · Vadi Çankaya</h2><div class="sub" style="color:var(--gray);font-size:13px">Kimler, neyi, hangi şartla satar?</div></div><span class="btn pri" style="flex:none;padding:10px 18px">Kaydet</span></div></div>
+      <div class="alloc">
+        <div>
+          <div class="modecard" style="margin-bottom:12px"><div class="mt">🌐 Herkese açık</div><div class="ms">Tüm yetkili ağ görür ve satar.</div></div>
+          <div class="modecard on"><div class="mt">🔒 Yalnız seçili ofisler <span style="color:var(--teal-d);font-size:12px">● seçili</span></div><div class="ms">Sadece aşağıdaki ofisler görür.</div>
+            <div style="margin-top:10px">
+              <div class="office"><span class="cbx on">✓</span> Remax Çankaya <span class="role">münhasır</span></div>
+              <div class="office"><span class="cbx on">✓</span> Century21 Vadi <span class="role">kontenjan 20</span></div>
+              <div class="office"><span class="cbx on">✓</span> Turyap Kızılay <span class="role">standart</span></div>
+              <div class="office"><span class="cbx"></span> Remax Yenimahalle <span class="role">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Kapsam</h3>
+          <div style="font-size:12.5px;color:var(--gray);margin-bottom:4px">Bloklar</div><div class="seg"><b class="on">A1</b><b class="on">A2</b><b>B1</b></div>
+          <div style="font-size:12.5px;color:var(--gray);margin:12px 0 4px">Katlar</div><div class="seg"><b>1–4</b><b class="on">5–8</b><b class="on">9–12</b></div>
+          <div style="font-size:12.5px;color:var(--gray);margin:12px 0 4px">Tip</div><div class="seg"><b>1+1</b><b class="on">2+1</b><b class="on">3+1</b><b>4+1</b></div>
+          <h3 style="margin-top:16px">Şartlar</h3>
+          <div class="kv"><span>Fiyat görünürlüğü</span><b>Göster</b></div><div class="kv"><span>Münhasırlık</span><b class="mono">30 gün</b></div><div class="kv"><span>Kontenjan</span><b class="mono">60 birim</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 MOBİL/PWA -->
+  <div class="slabel"><span class="n">05–07</span> SAHA / PWA · BASİT MOBİL · WHATSAPP<span class="tag">SIMPLE · MOBİL-ÖNCE</span></div>
+  <div class="scap">Soldan: sahadaki emlakçı için PWA proje gezme (çevrimdışı son-senkron, kurulabilir). Ortada 3-buton basit mod. Sağda WhatsApp teyit-merkezli giriş.</div>
+  <div class="phones">
+    <!-- PWA field -->
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="notch"></div>
+        <div class="mtop"><div class="logo"><i class="o"></i><i class="o"></i><i class="g"></i><i class="o"></i><i class="a"></i><i class="o"></i><i class="r"></i><i class="o"></i><i class="o"></i></div><span class="ofl"><i></i> çevrimdışı · 2sn</span></div>
+        <div class="mbody">
+          <div class="install"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg><div><b>Ana ekrana ekle</b><div style="font-size:11px;opacity:.8">Uygulama gibi çalışır, çevrimdışı açılır</div></div><span class="x">✕</span></div>
+          <div class="mh">Vadi Çankaya</div>
+          <div class="mcard"><div class="mt2" id="mt2"><span class="f2"><span class="fresh"><span class="pulse"></span>2sn</span></span></div>
+            <div class="bd2">
+              <div class="mrow" style="justify-content:space-between"><b style="font-family:'Bricolage Grotesque'">A1 · K7 · D12</b><span class="badge g" style="font-size:11px">● Müsait</span></div>
+              <div class="mkv"><span>3+1 · Güney-Batı</span><b>142 m²</b></div>
+              <div class="mkv"><span>Liste fiyatı</span><b class="mono">5.450.000 ₺</b></div>
+              <div class="miniu" id="miniu" style="margin-top:9px"></div>
+            </div>
+          </div>
+          <div class="mbig">
+            <div class="mbtn g"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16v12H7l-3 3z"/></svg> WhatsApp'tan Paylaş</div>
+            <div class="mbtn n"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 4l3 1 1 4-2 1a11 11 0 005 5l1-2 4 1 1 3a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg> Müteahhiti Ara</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="capm">05 · SAHA / PWA (çevrimdışı + kurulabilir)</div>
+    </div>
+    <!-- basit 3 button -->
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="notch"></div>
+        <div class="mtop"><div class="logo"><i class="o"></i><i class="o"></i><i class="g"></i><i class="o"></i><i class="a"></i><i class="o"></i><i class="r"></i><i class="o"></i><i class="o"></i></div><span class="ofl"><i></i> canlı</span></div>
+        <div class="mbody">
+          <div style="font-size:13px;color:var(--gray)">Merhaba</div><div class="mh" style="margin-top:-4px">Ahmet Bey</div>
+          <div class="mcard"><div class="mt2" id="mt3"><span class="f2"><span class="fresh"><span class="pulse"></span>2s</span></span></div>
+            <div class="bd2"><b style="font-family:'Bricolage Grotesque';font-size:15px">Vadi Çankaya</b><div class="loc" style="font-size:12px">Çankaya · 2+1, 3+1</div>
+              <div class="miniu" id="miniu2" style="margin-top:9px"></div>
+              <div class="mrow" style="justify-content:space-between;margin-top:8px"><span><i class="dots" style="background:var(--green)"></i><b>34</b> müsait</span><span class="price" style="font-size:12px">4.25M ₺’den</span></div></div></div>
+          <div class="mbig">
+            <div class="mbtn g"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg> Proje Bul</div>
+            <div class="mbtn t"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16v12H7l-3 3z"/></svg> WhatsApp Paylaş</div>
+            <div class="mbtn n"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 4l3 1 1 4-2 1a11 11 0 005 5l1-2 4 1 1 3a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg> Müteahhiti Ara</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="capm">06 · BASİT MOBİL (E2)</div>
+    </div>
+    <!-- whatsapp -->
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="watop"><div class="wav"><div class="logo" style="transform:scale(.58)"><i class="o"></i><i class="o"></i><i class="g"></i><i class="o"></i><i class="a"></i><i class="o"></i><i class="r"></i><i class="o"></i><i class="o"></i></div></div><div><div class="wn">ProjePazar</div><div class="ws">stok asistanı · çevrimiçi</div></div></div>
+        <div class="wa">
+          <div class="bub out">B blok 7. kat 3+1 satıldı, 2+1'lere %5 zam<div class="t">09:41 ✓✓</div></div>
+          <div class="bub in">2 aday buldum, hangisi?<div class="t">09:41</div></div>
+          <div class="walist"><div class="waopt">B1 · K7 · D12 — 3+1</div><div class="waopt" style="background:#F2FBF5;color:var(--ink)">B2 · K7 · D12 — 3+1 ✓</div></div>
+          <div class="confirm"><div class="cq">Teyit: <span class="mono">B2·K7·D12</span> 3+1 → <b>SATILDI?</b></div><div class="cbtns"><b class="yes">Evet</b><b class="no">Hayır</b></div></div>
+          <div class="bub in" style="background:#fff">Güncellendi. 2+1 fiyatları <b>%5 ↑</b>.<div class="t">09:42</div></div>
+          <div class="done">● Stok canlı · herkese yansıdı</div>
+        </div>
+      </div></div>
+      <div class="capm">07 · WHATSAPP GİRİŞ (teyit-merkezli)</div>
+    </div>
+  </div>
+
+  <div class="ftr"><span>BERRAK GÜVEN — ProjePazar ürün ekranları v2 · mobil-önce / PWA</span><span><b>projepazar.com</b></span></div>
+</div>
+
+<!-- MODAL -->
+<div class="ovl" id="ovl" onclick="if(event.target===this)closeUnit()"><div class="modal"><div id="modalBody"></div></div></div>
+
+<script>
+var GREEN='#2FB36B',AMBER='#E3A12C',RED='#D15A4E',NAVY='#13314B',TEAL='#1E9B8A';
+/* ---- render illustration ---- */
+function renderSVG(h){h=h||150;return `<svg viewBox="0 0 640 300" preserveAspectRatio="xMidYMid slice" style="width:100%;height:${h}px;display:block">
+<rect width="640" height="300" fill="#D7E6EE"/><circle cx="560" cy="56" r="34" fill="#F6E6C4"/>
+<rect y="210" width="640" height="90" fill="#E2EEE3"/>
+<g><rect x="70" y="70" width="150" height="190" rx="6" fill="#1E3A55"/><rect x="250" y="40" width="140" height="220" rx="6" fill="#214A63"/><rect x="420" y="95" width="150" height="165" rx="6" fill="#1E3A55"/></g>
+<g fill="#9FC3D6" opacity=".85">${win(86,86,150,190)}${win(266,56,140,220)}${win(436,111,150,165)}</g>
+<ellipse cx="320" cy="270" rx="120" ry="20" fill="#BFE3DA"/>
+<circle cx="40" cy="250" r="22" fill="#3E7E5C"/><circle cx="610" cy="250" r="20" fill="#3E7E5C"/><circle cx="600" cy="240" r="16" fill="#4C9A6E"/>
+</svg>`}
+function win(x,y,w,h){var s='';for(var r=0;r<Math.floor(h/26);r++)for(var c=0;c<Math.floor(w/26);c++){if(Math.random()<.22)continue;s+=`<rect x="${x+c*26}" y="${y+r*26}" width="15" height="16" rx="1.5"/>`}return s}
+/* ---- floor plan svg ---- */
+function planSVG(label,big){var H=big?260:120;return `<svg viewBox="0 0 360 260" style="width:100%;height:${H}px;display:block;background:#FBFCFD">
+<g stroke="#A9B6BF" stroke-width="1.3" fill="#EEF3F6">
+<rect x="14" y="14" width="170" height="84"/><rect x="14" y="98" width="170" height="78"/>
+<rect x="14" y="176" width="96" height="70"/><rect x="110" y="176" width="74" height="35"/><rect x="110" y="211" width="74" height="35"/>
+<rect x="184" y="14" width="162" height="162"/><rect x="184" y="176" width="162" height="70" fill="#E4F0E8"/></g>
+<rect x="14" y="14" width="332" height="232" fill="none" stroke="#2C4256" stroke-width="3"/>
+<g font-family="Geist Mono" font-size="10" fill="#5E6B78">
+<text x="99" y="58" text-anchor="middle">Ebeveyn Y.O.</text><text x="99" y="140" text-anchor="middle">Yatak Odası</text>
+<text x="62" y="214" text-anchor="middle">Mutfak</text><text x="147" y="197" text-anchor="middle">Antre</text><text x="147" y="232" text-anchor="middle">Banyo</text>
+<text x="265" y="96" text-anchor="middle" font-size="12" fill="#2C4256">Salon</text><text x="265" y="214" text-anchor="middle">Balkon / Teras</text></g>
+<g transform="translate(326,30)"><circle r="11" fill="#fff" stroke="#A9B6BF"/><path d="M0,-7 L4,5 L0,2 L-4,5 Z" fill="#D15A4E"/><text y="20" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#5E6B78">K</text></g>
+${label?`<rect x="14" y="14" width="86" height="22" fill="#13314B"/><text x="57" y="29" text-anchor="middle" font-family="Geist Mono" font-size="11" fill="#fff">${label}</text>`:''}</svg>`}
+/* ---- map ---- */
+function mapSVG(){return `<svg viewBox="0 0 360 150" style="width:100%;height:150px;display:block;background:#EEF2F4">
+<g stroke="#D7DEE3" stroke-width="9" fill="none"><path d="M0,55 H360"/><path d="M130,0 V150"/><path d="M0,110 H360"/></g>
+<g stroke="#C5D9CE" stroke-width="5" fill="none"><path d="M250,0 V150"/></g>
+<circle cx="200" cy="80" r="5" fill="#185FA5"/><text x="200" y="100" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#5E6B78">Metro</text>
+<circle cx="90" cy="90" r="5" fill="#BA7517"/><text x="90" y="110" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#5E6B78">Okul</text>
+<circle cx="300" cy="40" r="5" fill="#A32D2D"/><text x="300" y="30" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#5E6B78">Hastane</text>
+<g transform="translate(155,58)"><path d="M0,0 C-13,-13 -13,-30 0,-30 C13,-30 13,-13 0,0Z" fill="#13314B"/><circle cy="-19" r="6" fill="#fff"/></g>
+<text x="155" y="76" text-anchor="middle" font-family="Geist Mono" font-size="9" fill="#13314B">Vadi Çankaya</text></svg>`}
+/* ---- site plan ---- */
+function siteSVG(){return `<svg viewBox="0 0 360 220" style="width:100%;height:200px;display:block;background:#EEF3EE">
+<rect x="14" y="14" width="332" height="180" fill="#E4EFE5" stroke="#9DB7A4" stroke-width="2" stroke-dasharray="6 5"/>
+<rect x="14" y="196" width="332" height="14" fill="#D7DEE3"/>
+<ellipse cx="250" cy="150" rx="46" ry="22" fill="#BFE3DA"/>
+<g class="blk" style="cursor:pointer"><rect x="40" y="40" width="80" height="64" rx="6" fill="#1E9B8A"/><text x="80" y="78" text-anchor="middle" fill="#fff" font-family="Geist Mono" font-size="13">A1</text></g>
+<rect x="140" y="40" width="80" height="64" rx="6" fill="#214A63"/><text x="180" y="78" text-anchor="middle" fill="#fff" font-family="Geist Mono" font-size="13">A2</text>
+<rect x="240" y="44" width="76" height="56" rx="6" fill="#214A63"/><text x="278" y="78" text-anchor="middle" fill="#fff" font-family="Geist Mono" font-size="13">B1</text>
+<circle cx="60" cy="150" r="10" fill="#4C9A6E"/><circle cx="110" cy="165" r="8" fill="#4C9A6E"/><circle cx="150" cy="150" r="9" fill="#4C9A6E"/>
+<text x="80" y="118" text-anchor="middle" font-family="Geist Mono" font-size="8.5" fill="#137163">● seçili</text></svg>`}
+
+/* mini grids */
+function fillMini(el,n,cols){var s=[];for(var i=0;i<n;i++){var r=Math.random();s.push(r<.64?'':(r<.84?'a':(r<.95?'r':'o')))}el.style.gridTemplateColumns='repeat('+cols+',1fr)';el.innerHTML=s.map(c=>'<i class="'+c+'"></i>').join('')}
+
+/* ---- non-uniform stacking ---- */
+var floors=[
+ {fl:'7 · Çatı',u:[{n:'A1·D7A',t:'4+1 Dubleks',st:'g',k:'daire'},{n:'A1·D7B',t:'4+1 Dubleks',st:'r',k:'daire'}]},
+ {fl:'6',u:[{n:'A1·D6A',t:'4+1 Dubleks',st:'g',k:'daire'},{n:'A1·D6B',t:'4+1 Dubleks',st:'a',k:'daire'}]},
+ {fl:'5',u:[{n:'D5A',t:'3+1',st:'g',k:'daire'},{n:'D5B',t:'2+1',st:'g',k:'daire'},{n:'D5C',t:'2+1',st:'a',k:'daire'},{n:'D5D',t:'3+1',st:'r',k:'daire'}]},
+ {fl:'4',u:[{n:'D4A',t:'3+1',st:'g',k:'daire'},{n:'D4B',t:'2+1',st:'g',k:'daire'},{n:'D4C',t:'2+1',st:'g',k:'daire'},{n:'D4D',t:'3+1',st:'g',k:'daire'}]},
+ {fl:'3',u:[{n:'D3A',t:'3+1',st:'r',k:'daire'},{n:'D3B',t:'2+1',st:'g',k:'daire'},{n:'D3C',t:'2+1',st:'g',k:'daire'},{n:'D3D',t:'3+1',st:'a',k:'daire'}]},
+ {fl:'2',u:[{n:'D2A',t:'3+1',st:'g',k:'daire'},{n:'D2B',t:'2+1',st:'g',k:'daire'},{n:'D2C',t:'2+1',st:'r',k:'daire'},{n:'D2D',t:'3+1',st:'g',k:'daire'}]},
+ {fl:'1',u:[{n:'D1A',t:'3+1',st:'g',k:'daire'},{n:'D1B',t:'2+1',st:'g',k:'daire'},{n:'D1C',t:'2+1',st:'g',k:'daire'},{n:'D1D',t:'3+1',st:'g',k:'daire'}]},
+ {fl:'Zemin',u:[{n:'Z1',t:'Dükkan 120m²',st:'com',k:'ticari'},{n:'Z2',t:'Dükkan 80m²',st:'com',k:'ticari'},{n:'Z3',t:'Ofis 60m²',st:'com',k:'ticari'}]}
+];
+function buildStack(){
+  var h=floors.map(function(f){
+    var us=f.u.map(function(u){
+      return '<div class="u '+u.st+'" onclick=\'openUnit('+JSON.stringify(u)+')\'><span class="kindi">'+(u.k==='ticari'?'⌂':'')+'</span><span class="un">'+u.n+'</span><span class="ut">'+u.t+'</span></div>';
+    }).join('');
+    return '<div class="srow"><span class="fl">K'+f.fl+'</span><div class="units">'+us+'</div></div>';
+  }).join('');
+  document.getElementById('stack').innerHTML=h;
+}
+/* types */
+var types=[
+ {n:'2+1 · Bahçe',m:'88–96 m²',p:'4.25M ₺’den',av:'12 müsait'},
+ {n:'3+1 · Standart',m:'124–142 m²',p:'5.45M ₺’den',av:'9 müsait'},
+ {n:'4+1 · Dubleks',m:'190–210 m²',p:'7.80M ₺’den',av:'3 müsait'}
+];
+function buildTypes(){
+  document.getElementById('types').innerHTML=types.map(function(t){
+    return '<div class="tcard" onclick=\'openUnit({n:"Tip",t:"'+t.n+'",st:"g"})\'><div class="pl">'+planSVG('',false)+'</div><div class="ti2"><h4>'+t.n+'</h4><div class="ts">'+t.m+'</div><div class="tp">'+t.p+'</div><div class="av">'+t.av+'</div></div></div>';
+  }).join('');
+}
+/* unit detail html (inline + modal) */
+function unitDetailHTML(d){
+  var stt=d.st==='g'?'<span class="badge g">● Müsait</span>':d.st==='a'?'<span class="badge a">● Opsiyon</span>':d.st==='r'?'<span class="badge r">● Satıldı</span>':'<span class="badge g">● Müsait</span>';
+  return `<div class="mxhead"><div><div class="du">${d.no||d.n||'A1·K7·D12'} · Vadi Çankaya</div><h3>${d.t||'3+1'} · 142 m²</h3></div><div class="cls" onclick="closeUnit()">✕</div></div>
+  <div class="mxbody">
+    <div>
+      ${planSVG(d.t||'3+1',true)}
+      <div class="trace" style="margin-top:10px"><span>◳ Kat planındaki konum</span><span>↻ 24 görüntülenme</span><span>◴ güncel 2s</span></div>
+    </div>
+    <div>
+      <div style="margin-bottom:10px">${stt} <span class="badge" style="background:var(--navy-soft);color:var(--navy);margin-left:6px">Daire</span></div>
+      <div class="kv" style="border-top:0"><span>Net / Brüt</span><b class="mono">118 / 142 m²</b></div>
+      <div class="kv"><span>Yön / Cephe</span><b>Güney-Batı</b></div>
+      <div class="kv"><span>Manzara</span><b>Vadi · açık</b></div>
+      <div class="kv"><span>Oda / Banyo</span><b>3+1 · 2 banyo</b></div>
+      <div class="kv"><span>Balkon / Teras</span><b>2 · 14 m²</b></div>
+      <div class="kv"><span>Otopark / Depo</span><b>1 kapalı · 1 depo</b></div>
+      <div class="sheri"><div class="sl"><span>Taban fiyat (m²×birim)</span><b>5.040.000 ₺</b></div><div class="sl"><span>Şerefiye · kat 7</span><b>+%6</b></div><div class="sl"><span>Şerefiye · vadi manzara</span><b>+%2</b></div><div class="sl" style="border-top:1px solid #dde4e9;margin-top:4px;padding-top:6px"><span style="color:var(--ink);font-weight:600">Liste fiyatı</span><b style="color:var(--teal-d)">5.450.000 ₺</b></div></div>
+      <div class="plan"><b>Ödeme planı:</b> %30 peşin · 36 ay · kalan teslimde <span class="mono">(≈ 88.000 ₺/ay)</span> · KDV %1 · USD endeksli</div>
+      <div class="btns"><span class="btn navy">Opsiyon Al · 48s</span><span class="btn pri">Sattım</span><span class="btn gho">Paylaş</span></div>
+    </div>
+  </div>`;
+}
+function openUnit(d){document.getElementById('modalBody').innerHTML=unitDetailHTML(d||{});document.getElementById('ovl').classList.add('show')}
+function closeUnit(){document.getElementById('ovl').classList.remove('show')}
+
+/* init */
+document.getElementById('thumb1').insertAdjacentHTML('afterbegin',renderSVG(150));
+document.getElementById('thumb2').insertAdjacentHTML('afterbegin',renderSVG(150));
+document.getElementById('hero').insertAdjacentHTML('afterbegin','<div style="position:absolute;inset:0">'+renderSVG(300)+'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,38,56,0) 35%,rgba(15,38,56,.6))"></div></div>');
+['m1','m2','m3','m4','m5','m6'].forEach(function(id){var e=document.getElementById(id);e.innerHTML=planSVG('',false).replace('height:120px','height:22px')});
+document.getElementById('mt2').insertAdjacentHTML('afterbegin',renderSVG(96));
+document.getElementById('mt3').insertAdjacentHTML('afterbegin',renderSVG(96));
+document.getElementById('map').innerHTML=mapSVG();
+document.getElementById('site').innerHTML=siteSVG();
+var gl=['Render · Cephe','Render · Lobi','Vaziyet Planı','Kat Planı','Örnek Daire','Video Tur'];
+document.getElementById('gallery').innerHTML=gl.map(function(t,i){return i<5?'<div class="gthumb">'+renderSVG(74)+'<span>'+t+'</span></div>':'<div class="gthumb more">+19<br>görsel</div>'}).join('');
+fillMini(document.getElementById('miniu'),36,12);
+fillMini(document.getElementById('miniu2'),36,12);
+buildStack();buildTypes();
+document.getElementById('inlineDetail').innerHTML='<div style="max-width:920px;margin:0 auto;border:1px solid var(--hair);border-radius:14px;overflow:hidden">'+unitDetailHTML({no:'A1·K7·D12',t:'3+1',st:'g'}).replace('onclick="closeUnit()"','style="opacity:.3"')+'</div>';
+</script>
+</body>
+</html>

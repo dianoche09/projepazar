@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "permissions": {
+    "deny": [
+      "mcp__claude_ai_Supabase",
+      "mcp__claude_ai_Vercel",
+      "mcp__claude_ai_PostHog"
+    ]
+  },
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": ["supabase"]
+}
