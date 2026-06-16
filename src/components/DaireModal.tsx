@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom";
 import { birimDurumGuncelle } from "@/app/uretici/actions";
 import { opsiyonAl, opsiyonBirak } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
+import { KatPlani } from "@/components/KatPlani";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
 
@@ -120,6 +121,11 @@ export function DaireModal({
             {DURUM_ETIKET[birim.durum]}
           </span>
         ) : null}
+
+        {/* Daire planı (şematik) */}
+        <div className="mt-4 overflow-hidden rounded-xl border border-hair">
+          <KatPlani etiket={birim.oda ?? birim.tip_ad ?? undefined} buyuk />
+        </div>
 
         {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara ? (
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
