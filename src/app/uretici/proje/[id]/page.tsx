@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { blokEkle, daireTipiEkle, birimGenerator } from "@/app/uretici/actions";
+import { blokEkle, daireTipiEkle, birimGenerator, excelImport } from "@/app/uretici/actions";
 import {
   ASAMA_ETIKET,
   zamanOnce,
@@ -280,6 +280,26 @@ export default async function ProjeDetay({
               Generator için en az 1 blok ve 1 daire tipi tanımla.
             </p>
           )}
+        </div>
+
+        {/* Excel/CSV ile toplu yükle */}
+        <div className="mt-5 rounded-2xl border border-hair bg-card p-5">
+          <h3 className="font-medium text-ink">Excel/CSV ile toplu yükle</h3>
+          <p className="mt-1 text-xs text-gray">
+            Sütunlar: <span className="font-mono">blok · kat · daire_no · tip · durum · fiyat · net_m2</span>{" "}
+            (blok adları mevcut bloklarla eşleşmeli).
+          </p>
+          <form action={excelImport} className="mt-3 flex flex-wrap items-center gap-2">
+            <input type="hidden" name="proje_id" value={id} />
+            <input
+              type="file"
+              name="dosya"
+              accept=".xlsx,.xls,.csv"
+              required
+              className="text-sm text-gray file:mr-2 file:rounded-lg file:border-0 file:bg-navy file:px-3 file:py-2 file:text-sm file:text-white"
+            />
+            <button className={btnCls}>Yükle</button>
+          </form>
         </div>
       </section>
     </div>
