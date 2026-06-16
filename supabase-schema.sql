@@ -361,6 +361,62 @@ create policy proje_belge_read on proje_belge for select using (emlakci_proje_ta
 -- (Satış sonrası ALICI evrak yönetimi = Faz 2)
 
 -- =========================================================
+-- ABONELİK / GELİR (Admin = platform işletmecisi; gelir modeli ①/②)
+-- Paket = ofis/franchise SaaS kademeleri (ANA GELİR). Üretici (②) için de kullanılır.
+-- =========================================================
+create table abonelik_paketi (
+  id             uuid primary key default gen_random_uuid(),
+  ad             text not null,                 -- "Başlangıç" | "Profesyonel" | "Kurumsal"
+  hedef          text not null default 'ofis',  -- 'ofis' | 'uretici'
+  fiyat_aylik    numeric not null default 0,
+  para_birimi    text not null default 'TRY',
+  kota_proje     int,                           -- null = sınırsız
+  kota_koltuk    int,                           -- ofis: bağlı emlakçı koltuğu; null = sınırsız
+  kota_ai        int,                           -- AI içerik/ay (Faz 2 limiti); null = yok
+  gelismis_rapor boolean default false,
+  aktif          boolean default true,
+  siralama       int default 0,
+  created_at     timestamptz default now()
+);
+
+-- Atanan abonelik: ofis VEYA üretici → paket. Tek aktif abonelik/abone (unique partial index).
+create table abonelik (
+  id            uuid primary key default gen_random_uuid(),
+  ofis_id       uuid references ofis(id) on delete cascade,
+  uretici_id    uuid references uretici(id) on delete cascade,
+  paket_id      uuid not null references abonelik_paketi(id),
+  durum         text not null default 'deneme',  -- 'deneme' | 'aktif' | 'askida' | 'iptal'
+  baslangic     date default current_date,
+  bitis         date,                            -- null = süresiz/otomatik yenilenen
+  kota_proje_override  int,                       -- pakete özel kota istisnası
+  kota_koltuk_override int,
+  not_admin     text,
+  created_at    timestamptz default now(),
+  -- abone ya ofis ya üretici (biri zorunlu, ikisi birden değil)
+  constraint abonelik_tek_abone check (
+    (ofis_id is not null)::int + (uretici_id is not null)::int = 1
+  )
+);
+create unique index abonelik_ofis_aktif on abonelik (ofis_id)
+  where durum in ('deneme','aktif') and ofis_id is not null;
+create unique index abonelik_uretici_aktif on abonelik (uretici_id)
+  where durum in ('deneme','aktif') and uretici_id is not null;
+
+alter table abonelik_paketi enable row level security;
+alter table abonelik        enable row level security;
+
+-- paket: okuma serbest (seçim/pazarlama), yazma admin
+create policy paket_read  on abonelik_paketi for select using (true);
+create policy paket_admin on abonelik_paketi for all using (is_admin()) with check (is_admin());
+
+-- abonelik: admin tam yetki; ofis/üretici sahibi yalnız kendi aboneliğini görür
+create policy abonelik_admin on abonelik for all using (is_admin()) with check (is_admin());
+create policy abonelik_self on abonelik for select using (
+  ofis_id = current_ofis()
+  or exists (select 1 from uretici u where u.id = abonelik.uretici_id and u.sahip_id = auth.uid())
+);
+
+-- =========================================================
 -- FAZ 2 TABLOLARI (yapı hazır; iş mantığı Faz 2'de)
 -- =========================================================
 -- Dinamik / otomatik fiyatlama kuralları (tarih / satış adedi / doluluk tetikli)

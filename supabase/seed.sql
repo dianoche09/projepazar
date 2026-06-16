@@ -141,3 +141,19 @@ from auth.users u where u.id = 'a0000000-0000-0000-0000-000000000001'
 on conflict do nothing;
 
 update profiles set rol='admin', ad='ProjePazar Admin' where id='a0000000-0000-0000-0000-000000000001';
+
+-- =========================================================
+-- ABONELİK PAKETLERİ (gelir modeli ① — ofis SaaS kademeleri) + Demo ofis denemesi
+-- =========================================================
+insert into abonelik_paketi (id, ad, hedef, fiyat_aylik, para_birimi, kota_proje, kota_koltuk, kota_ai, gelismis_rapor, siralama) values
+  ('c0000000-0000-0000-0000-000000000001','Başlangıç','ofis',1500,'TRY',null,3,10,false,1),
+  ('c0000000-0000-0000-0000-000000000002','Profesyonel','ofis',3500,'TRY',null,10,50,true,2),
+  ('c0000000-0000-0000-0000-000000000003','Kurumsal','ofis',7500,'TRY',null,null,200,true,3)
+on conflict (id) do nothing;
+
+insert into abonelik (ofis_id, paket_id, durum, baslangic)
+select '55555555-5555-5555-5555-555555555555','c0000000-0000-0000-0000-000000000002','deneme',current_date
+where not exists (
+  select 1 from abonelik
+  where ofis_id = '55555555-5555-5555-5555-555555555555' and durum in ('deneme','aktif')
+);

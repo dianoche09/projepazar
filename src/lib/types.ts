@@ -81,6 +81,48 @@ export const ASAMA_ETIKET: Record<InsaatAsama, string> = {
   tamamlandi: "Tamamlandı",
 };
 
+// ── Abonelik / gelir (Admin = platform işletmecisi; gelir modeli ①/②) ──
+export type AbonelikDurum = "deneme" | "aktif" | "askida" | "iptal";
+
+export interface AbonelikPaketi {
+  id: string;
+  ad: string;
+  hedef: "ofis" | "uretici";
+  fiyat_aylik: number;
+  para_birimi: string;
+  kota_proje: number | null;
+  kota_koltuk: number | null;
+  kota_ai: number | null;
+  gelismis_rapor: boolean;
+  aktif: boolean;
+  siralama: number;
+}
+
+export interface Abonelik {
+  id: string;
+  ofis_id: string | null;
+  uretici_id: string | null;
+  paket_id: string;
+  durum: AbonelikDurum;
+  baslangic: string | null;
+  bitis: string | null;
+  kota_koltuk_override: number | null;
+}
+
+export const ABONELIK_DURUM_ETIKET: Record<AbonelikDurum, string> = {
+  deneme: "Deneme",
+  aktif: "Aktif",
+  askida: "Askıda",
+  iptal: "İptal",
+};
+
+/** Para birimine göre kısa biçim (1.5M ₺ / 7.500 ₺). */
+export function fmtPara(n: number, birim = "TRY"): string {
+  const sembol = birim === "TRY" ? "₺" : birim === "USD" ? "$" : birim === "EUR" ? "€" : birim;
+  const v = n >= 1_000_000 ? `${(n / 1_000_000).toFixed(2)}M` : n.toLocaleString("tr-TR");
+  return `${v} ${sembol}`;
+}
+
 /** Basit "X önce" tazelik etiketi (UI'da nabız). */
 export function zamanOnce(iso: string): string {
   const fark = Date.now() - new Date(iso).getTime();
