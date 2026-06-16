@@ -3,13 +3,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { blokEkle, daireTipiEkle, birimGenerator } from "@/app/uretici/actions";
 import {
-  DURUM_BG,
-  DURUM_ETIKET,
   ASAMA_ETIKET,
   zamanOnce,
   type BirimDurum,
   type InsaatAsama,
 } from "@/lib/types";
+import { BirimHucre } from "@/components/BirimHucre";
 
 const inpCls =
   "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
@@ -156,13 +155,16 @@ export default async function ProjeDetay({
                         <span className="w-12 shrink-0 font-mono text-xs text-gray">{kat}. kat</span>
                         <div className="flex gap-1.5">
                           {kb.map((b) => (
-                            <div
+                            <BirimHucre
                               key={b.id}
-                              title={`${b.daire_no} · ${DURUM_ETIKET[b.durum as BirimDurum]}${!b.satilabilir ? " · arsa payı (satılamaz)" : ""}`}
-                              className={`flex size-11 shrink-0 items-center justify-center rounded-lg font-mono text-[10px] text-white ${DURUM_BG[b.durum as BirimDurum]} ${!b.satilabilir ? "opacity-70 ring-2 ring-inset ring-white/60" : ""}`}
-                            >
-                              {b.daire_no}
-                            </div>
+                              projeId={id}
+                              birim={{
+                                id: b.id,
+                                daire_no: b.daire_no,
+                                durum: b.durum as BirimDurum,
+                                satilabilir: b.satilabilir,
+                              }}
+                            />
                           ))}
                         </div>
                       </div>

@@ -141,3 +141,30 @@ export async function birimGenerator(formData: FormData) {
   revalidatePath(`/uretici/proje/${proje_id}`);
   redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(`${birimler.length} birim üretildi`)}`);
 }
+
+// ---- Birim durum güncelle (ızgaradan tek tık) ----
+const durumSemasi = z.enum([
+  "musait",
+  "opsiyonlu",
+  "satis_beklemede",
+  "satildi",
+  "stop",
+  "planli",
+  "kiralandi",
+]);
+
+export async function birimDurumGuncelle(formData: FormData) {
+  const supabase = await createClient();
+  const birim_id = String(formData.get("birim_id"));
+  const proje_id = String(formData.get("proje_id"));
+  const durum = durumSemasi.safeParse(formData.get("durum"));
+  if (!durum.success) hataya(`/uretici/proje/${proje_id}`, "Geçersiz durum");
+
+  // Tek doğru kaynak: her yazışta son_guncelleme=now() (DEĞİŞMEZ #5)
+  const { error } = await supabase
+    .from("birim")
+    .update({ durum: durum.data, son_guncelleme: new Date().toISOString() })
+    .eq("id", birim_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+}
