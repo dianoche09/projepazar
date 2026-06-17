@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { medyaYukle, medyaSil, projeKunyeGuncelle } from "@/app/uretici/actions";
+import { medyaYukle, medyaSil, projeKunyeGuncelle, mahalEkle, mahalSil } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { StokKurulumu } from "../StokKurulumu";
 
@@ -101,10 +101,18 @@ export default async function ProjeKurulum({
   const belgeler = (belgelerRaw ?? []) as Belge[];
   const kunye = (proje.kunye ?? {}) as Record<string, unknown>;
 
-  const [{ data: bloklar }, { data: tipler }] = await Promise.all([
+  const [{ data: bloklar }, { data: tipler }, { data: mahaller }] = await Promise.all([
     supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
     supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, plan_url").eq("proje_id", id).order("ad"),
+    supabase.from("mahal").select("id, mahal, zemin, duvar, tavan").eq("proje_id", id).order("sira").order("created_at"),
   ]);
+  const mahalListe = (mahaller ?? []) as {
+    id: string;
+    mahal: string;
+    zemin: string | null;
+    duvar: string | null;
+    tavan: string | null;
+  }[];
 
   const kapak = belgeler.find((b) => b.tip === "kapak") ?? null;
   const fotolar = belgeler.filter((b) => b.tip === "foto");
@@ -204,6 +212,52 @@ export default async function ProjeKurulum({
           <textarea name="malzeme" defaultValue={Array.isArray(kunye.malzeme) ? (kunye.malzeme as string[]).join("\n") : ""} placeholder="Malzeme (her satır: Pencere · Schüco)" rows={3} className={`${inpCls} sm:col-span-2`} />
           <input name="donati" defaultValue={Array.isArray(kunye.donati) ? (kunye.donati as string[]).join(", ") : ""} placeholder="Sosyal donatı (virgülle: Havuz, Fitness, Güvenlik)" className={`${inpCls} sm:col-span-2`} />
           <div className="sm:col-span-2"><SubmitButton>Künyeyi kaydet</SubmitButton></div>
+        </form>
+      </Bolum>
+
+      {/* ── Mahal Listesi ── */}
+      <Bolum baslik="Mahal Listesi" aciklama="Teslim standardı — her mahal için zemin / duvar / tavan kaplaması.">
+        {mahalListe.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px] text-sm">
+              <thead>
+                <tr className="text-left text-xs uppercase tracking-wide text-gray">
+                  <th className="pb-2 pr-3 font-medium">Mahal</th>
+                  <th className="pb-2 pr-3 font-medium">Zemin</th>
+                  <th className="pb-2 pr-3 font-medium">Duvar</th>
+                  <th className="pb-2 pr-3 font-medium">Tavan</th>
+                  <th className="pb-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {mahalListe.map((m) => (
+                  <tr key={m.id} className="border-t border-hair">
+                    <td className="py-2 pr-3 font-medium text-ink">{m.mahal}</td>
+                    <td className="py-2 pr-3 text-gray">{m.zemin ?? "—"}</td>
+                    <td className="py-2 pr-3 text-gray">{m.duvar ?? "—"}</td>
+                    <td className="py-2 pr-3 text-gray">{m.tavan ?? "—"}</td>
+                    <td className="py-2 text-right">
+                      <form action={mahalSil}>
+                        <input type="hidden" name="mahal_id" value={m.id} />
+                        <input type="hidden" name="proje_id" value={id} />
+                        <button className="text-xs font-medium text-red hover:underline">Sil</button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
+        <form action={mahalEkle} className="mt-3 grid gap-2 sm:grid-cols-4">
+          <input type="hidden" name="proje_id" value={id} />
+          <input name="mahal" placeholder="Salon" required className={inpCls} />
+          <input name="zemin" placeholder="Zemin (ör. seramik)" className={inpCls} />
+          <input name="duvar" placeholder="Duvar (ör. saten boya)" className={inpCls} />
+          <input name="tavan" placeholder="Tavan (ör. alçı)" className={inpCls} />
+          <div className="sm:col-span-4">
+            <SubmitButton>Mahal ekle</SubmitButton>
+          </div>
         </form>
       </Bolum>
 

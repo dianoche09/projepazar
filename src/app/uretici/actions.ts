@@ -739,3 +739,37 @@ export async function projeKunyeGuncelle(formData: FormData) {
   revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
   redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Künye güncellendi")}`);
 }
+
+// ── Mahal Listesi (proje teslim standardı: her mahal için zemin/duvar/tavan) ──
+export async function mahalEkle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const geri = `/uretici/proje/${proje_id}/kurulum`;
+  const supabase = await createClient();
+  if (!(await projeSahibiMi(supabase, proje_id))) hataya("/uretici", "Bu projeye erişim yok");
+
+  const mahal = String(formData.get("mahal") ?? "").trim();
+  if (!mahal) hataya(geri, "Mahal adı gerekli");
+  const al = (k: string) => String(formData.get(k) ?? "").trim() || null;
+
+  const { error } = await supabase.from("mahal").insert({
+    proje_id,
+    mahal,
+    zemin: al("zemin"),
+    duvar: al("duvar"),
+    tavan: al("tavan"),
+    aciklama: al("aciklama"),
+  });
+  if (error) hataya(geri, error.message);
+  revalidatePath(geri);
+  redirect(`${geri}?mesaj=${encodeURIComponent("Mahal eklendi")}`);
+}
+
+export async function mahalSil(formData: FormData) {
+  const id = z.string().uuid().safeParse(formData.get("mahal_id"));
+  const proje_id = String(formData.get("proje_id"));
+  if (!id.success) return;
+  const supabase = await createClient();
+  if (!(await projeSahibiMi(supabase, proje_id))) return;
+  await supabase.from("mahal").delete().eq("id", id.data);
+  revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
+}
