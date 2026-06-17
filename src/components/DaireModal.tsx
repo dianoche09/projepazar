@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { birimDurumGuncelle, birimGuncelle } from "@/app/uretici/actions";
-import { opsiyonAl, opsiyonBirak } from "@/app/havuz/actions";
+import { opsiyonAlSessiz, opsiyonBirakSessiz } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 import { KatPlani } from "@/components/KatPlani";
+import { useToast } from "@/components/ui/Toast";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
 const inp =
@@ -49,20 +50,6 @@ function Kaydet() {
   );
 }
 
-function OpsiyonBtn({ etiket, ton }: { etiket: string; ton: "amber" | "outline" }) {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      disabled={pending}
-      className={`w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity disabled:opacity-50 ${
-        ton === "amber" ? "bg-amber text-white hover:opacity-90" : "border border-hair text-amber hover:border-amber"
-      }`}
-    >
-      {pending ? "…" : etiket}
-    </button>
-  );
-}
-
 /**
  * Daire detay modalı — merkezi, scroll yaratmaz. Künye + şerefiye kırılımı + iz.
  * mod="uretici": durum/not değiştir. mod="emlakci": salt-okunur + paylaş + opsiyon (48s kilit).
@@ -83,6 +70,8 @@ export function DaireModal({
   shareUrl?: string;
 }) {
   const [durum, setDurum] = useState<BirimDurum>(birim.durum);
+  const [bekliyor, basla] = useTransition();
+  const toast = useToast();
 
   const taban = birim.taban_fiyat;
   const liste = birim.liste_fiyati;
@@ -105,9 +94,9 @@ export function DaireModal({
   const waLink = `https://wa.me/?text=${encodeURIComponent(paylasMetni)}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-ink/40" onClick={onKapat} aria-hidden />
-      <div className="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-hair bg-card p-5 shadow-xl">
+      <div className="sheet-in relative z-10 max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-hair bg-card p-5 shadow-xl sm:rounded-2xl">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="font-display text-lg font-semibold text-ink">Daire {birim.daire_no ?? "—"}</h3>
@@ -285,17 +274,35 @@ export function DaireModal({
             </a>
 
             {birim.durum === "musait" && birim.satilabilir ? (
-              <form action={opsiyonAl}>
-                <input type="hidden" name="birim_id" value={birim.id} />
-                <input type="hidden" name="proje_id" value={projeId} />
-                <OpsiyonBtn etiket="Opsiyon Al · 48s" ton="amber" />
-              </form>
+              <button
+                type="button"
+                disabled={bekliyor}
+                onClick={() =>
+                  basla(async () => {
+                    const r = await opsiyonAlSessiz(birim.id, projeId);
+                    toast.goster(r.mesaj, r.ok ? "basari" : "hata");
+                    if (r.ok) onKapat();
+                  })
+                }
+                className="w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              >
+                {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48s"}
+              </button>
             ) : birim.durum === "opsiyonlu" ? (
-              <form action={opsiyonBirak}>
-                <input type="hidden" name="birim_id" value={birim.id} />
-                <input type="hidden" name="proje_id" value={projeId} />
-                <OpsiyonBtn etiket="Opsiyonu bırak (yalnız kendi opsiyonun)" ton="outline" />
-              </form>
+              <button
+                type="button"
+                disabled={bekliyor}
+                onClick={() =>
+                  basla(async () => {
+                    const r = await opsiyonBirakSessiz(birim.id, projeId);
+                    toast.goster(r.mesaj, r.ok ? "basari" : "hata");
+                    if (r.ok) onKapat();
+                  })
+                }
+                className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-amber transition-colors hover:border-amber disabled:opacity-50"
+              >
+                {bekliyor ? "İşleniyor…" : "Opsiyonu bırak (yalnız kendi opsiyonun)"}
+              </button>
             ) : (
               <button disabled className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-gray opacity-60">
                 {DURUM_ETIKET[birim.durum]} — opsiyon alınamaz

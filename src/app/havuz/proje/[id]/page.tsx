@@ -3,7 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ASAMA_ETIKET, zamanOnce, type InsaatAsama } from "@/lib/types";
-import { BinaKesiti } from "@/components/BinaKesiti";
+import { CanliIzgara } from "@/components/CanliIzgara";
 import { generateShareToken } from "@/lib/sharing";
 
 function trTarih(iso: string | null): string {
@@ -137,13 +137,12 @@ export default async function HavuzProjeDetay({
         {toplam === 0 ? (
           <p className="text-sm text-gray">Bu projede sana tahsisli birim yok.</p>
         ) : (
-          <BinaKesiti
-            bloklar={bloklar ?? []}
-            birimler={(birimler ?? []) as never}
-            tipler={tipler ?? []}
-            mod="emlakci"
+          <CanliIzgara
             projeId={id}
             projeAd={proje.ad}
+            bloklar={bloklar ?? []}
+            tipler={tipler ?? []}
+            baslangic={(birimler ?? []) as never}
             shareUrlMap={shareUrlMap}
           />
         )}

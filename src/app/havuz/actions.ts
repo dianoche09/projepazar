@@ -61,3 +61,54 @@ export async function opsiyonBirak(formData: FormData) {
   revalidatePath("/havuz");
   redirect(`/havuz/proje/${proje.data}?mesaj=${encodeURIComponent("Opsiyon bırakıldı")}`);
 }
+
+/** Optimistic UI için sessiz varyantlar — redirect yok, sonuç döner; ızgara Realtime ile güncellenir. */
+export async function opsiyonAlSessiz(
+  birimId: string,
+  projeId: string,
+): Promise<{ ok: boolean; mesaj: string }> {
+  const b = uuid.safeParse(birimId);
+  const p = uuid.safeParse(projeId);
+  if (!b.success || !p.success) return { ok: false, mesaj: "Geçersiz istek" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, mesaj: "Giriş gerekli" };
+
+  const kilit = new Date(Date.now() + 48 * 3600 * 1000).toISOString();
+  const { error } = await supabase
+    .from("opsiyon")
+    .insert({ birim_id: b.data, satici_id: user.id, durum: "opsiyonlu", kilit_bitis: kilit });
+  revalidatePath(`/havuz/proje/${p.data}`);
+  revalidatePath("/havuz");
+  return error
+    ? { ok: false, mesaj: "Bu birim müsait değil veya başkası opsiyonladı" }
+    : { ok: true, mesaj: "48 saat opsiyon alındı" };
+}
+
+export async function opsiyonBirakSessiz(
+  birimId: string,
+  projeId: string,
+): Promise<{ ok: boolean; mesaj: string }> {
+  const b = uuid.safeParse(birimId);
+  const p = uuid.safeParse(projeId);
+  if (!b.success || !p.success) return { ok: false, mesaj: "Geçersiz istek" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, mesaj: "Giriş gerekli" };
+
+  const { error } = await supabase
+    .from("opsiyon")
+    .delete()
+    .eq("birim_id", b.data)
+    .eq("satici_id", user.id)
+    .in("durum", ["opsiyonlu", "satis_beklemede"]);
+  revalidatePath(`/havuz/proje/${p.data}`);
+  revalidatePath("/havuz");
+  return error ? { ok: false, mesaj: "Bırakılamadı" } : { ok: true, mesaj: "Opsiyon bırakıldı" };
+}
