@@ -1,18 +1,14 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { cikisYap } from "@/app/(auth)/login/actions";
-import { panelYolu, ROL_ETIKET, type Rol } from "@/lib/roller";
+import { panelYolu } from "@/lib/roller";
 
 /** Berrak Güven imza öğesi: 3×3 ızgara, ortadaki yeşil (tazelik sinyali). */
 function GridMark() {
-  const cells = Array.from({ length: 9 });
   return (
     <span className="grid grid-cols-3 gap-1" aria-hidden>
-      {cells.map((_, i) => (
-        <span
-          key={i}
-          className={`size-2.5 rounded-[3px] ${i === 4 ? "bg-green" : "bg-navy/25"}`}
-        />
+      {Array.from({ length: 9 }).map((_, i) => (
+        <span key={i} className={`size-2.5 rounded-[3px] ${i === 4 ? "bg-green" : "bg-navy/25"}`} />
       ))}
     </span>
   );
@@ -33,14 +29,11 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let profil: { ad: string | null; rol: string } | null = null;
+  // Girişliyse doğrudan kendi kokpitine — ara landing yok
   if (user) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("ad, rol")
-      .eq("id", user.id)
-      .single();
-    profil = data;
+    const { data } = await supabase.from("profiles").select("rol, durum").eq("id", user.id).single();
+    if (data && data.durum !== "aktif") redirect("/hesap-bekliyor");
+    redirect(panelYolu(data?.rol));
   }
 
   return (
@@ -55,8 +48,7 @@ export default async function Home() {
       </h1>
 
       <p className="max-w-xl text-balance text-gray">
-        Tek doğru kaynak · granüler tahsis · çift-satış kalkanı · görünür tazelik.
-        Gayrimenkulün güven protokolü.
+        Tek doğru kaynak · granüler tahsis · çift-satış kalkanı · görünür tazelik. Gayrimenkulün güven protokolü.
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-sm text-ink">
@@ -65,43 +57,14 @@ export default async function Home() {
         <SinyalRozet renk="bg-red" etiket="satıldı" />
       </div>
 
-      {user ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-hair bg-card px-6 py-5">
-          <p className="text-sm text-gray">
-            Giriş yapıldı:{" "}
-            <strong className="text-ink">{profil?.ad ?? user.email}</strong>
-            {profil?.rol ? (
-              <>
-                {" "}
-                · rol{" "}
-                <code className="rounded bg-paper px-1.5 py-0.5 font-mono text-xs text-teal">
-                  {profil.rol}
-                </code>
-              </>
-            ) : null}
-          </p>
-          {profil?.rol ? (
-            <Link
-              href={panelYolu(profil.rol)}
-              className="rounded-lg bg-teal px-5 py-2 font-medium text-white transition-colors hover:bg-ink"
-            >
-              {ROL_ETIKET[profil.rol as Rol] ?? "Panel"} →
-            </Link>
-          ) : null}
-          <form action={cikisYap}>
-            <button className="rounded-lg border border-hair bg-card px-5 py-2 font-medium text-navy transition-colors hover:border-teal">
-              Çıkış yap
-            </button>
-          </form>
-        </div>
-      ) : (
-        <Link
-          href="/login"
-          className="rounded-lg bg-navy px-6 py-3 font-medium text-white transition-colors hover:bg-ink"
-        >
+      <div className="flex items-center gap-3">
+        <Link href="/login" className="btn rounded-xl bg-navy px-6 py-3 font-semibold text-white transition-colors hover:bg-ink">
           Giriş yap
         </Link>
-      )}
+        <Link href="/kayit" className="btn rounded-xl border border-hair bg-card px-6 py-3 font-semibold text-navy transition-colors hover:border-teal">
+          Kayıt ol
+        </Link>
+      </div>
     </main>
   );
 }

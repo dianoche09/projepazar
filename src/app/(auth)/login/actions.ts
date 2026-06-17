@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { panelYolu } from "@/lib/roller";
 
 // MVP: kod kuralı — input doğrulama Zod ile (CLAUDE.md)
 const girisSemasi = z.object({
@@ -33,13 +34,14 @@ export async function girisYap(formData: FormData) {
     .eq("id", data.user.id);
   const { data: profil } = await supabase
     .from("profiles")
-    .select("durum")
+    .select("durum, rol")
     .eq("id", data.user.id)
     .single();
 
   revalidatePath("/", "layout");
   if (profil && profil.durum !== "aktif") redirect("/hesap-bekliyor");
-  redirect("/");
+  // Kim girerse doğrudan kendi kokpitine — ara adım yok
+  redirect(panelYolu(profil?.rol));
 }
 
 export async function cikisYap() {

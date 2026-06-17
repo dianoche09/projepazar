@@ -33,6 +33,9 @@ export default async function UreticiKokpit() {
     .order("created_at", { ascending: false })
     .limit(8);
 
+  const { data: kapaklar } = await supabase.from("proje_belge").select("proje_id, url").eq("tip", "kapak");
+  const kapakMap = new Map((kapaklar ?? []).map((k) => [k.proje_id, k.url as string | null]));
+
   const ozet = new Map<string, Ozet>();
   for (const b of birimler ?? []) {
     const o = ozet.get(b.proje_id) ?? { toplam: 0, musait: 0, opsiyon: 0, satildi: 0 };
@@ -125,32 +128,44 @@ export default async function UreticiKokpit() {
               { etiket: "Opsiyon", deger: o.opsiyon, renk: C.amber },
               { etiket: "Satıldı", deger: o.satildi, renk: C.red },
             ];
+            const kapak = kapakMap.get(p.id);
             return (
               <Link
                 key={p.id}
                 href={`/uretici/proje/${p.id}`}
-                className="group rounded-2xl border border-hair bg-card p-5 shadow-card transition-shadow hover:shadow-cardlg"
+                className="group overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="truncate font-display text-base font-semibold text-ink group-hover:text-teal-d">{p.ad}</h3>
-                    <p className="text-sm text-gray">{[p.ilce, p.il].filter(Boolean).join(", ") || "—"}</p>
-                  </div>
+                <div className="relative h-44 overflow-hidden sm:h-48">
+                  {kapak ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-navy-soft via-teal-soft to-soft">
+                      <span className="select-none font-display text-5xl font-bold text-teal-d/25">{(p.ad ?? "P").charAt(0).toUpperCase()}</span>
+                    </div>
+                  )}
                   {p.belge_dogrulandi ? (
-                    <span className="shrink-0 rounded-full bg-teal/10 px-2 py-0.5 text-xs font-medium text-teal-d">Belgeli</span>
+                    <span className="absolute right-3 top-3 rounded-full bg-card/90 px-2.5 py-0.5 text-xs font-semibold text-teal-d shadow-sm backdrop-blur">✓ Belgeli</span>
                   ) : null}
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-ink/65 px-2.5 py-1 font-mono text-[11px] text-white backdrop-blur">
+                    <span className="nabiz size-1.5 rounded-full bg-green" /> {zamanOnce(p.son_guncelleme)}
+                  </span>
                 </div>
-
-                <div className="mt-4">
-                  <YiginBar parcalar={par} />
-                  <div className="mt-2.5 flex items-center justify-between font-mono text-xs text-gray">
-                    <span className="tabular-nums">
-                      <b className="text-ink">{o.toplam}</b> birim · {o.satildi} satıldı
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <span className="nabiz size-1.5 rounded-full bg-green" />
-                      {zamanOnce(p.son_guncelleme)}
-                    </span>
+                <div className="p-5">
+                  <h3 className="truncate font-display text-lg font-semibold text-ink group-hover:text-teal-d">{p.ad}</h3>
+                  <p className="text-sm text-gray">{[p.ilce, p.il].filter(Boolean).join(", ") || "—"}</p>
+                  <div className="mt-4">
+                    <YiginBar parcalar={par} yukseklik={10} />
+                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-mono text-xs tabular-nums text-gray">
+                      <span>
+                        <b className="text-ink">{o.toplam}</b> birim
+                      </span>
+                      <span className="flex gap-3">
+                        <span className="text-green">{o.musait} müsait</span>
+                        <span className="text-amber">{o.opsiyon} ops.</span>
+                        <span className="text-red">{o.satildi} satıldı</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>

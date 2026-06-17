@@ -93,6 +93,19 @@ p {
   animation: sheetIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Logo-icon loader — 3×3 ızgara hücreleri dalga hâlinde parlar (renkler yansır) */
+@keyframes hucrePulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.65);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* =========================================================
    Genel buton geri bildirimi — basışta NET his.
    (Kullanıcı: "butonlara basıldığı anlaşılmıyor")
