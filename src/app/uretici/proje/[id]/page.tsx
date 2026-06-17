@@ -21,6 +21,7 @@ import {
   type InsaatAsama,
 } from "@/lib/types";
 import { BinaKesiti } from "@/components/BinaKesiti";
+import { SecimDuzenle } from "@/components/SecimDuzenle";
 
 const inpCls =
   "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
@@ -220,13 +221,15 @@ export default async function ProjeDetay({
       </div>
 
       <div className="mt-4">
-        <BinaKesiti
-          bloklar={bloklar ?? []}
-          birimler={(birimler ?? []) as never}
-          tipler={tipler ?? []}
-          mod="uretici"
-          projeId={id}
-        />
+        <SecimDuzenle projeId={id}>
+          <BinaKesiti
+            bloklar={bloklar ?? []}
+            birimler={(birimler ?? []) as never}
+            tipler={tipler ?? []}
+            mod="uretici"
+            projeId={id}
+          />
+        </SecimDuzenle>
       </div>
 
       {/* ===== TAHSİS (MOAT) ===== */}

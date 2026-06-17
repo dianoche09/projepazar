@@ -290,6 +290,68 @@ export async function birimDurumGuncelle(formData: FormData) {
   revalidatePath(`/uretici/proje/${proje_id}`);
 }
 
+// ---- Çoklu seçim: toplu durum/fiyat güncelle ----
+function idListesi(formData: FormData): string[] {
+  return String(formData.get("birim_idler") ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => z.string().uuid().safeParse(s).success);
+}
+
+export async function birimTopluGuncelle(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const idler = idListesi(formData);
+  if (idler.length === 0) hataya(`/uretici/proje/${proje_id}`, "Birim seçilmedi.");
+
+  const guncelle: Record<string, unknown> = { son_guncelleme: new Date().toISOString() };
+  const durum = durumSemasi.safeParse(formData.get("durum"));
+  if (durum.success) guncelle.durum = durum.data;
+  const fiyatRaw = String(formData.get("liste_fiyati") ?? "").trim();
+  if (fiyatRaw) guncelle.liste_fiyati = Number(fiyatRaw);
+
+  if (Object.keys(guncelle).length === 1) {
+    hataya(`/uretici/proje/${proje_id}`, "Durum veya fiyat gir (en az biri).");
+  }
+
+  const { error } = await supabase
+    .from("birim")
+    .update(guncelle)
+    .in("id", idler)
+    .eq("proje_id", proje_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(`${idler.length} birim güncellendi`)}`);
+}
+
+// ---- Çoklu seçim: toplu sil (opsiyon/satış korunur) ----
+export async function birimTopluSil(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const idler = idListesi(formData);
+  if (idler.length === 0) hataya(`/uretici/proje/${proje_id}`, "Birim seçilmedi.");
+
+  const { data } = await supabase
+    .from("birim")
+    .select("id, durum")
+    .in("id", idler)
+    .eq("proje_id", proje_id);
+  const silinebilir = (data ?? [])
+    .filter((b) => b.durum === "musait" || b.durum === "planli")
+    .map((b) => b.id);
+  const korunan = (data ?? []).length - silinebilir.length;
+
+  if (silinebilir.length > 0) {
+    const { error } = await supabase.from("birim").delete().in("id", silinebilir);
+    if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  }
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  const mesaj =
+    `${silinebilir.length} birim silindi` +
+    (korunan ? ` · ${korunan} opsiyon/satış korundu` : "");
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(mesaj)}`);
+}
+
 // ---- Excel/CSV import (toplu birim) ----
 const GECERLI_DURUM = [
   "musait",
