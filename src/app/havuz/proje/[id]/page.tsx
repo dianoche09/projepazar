@@ -3,20 +3,12 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ASAMA_ETIKET, zamanOnce, type InsaatAsama } from "@/lib/types";
-import { CanliIzgara } from "@/components/CanliIzgara";
+import { EmlakciStok } from "@/components/EmlakciStok";
 import { generateShareToken } from "@/lib/sharing";
 
 function trTarih(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("tr-TR", { year: "numeric", month: "short" });
-}
-
-function Lejant({ renk, etiket }: { renk: string; etiket: string }) {
-  return (
-    <span className="inline-flex items-center gap-1">
-      <span className={`size-2.5 rounded-[3px] ${renk}`} /> {etiket}
-    </span>
-  );
 }
 
 export default async function HavuzProjeDetay({
@@ -122,22 +114,13 @@ export default async function HavuzProjeDetay({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-lg font-semibold text-ink">
-          Sana tahsisli birimler <span className="font-mono text-sm text-gray">({toplam})</span>
-        </h2>
-        <div className="flex flex-wrap gap-3 font-mono text-xs text-gray">
-          <Lejant renk="bg-green" etiket="müsait" />
-          <Lejant renk="bg-amber" etiket="opsiyon" />
-          <Lejant renk="bg-red" etiket="satıldı" />
-        </div>
-      </div>
-
-      <div className="mt-4">
+      <div className="mt-8">
         {toplam === 0 ? (
-          <p className="text-sm text-gray">Bu projede sana tahsisli birim yok.</p>
+          <p className="rounded-2xl border border-dashed border-hair bg-card/60 p-8 text-center text-sm text-gray">
+            Bu projede sana tahsisli birim yok. Üretici tahsis edince burada canlı görünür.
+          </p>
         ) : (
-          <CanliIzgara
+          <EmlakciStok
             projeId={id}
             projeAd={proje.ad}
             bloklar={bloklar ?? []}
