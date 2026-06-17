@@ -1,36 +1,7 @@
 import Link from "next/link";
 import { projeOlustur } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-
-function Alan({
-  name,
-  label,
-  type = "text",
-  required = false,
-  placeholder,
-}: {
-  name: string;
-  label: string;
-  type?: string;
-  required?: boolean;
-  placeholder?: string;
-}) {
-  return (
-    <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
-      <span>
-        {label}
-        {required ? <span className="text-red"> *</span> : null}
-      </span>
-      <input
-        name={name}
-        type={type}
-        required={required}
-        placeholder={placeholder}
-        className="rounded-lg border border-hair bg-paper px-3 py-2 font-sans text-base text-ink outline-none transition-colors focus:border-teal"
-      />
-    </label>
-  );
-}
+import { Field, Input, Grup } from "@/components/ui/Form";
 
 export default async function YeniProje({
   searchParams,
@@ -40,38 +11,58 @@ export default async function YeniProje({
   const { hata } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-xl px-6 py-10">
+    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
       <Link href="/uretici" className="text-sm font-medium text-teal hover:underline">
         ← Kokpit
       </Link>
       <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Yeni proje</h1>
       <p className="mt-1 text-sm text-gray">
-        Künyeyi gir; sonra blok/daire tipi tanımlayıp generator ile birimleri üretirsin.
+        Önce künye. Sonra Kurulum&apos;da kapak &amp; belgeler, ardından blok / daire tipi tanımlayıp
+        birim üretirsin.
       </p>
 
       {hata ? (
-        <p
-          role="alert"
-          className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red"
-        >
+        <p role="alert" className="mt-4 rounded-xl border border-red/30 bg-red-soft px-3.5 py-2.5 text-sm text-red">
           {hata}
         </p>
       ) : null}
 
-      <form action={projeOlustur} className="mt-6 flex flex-col gap-4">
-        <Alan name="ad" label="Proje adı" required placeholder="Çankaya Vadi Konakları" />
-        <div className="grid grid-cols-2 gap-4">
-          <Alan name="il" label="İl" placeholder="Ankara" />
-          <Alan name="ilce" label="İlçe" placeholder="Çankaya" />
-        </div>
-        <Alan name="mahalle" label="Mahalle" placeholder="Kızılırmak" />
-        <div className="grid grid-cols-2 gap-4">
-          <Alan name="ada" label="Ada" placeholder="12345" />
-          <Alan name="parsel" label="Parsel" placeholder="6" />
-        </div>
-        <Alan name="teslim_tarihi" label="Tahmini teslim" type="date" />
+      <form action={projeOlustur} className="mt-6 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+        <div className="flex flex-col gap-6">
+          <Grup baslik="Kimlik">
+            <Field label="Proje adı" required htmlFor="ad" className="sm:col-span-2">
+              <Input id="ad" name="ad" required placeholder="Çankaya Vadi Konakları" />
+            </Field>
+          </Grup>
 
-        <SubmitButton className="mt-2 w-full">Projeyi oluştur</SubmitButton>
+          <Grup baslik="Konum" aciklama="Projenin bulunduğu yer.">
+            <Field label="İl" htmlFor="il">
+              <Input id="il" name="il" placeholder="Ankara" />
+            </Field>
+            <Field label="İlçe" htmlFor="ilce">
+              <Input id="ilce" name="ilce" placeholder="Çankaya" />
+            </Field>
+            <Field label="Mahalle" htmlFor="mahalle" className="sm:col-span-2">
+              <Input id="mahalle" name="mahalle" placeholder="Kızılırmak" />
+            </Field>
+          </Grup>
+
+          <Grup baslik="Parsel & Teslim" aciklama="İmar detayını (emsal/TAKS/ruhsat) Kurulum&apos;da tamamlarsın.">
+            <Field label="Ada" htmlFor="ada">
+              <Input id="ada" name="ada" placeholder="12345" />
+            </Field>
+            <Field label="Parsel" htmlFor="parsel">
+              <Input id="parsel" name="parsel" placeholder="6" />
+            </Field>
+            <Field label="Tahmini teslim" htmlFor="teslim" className="sm:col-span-2">
+              <Input id="teslim" name="teslim_tarihi" type="date" />
+            </Field>
+          </Grup>
+        </div>
+
+        <div className="mt-6 border-t border-hair pt-5">
+          <SubmitButton className="w-full">Projeyi oluştur</SubmitButton>
+        </div>
       </form>
     </div>
   );
