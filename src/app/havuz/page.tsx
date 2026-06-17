@@ -5,14 +5,16 @@ export default async function Havuz() {
   const supabase = await createClient();
 
   // RLS: proje_emlakci_select + birim_emlakci_select → yalnız tahsisli projeler/birimler
-  const [{ data: projeler }, { data: birimler }, { data: tipler }] = await Promise.all([
+  const [{ data: projeler }, { data: birimler }, { data: tipler }, { data: kapaklar }] = await Promise.all([
     supabase
       .from("proje")
       .select("id, ad, il, ilce, mahalle, belge_dogrulandi, son_guncelleme, insaat_asamasi, ilerleme_yuzde, teslim_tarihi")
       .order("son_guncelleme", { ascending: false }),
     supabase.from("birim").select("proje_id, tip_id, durum, liste_fiyati"),
     supabase.from("daire_tipi").select("proje_id, oda, ad, net_m2"),
+    supabase.from("proje_belge").select("proje_id, url").eq("tip", "kapak"),
   ]);
+  const kapakMap = new Map((kapaklar ?? []).map((k) => [k.proje_id, k.url as string | null]));
 
   const kartlar: ProjeKart[] = (projeler ?? []).map((p) => {
     const bb = (birimler ?? []).filter((b) => b.proje_id === p.id);
@@ -43,6 +45,7 @@ export default async function Havuz() {
       min: fiyatlar.length ? Math.min(...fiyatlar) : null,
       max: fiyatlar.length ? Math.max(...fiyatlar) : null,
       tipler: tipSet,
+      kapak: kapakMap.get(p.id) ?? null,
     };
   });
 

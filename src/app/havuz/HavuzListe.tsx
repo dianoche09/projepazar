@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { zamanOnce } from "@/lib/types";
+import { YiginBar } from "@/components/ui/Grafik";
 
 export type ProjeKart = {
   id: string;
@@ -22,6 +23,7 @@ export type ProjeKart = {
   min: number | null;
   max: number | null;
   tipler: string[];
+  kapak: string | null;
 };
 
 function fiyat(n: number): string {
@@ -179,11 +181,18 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
                 className="overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
               >
                 {/* thumb — render görsel */}
-                <Link href={`/havuz/proje/${p.id}`} className="relative block h-[150px] overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-navy-soft via-teal-soft to-soft" />
-                  <span className="absolute inset-0 flex items-center justify-center font-display text-6xl font-bold text-teal-d/25 select-none">
-                    {p.ad.charAt(0).toUpperCase()}
-                  </span>
+                <Link href={`/havuz/proje/${p.id}`} className="relative block h-[160px] overflow-hidden">
+                  {p.kapak ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover" />
+                  ) : (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-br from-navy-soft via-teal-soft to-soft" />
+                      <span className="absolute inset-0 flex select-none items-center justify-center font-display text-6xl font-bold text-teal-d/25">
+                        {p.ad.charAt(0).toUpperCase()}
+                      </span>
+                    </>
+                  )}
                   {p.belge_dogrulandi && (
                     <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-teal-soft px-2 py-1 text-[11px] font-semibold text-teal-d shadow-sm">
                       ✓ Doğrulanmış
@@ -217,6 +226,16 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
                       ))}
                     </div>
                   )}
+
+                  <div className="mt-2.5">
+                    <YiginBar
+                      parcalar={[
+                        { etiket: "Müsait", deger: p.musait, renk: "#2FB36B" },
+                        { etiket: "Opsiyon", deger: p.opsiyon, renk: "#E3A12C" },
+                        { etiket: "Satıldı", deger: p.satildi, renk: "#D15A4E" },
+                      ]}
+                    />
+                  </div>
 
                   <div className="my-2.5 flex flex-wrap gap-3 text-[12px] text-gray">
                     <span><span className="mr-1.5 inline-block size-2 rounded-full bg-green align-middle" /><b className="text-ink">{p.musait}</b> müsait</span>
