@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { projeOlustur } from "@/app/uretici/actions";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 function Alan({
   name,
@@ -70,9 +71,7 @@ export default async function YeniProje({
         </div>
         <Alan name="teslim_tarihi" label="Tahmini teslim" type="date" />
 
-        <button className="mt-2 rounded-lg bg-navy px-4 py-2.5 font-medium text-white transition-colors hover:bg-ink">
-          Projeyi oluştur
-        </button>
+        <SubmitButton className="mt-2 w-full">Projeyi oluştur</SubmitButton>
       </form>
     </div>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { girisYap } from "./actions";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export default async function LoginPage({
   searchParams,
@@ -46,7 +47,7 @@ export default async function LoginPage({
             </p>
           )}
 
-          <form className="mt-6 flex flex-col gap-4">
+          <form action={girisYap} className="mt-6 flex flex-col gap-4">
             <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
               E-posta
               <input
@@ -71,12 +72,9 @@ export default async function LoginPage({
               />
             </label>
 
-            <button
-              formAction={girisYap}
-              className="mt-2 rounded-lg bg-navy px-4 py-2.5 font-medium text-white transition-colors hover:bg-ink"
-            >
+            <SubmitButton className="mt-2 w-full" bekleyenMetin="Giriş yapılıyor…">
               Giriş yap
-            </button>
+            </SubmitButton>
           </form>
           <p className="mt-4 text-center text-sm text-gray">
             Hesabın yok mu?{" "}

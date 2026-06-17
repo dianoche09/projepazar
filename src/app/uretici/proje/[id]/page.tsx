@@ -26,8 +26,6 @@ import { SecimDuzenle } from "@/components/SecimDuzenle";
 
 const inpCls =
   "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
-const btnCls =
-  "rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink";
 
 function trTarih(iso: string | null): string {
   if (!iso) return "—";
@@ -328,7 +326,7 @@ export default async function ProjeDetay({
               <input type="hidden" name="proje_id" value={id} />
               <input name="ad" placeholder="C Blok" required className={`${inpCls} flex-1`} />
               <input name="kat_sayisi" type="number" placeholder="kat" className={`${inpCls} w-20`} />
-              <button className={btnCls}>Ekle</button>
+              <SubmitButton>Ekle</SubmitButton>
             </form>
           </div>
 
@@ -393,7 +391,7 @@ export default async function ProjeDetay({
               <input name="banyo" type="number" placeholder="banyo" className={inpCls} />
               <input name="balkon" type="number" placeholder="balkon" className={inpCls} />
               <input name="otopark" placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
-              <button className={`${btnCls} col-span-2`}>Tip ekle</button>
+              <SubmitButton className="col-span-2 w-full">Tip ekle</SubmitButton>
             </form>
           </div>
         </div>
@@ -426,7 +424,7 @@ export default async function ProjeDetay({
               required
               className="text-sm text-gray file:mr-2 file:rounded-lg file:border-0 file:bg-navy file:px-3 file:py-2 file:text-sm file:text-white"
             />
-            <button className={btnCls}>Yükle</button>
+            <SubmitButton>Yükle</SubmitButton>
           </form>
         </div>
       </section>

@@ -81,3 +81,37 @@ body {
 .sheet-in {
   animation: sheetIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* =========================================================
+   Genel buton geri bildirimi — basışta NET his.
+   (Kullanıcı: "butonlara basıldığı anlaşılmıyor")
+   Her button + a.btn + [role=button] basılınca hafifçe küçülür;
+   tap-highlight kapalı, geçişler yumuşak.
+   ========================================================= */
+button,
+a.btn,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.08s ease,
+    opacity 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  touch-action: manipulation;
+}
+button:not(:disabled):active,
+a.btn:active,
+[role="button"]:not([aria-disabled="true"]):active {
+  transform: scale(0.96);
+}
+button:disabled {
+  cursor: not-allowed;
+}
+/* Klavye erişilebilirliği — net odak halkası */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
