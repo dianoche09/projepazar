@@ -54,24 +54,20 @@ function Rozet({ ok, etiket }: { ok: boolean; etiket: string }) {
   );
 }
 
-/** Numaralı bölüm kabuğu. */
+/** Bölüm kabuğu — mimari ince teal aksan (numara yok). */
 function Bolum({
-  no,
   baslik,
   aciklama,
   children,
 }: {
-  no: number;
   baslik: string;
   aciklama: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-5 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+    <section className="mt-5 rounded-2xl border border-hair bg-card p-5 sm:p-6">
       <div className="flex items-start gap-3">
-        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-navy text-sm font-semibold text-white">
-          {no}
-        </span>
+        <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full bg-teal" aria-hidden />
         <div>
           <h2 className="font-display text-base font-semibold text-ink">{baslik}</h2>
           <p className="text-xs text-gray">{aciklama}</p>
@@ -183,7 +179,7 @@ export default async function ProjeKurulum({
       </div>
 
       {/* 1 — KİMLİK & İMAR */}
-      <Bolum no={1} baslik="Kimlik & İmar" aciklama="Ada/parsel, emsal, ruhsat, otopark kuralı, malzeme & donatı.">
+      <Bolum baslik="Kimlik & İmar" aciklama="Ada/parsel, emsal, ruhsat, otopark kuralı, malzeme & donatı.">
         <form action={projeKunyeGuncelle} className="grid gap-2 sm:grid-cols-2">
           <input type="hidden" name="proje_id" value={id} />
           <input name="ada" defaultValue={proje.ada ?? ""} placeholder="Ada" className={inpCls} />
@@ -206,7 +202,7 @@ export default async function ProjeKurulum({
       </Bolum>
 
       {/* 2 — TANITIM ENVANTERİ */}
-      <Bolum no={2} baslik="Tanıtım Envanteri" aciklama="Render & cephe görselleri, tanıtım videosu, broşür/katalog.">
+      <Bolum baslik="Tanıtım Envanteri" aciklama="Render & cephe görselleri, tanıtım videosu, broşür/katalog.">
         {/* Galeri */}
         <p className="text-sm font-medium text-ink">Tanıtım görselleri</p>
         {fotolar.length > 0 ? (
@@ -236,7 +232,7 @@ export default async function ProjeKurulum({
             <div className="mt-2 space-y-2">
               {videolar.map((v) => (
                 <div key={v.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
-                  <span className="flex-1 truncate text-ink">▶ {v.ad}</span>
+                  <span className="flex-1 truncate text-ink">{v.ad}</span>
                   {v.url ? <a href={v.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
                   <Sil belgeId={v.id} projeId={id} />
                 </div>
@@ -259,7 +255,7 @@ export default async function ProjeKurulum({
             <div className="mt-2 space-y-2">
               {brosurler.map((b) => (
                 <div key={b.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
-                  <span className="flex-1 truncate text-ink">📄 {b.ad}</span>
+                  <span className="flex-1 truncate text-ink">{b.ad}</span>
                   {b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
                   <Sil belgeId={b.id} projeId={id} />
                 </div>
@@ -276,7 +272,7 @@ export default async function ProjeKurulum({
       </Bolum>
 
       {/* 3 — RESMİ BELGELER */}
-      <Bolum no={3} baslik="Resmi Belgeler" aciklama="Ruhsat · iskan · yapı denetim — belge-doğrulanmış proje rozeti (güven protokolü).">
+      <Bolum baslik="Resmi Belgeler" aciklama="Ruhsat · iskan · yapı denetim — belge-doğrulanmış proje rozeti (güven protokolü).">
         {belgelerResmi.length > 0 ? (
           <div className="space-y-2">
             {belgelerResmi.map((b) => (

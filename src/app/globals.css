@@ -12,7 +12,7 @@
   --color-green: #2fb36b;
   --color-amber: #e3a12c;
   --color-red: #d15a4e;
-  --color-paper: #f4f2ee;
+  --color-paper: #eef1f5;
   --color-card: #ffffff;
   --color-gray: #5e6b78;
   --color-hair: #e6ebef;
@@ -25,8 +25,8 @@
   --color-red-soft: #f8e7e4;
   --color-teal-soft: #e2f3f0;
 
-  /* iki kademeli yumuşak gölge (Berrak Güven derinlik) */
-  --shadow-card: 0 1px 2px rgba(15, 38, 56, 0.06), 0 8px 24px rgba(15, 38, 56, 0.06);
+  /* gölge: kart border+gölgeyi BİRLİKTE ağır kullanma (ghost-card yasak) → kart için tight tek gölge */
+  --shadow-card: 0 1px 2px rgba(15, 38, 56, 0.05);
   --shadow-cardlg: 0 2px 8px rgba(15, 38, 56, 0.08), 0 24px 60px rgba(15, 38, 56, 0.12);
 
   --font-display: var(--font-bricolage); /* başlık / wordmark */
@@ -39,6 +39,17 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* impeccable craft: dengeli başlık kırılımı, akıcı paragraf, sıkışık olmayan display tracking */
+h1, h2, h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+.font-display {
+  letter-spacing: -0.018em;
 }
 
 /* Tazelik nabzı — Berrak Güven imzası (canlılık sinyali) */
