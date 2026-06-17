@@ -92,22 +92,102 @@ export async function blokEkle(formData: FormData) {
   redirect(`/uretici/proje/${proje_id}`);
 }
 
-// ---- Daire tipi ekle ----
-export async function daireTipiEkle(formData: FormData) {
+// ---- Blok düzelt ----
+export async function blokGuncelle(formData: FormData) {
   const supabase = await createClient();
   const proje_id = String(formData.get("proje_id"));
+  const blok_id = String(formData.get("blok_id"));
   const ad = String(formData.get("ad") ?? "").trim();
-  const oda = String(formData.get("oda") ?? "").trim() || null;
-  const net_m2 = formData.get("net_m2") ? Number(formData.get("net_m2")) : null;
-  const taban_fiyat = formData.get("taban_fiyat") ? Number(formData.get("taban_fiyat")) : null;
-  if (!ad) hataya(`/uretici/proje/${proje_id}`, "Daire tipi adı gerekli");
+  const kat_sayisi = formData.get("kat_sayisi") ? Number(formData.get("kat_sayisi")) : null;
+  if (!ad) hataya(`/uretici/proje/${proje_id}`, "Blok adı gerekli");
 
-  const { error } = await supabase
-    .from("daire_tipi")
-    .insert({ proje_id, ad, oda, net_m2, taban_fiyat });
+  const { error } = await supabase.from("blok").update({ ad, kat_sayisi }).eq("id", blok_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
   redirect(`/uretici/proje/${proje_id}`);
+}
+
+// ---- Blok sil (yalnız müsait/planlı birimler temizlenir; opsiyon/satış varsa reddeder) ----
+export async function blokSil(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const blok_id = String(formData.get("blok_id"));
+
+  const { data: birimler } = await supabase.from("birim").select("durum").eq("blok_id", blok_id);
+  const kritik = (birimler ?? []).filter((b) => b.durum !== "musait" && b.durum !== "planli");
+  if (kritik.length > 0) {
+    hataya(
+      `/uretici/proje/${proje_id}`,
+      `Blok silinemez: ${kritik.length} birim opsiyonlu/satılmış/durdurulmuş. Önce onları çöz.`,
+    );
+  }
+
+  await supabase.from("birim").delete().eq("blok_id", blok_id);
+  const { error } = await supabase.from("blok").delete().eq("id", blok_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Blok silindi")}`);
+}
+
+// ---- Daire tipi ekle ----
+/** Form'dan daire tipi alanlarını oku (ekle + düzelt ortak). */
+function tipAlanlari(formData: FormData) {
+  const tamsayi = (v: FormDataEntryValue | null) => (v && String(v).trim() ? Number(v) : null);
+  return {
+    ad: String(formData.get("ad") ?? "").trim(),
+    oda: String(formData.get("oda") ?? "").trim() || null,
+    net_m2: tamsayi(formData.get("net_m2")),
+    taban_fiyat: tamsayi(formData.get("taban_fiyat")),
+    banyo: tamsayi(formData.get("banyo")),
+    balkon: tamsayi(formData.get("balkon")),
+    otopark: String(formData.get("otopark") ?? "").trim() || null,
+  };
+}
+
+export async function daireTipiEkle(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const alanlar = tipAlanlari(formData);
+  if (!alanlar.ad) hataya(`/uretici/proje/${proje_id}`, "Daire tipi adı gerekli");
+
+  const { error } = await supabase.from("daire_tipi").insert({ proje_id, ...alanlar });
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}`);
+}
+
+// ---- Daire tipi düzelt ----
+export async function tipGuncelle(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const tip_id = String(formData.get("tip_id"));
+  const alanlar = tipAlanlari(formData);
+  if (!alanlar.ad) hataya(`/uretici/proje/${proje_id}`, "Daire tipi adı gerekli");
+
+  const { error } = await supabase.from("daire_tipi").update(alanlar).eq("id", tip_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}`);
+}
+
+// ---- Daire tipi sil (birim kullanıyorsa reddeder) ----
+export async function tipSil(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const tip_id = String(formData.get("tip_id"));
+
+  const { count } = await supabase
+    .from("birim")
+    .select("id", { count: "exact", head: true })
+    .eq("tip_id", tip_id);
+  if ((count ?? 0) > 0) {
+    hataya(`/uretici/proje/${proje_id}`, `${count} birim bu tipi kullanıyor — önce onları sil/değiştir.`);
+  }
+
+  const { error } = await supabase.from("daire_tipi").delete().eq("id", tip_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Daire tipi silindi")}`);
 }
 
 // ---- Generator: tip × kat → birimler (toplu üretim) ----
@@ -121,6 +201,8 @@ export async function birimGenerator(formData: FormData) {
   const daire_basina = Math.max(1, Number(formData.get("daire_basina")) || 1);
   const taban = Number(formData.get("taban_fiyat")) || 0;
   const kat_artis = (Number(formData.get("kat_artis")) || 0) / 100; // % kat şerefiyesi
+  const yon = String(formData.get("yon") ?? "").trim() || null;
+  const tur = String(formData.get("tur") ?? "daire");
 
   if (!blok_id || !tip_id || Number.isNaN(kat_bas) || Number.isNaN(kat_son) || kat_son < kat_bas) {
     hataya(`/uretici/proje/${proje_id}`, "Generator girdileri eksik/hatalı (blok, tip, kat aralığı).");
@@ -129,28 +211,51 @@ export async function birimGenerator(formData: FormData) {
     hataya(`/uretici/proje/${proje_id}`, "Tek seferde en fazla 500 birim üretilebilir.");
   }
 
-  const { data: blok } = await supabase.from("blok").select("ad").eq("id", blok_id).single();
+  // blok kodu + tip m² + mevcut daire_no'lar (duplicate atlamak için) — tek turda
+  const [{ data: blok }, { data: tip }, { data: mevcutlar }] = await Promise.all([
+    supabase.from("blok").select("ad").eq("id", blok_id).single(),
+    supabase.from("daire_tipi").select("net_m2, brut_m2").eq("id", tip_id).single(),
+    supabase.from("birim").select("daire_no").eq("blok_id", blok_id),
+  ]);
   const kod = (blok?.ad ?? "X").trim().charAt(0).toUpperCase();
+  const mevcutSet = new Set((mevcutlar ?? []).map((b) => b.daire_no));
 
   const birimler: Record<string, unknown>[] = [];
+  let atlanan = 0;
   for (let kat = kat_bas; kat <= kat_son; kat++) {
     for (let d = 1; d <= daire_basina; d++) {
+      const daire_no = `${kod}${String(kat).padStart(2, "0")}${String(d).padStart(2, "0")}`;
+      if (mevcutSet.has(daire_no)) {
+        atlanan++;
+        continue;
+      }
+      const katYuzde = Math.round((kat - 1) * kat_artis * 100);
       birimler.push({
         proje_id,
         blok_id,
         tip_id,
+        tur,
         kat,
-        daire_no: `${kod}${String(kat).padStart(2, "0")}${String(d).padStart(2, "0")}`,
+        daire_no,
+        yon,
+        net_m2: tip?.net_m2 ?? null,
+        brut_m2: tip?.brut_m2 ?? null,
         durum: "musait",
         liste_fiyati: taban ? Math.round(taban * (1 + (kat - 1) * kat_artis)) : null,
+        serefiye: taban && katYuzde ? { kat: katYuzde } : null,
       });
     }
+  }
+
+  if (birimler.length === 0) {
+    hataya(`/uretici/proje/${proje_id}`, `Üretilecek yeni birim yok — ${atlanan} daire zaten mevcut.`);
   }
 
   const { error } = await supabase.from("birim").insert(birimler);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(`${birimler.length} birim üretildi`)}`);
+  const mesaj = `${birimler.length} birim üretildi${atlanan ? ` · ${atlanan} mevcut atlandı` : ""}`;
+  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(mesaj)}`);
 }
 
 // ---- Birim durum güncelle (ızgaradan tek tık) ----

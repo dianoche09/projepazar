@@ -42,7 +42,7 @@ export default async function HavuzProjeDetay({
 
   const [{ data: bloklar }, { data: tipler }, { data: birimler }] = await Promise.all([
     supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
-    supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat").eq("proje_id", id).order("ad"),
+    supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark").eq("proje_id", id).order("ad"),
     supabase
       .from("birim")
       .select(

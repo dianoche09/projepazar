@@ -19,17 +19,19 @@ export function SubmitButton({
   varyant = "navy",
   className = "",
   bekleyenMetin = "İşleniyor…",
+  disabled = false,
 }: {
   children: React.ReactNode;
   varyant?: "navy" | "green" | "teal" | "red" | "outline";
   className?: string;
   bekleyenMetin?: string;
+  disabled?: boolean;
 }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
       className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all active:scale-[0.97] disabled:cursor-progress disabled:opacity-70 ${VARYANT[varyant]} ${className}`}
     >

@@ -3,13 +3,18 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import {
   blokEkle,
+  blokGuncelle,
+  blokSil,
   daireTipiEkle,
-  birimGenerator,
+  tipGuncelle,
+  tipSil,
   excelImport,
   tahsisSil,
   projeTazele,
 } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
+import { GeneratorForm } from "./GeneratorForm";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import {
   ASAMA_ETIKET,
   zamanOnce,
@@ -57,7 +62,7 @@ export default async function ProjeDetay({
 
   const { data: tipler } = await supabase
     .from("daire_tipi")
-    .select("id, ad, oda, net_m2, taban_fiyat")
+    .select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark")
     .eq("proje_id", id)
     .order("ad");
 
@@ -283,14 +288,35 @@ export default async function ProjeDetay({
         <h2 className="font-display text-lg font-semibold text-ink">Stok yönetimi</h2>
 
         <div className="mt-4 grid gap-5 md:grid-cols-2">
-          {/* Bloklar */}
+          {/* Bloklar — düzenle / sil */}
           <div className="rounded-2xl border border-hair bg-card p-5">
             <h3 className="font-medium text-ink">Bloklar ({bloklar?.length ?? 0})</h3>
-            <ul className="mt-2 space-y-1 text-sm text-gray">
+            <ul className="mt-2 space-y-1.5">
               {(bloklar ?? []).map((b) => (
                 <li key={b.id}>
-                  {b.ad}
-                  {b.kat_sayisi ? ` · ${b.kat_sayisi} kat` : ""}
+                  <details className="rounded-lg border border-hair">
+                    <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm">
+                      <span className="text-ink">
+                        {b.ad}
+                        {b.kat_sayisi ? ` · ${b.kat_sayisi} kat` : ""}
+                      </span>
+                      <span className="text-xs text-teal-d">düzenle</span>
+                    </summary>
+                    <div className="border-t border-hair p-3">
+                      <form action={blokGuncelle} className="flex flex-wrap items-end gap-2">
+                        <input type="hidden" name="proje_id" value={id} />
+                        <input type="hidden" name="blok_id" value={b.id} />
+                        <input name="ad" defaultValue={b.ad ?? ""} className={`${inpCls} flex-1`} />
+                        <input name="kat_sayisi" type="number" defaultValue={b.kat_sayisi ?? ""} placeholder="kat" className={`${inpCls} w-20`} />
+                        <SubmitButton>Kaydet</SubmitButton>
+                      </form>
+                      <form action={blokSil} className="mt-2">
+                        <input type="hidden" name="proje_id" value={id} />
+                        <input type="hidden" name="blok_id" value={b.id} />
+                        <SubmitButton varyant="outline" className="!border-red/40 !text-red">Bloğu sil</SubmitButton>
+                      </form>
+                    </div>
+                  </details>
                 </li>
               ))}
             </ul>
@@ -302,16 +328,42 @@ export default async function ProjeDetay({
             </form>
           </div>
 
-          {/* Daire tipleri */}
+          {/* Daire tipleri — düzenle / sil (oda · banyo · balkon · otopark) */}
           <div className="rounded-2xl border border-hair bg-card p-5">
             <h3 className="font-medium text-ink">Daire tipleri ({tipler?.length ?? 0})</h3>
-            <ul className="mt-2 space-y-1 text-sm text-gray">
+            <ul className="mt-2 space-y-1.5">
               {(tipler ?? []).map((t) => (
                 <li key={t.id}>
-                  {t.ad}
-                  {t.oda ? ` · ${t.oda}` : ""}
-                  {t.net_m2 ? ` · ${t.net_m2}m²` : ""}
-                  {t.taban_fiyat ? ` · ${Number(t.taban_fiyat).toLocaleString("tr-TR")}₺` : ""}
+                  <details className="rounded-lg border border-hair">
+                    <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm">
+                      <span className="text-ink">
+                        {t.ad}
+                        {t.oda ? ` · ${t.oda}` : ""}
+                        {t.net_m2 ? ` · ${t.net_m2}m²` : ""}
+                        {t.taban_fiyat ? ` · ${Number(t.taban_fiyat).toLocaleString("tr-TR")}₺` : ""}
+                      </span>
+                      <span className="text-xs text-teal-d">düzenle</span>
+                    </summary>
+                    <div className="border-t border-hair p-3">
+                      <form action={tipGuncelle} className="grid grid-cols-2 gap-2">
+                        <input type="hidden" name="proje_id" value={id} />
+                        <input type="hidden" name="tip_id" value={t.id} />
+                        <input name="ad" defaultValue={t.ad ?? ""} placeholder="ad" className={inpCls} />
+                        <input name="oda" defaultValue={t.oda ?? ""} placeholder="2+1" className={inpCls} />
+                        <input name="net_m2" type="number" defaultValue={t.net_m2 ?? ""} placeholder="net m²" className={inpCls} />
+                        <input name="taban_fiyat" type="number" defaultValue={t.taban_fiyat ?? ""} placeholder="taban ₺" className={inpCls} />
+                        <input name="banyo" type="number" defaultValue={t.banyo ?? ""} placeholder="banyo" className={inpCls} />
+                        <input name="balkon" type="number" defaultValue={t.balkon ?? ""} placeholder="balkon" className={inpCls} />
+                        <input name="otopark" defaultValue={t.otopark ?? ""} placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
+                        <div className="col-span-2"><SubmitButton>Kaydet</SubmitButton></div>
+                      </form>
+                      <form action={tipSil} className="mt-2">
+                        <input type="hidden" name="proje_id" value={id} />
+                        <input type="hidden" name="tip_id" value={t.id} />
+                        <SubmitButton varyant="outline" className="!border-red/40 !text-red">Tipi sil</SubmitButton>
+                      </form>
+                    </div>
+                  </details>
                 </li>
               ))}
             </ul>
@@ -321,6 +373,9 @@ export default async function ProjeDetay({
               <input name="oda" placeholder="2+1" className={inpCls} />
               <input name="net_m2" type="number" placeholder="net m²" className={inpCls} />
               <input name="taban_fiyat" type="number" placeholder="taban fiyat ₺" className={inpCls} />
+              <input name="banyo" type="number" placeholder="banyo" className={inpCls} />
+              <input name="balkon" type="number" placeholder="balkon" className={inpCls} />
+              <input name="otopark" placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
               <button className={`${btnCls} col-span-2`}>Tip ekle</button>
             </form>
           </div>
@@ -330,52 +385,7 @@ export default async function ProjeDetay({
         <div className="mt-5 rounded-2xl border border-hair bg-card p-5">
           <h3 className="font-medium text-ink">Generator — toplu birim üret (tip × kat)</h3>
           {(bloklar?.length ?? 0) > 0 && (tipler?.length ?? 0) > 0 ? (
-            <form action={birimGenerator} className="mt-3 grid gap-3 sm:grid-cols-3">
-              <input type="hidden" name="proje_id" value={id} />
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Blok
-                <select name="blok_id" required className={inpCls}>
-                  {(bloklar ?? []).map((b) => (
-                    <option key={b.id} value={b.id}>
-                      {b.ad}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Daire tipi
-                <select name="tip_id" required className={inpCls}>
-                  {(tipler ?? []).map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.ad}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Daire / kat
-                <input name="daire_basina" type="number" defaultValue={2} min={1} className={inpCls} />
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Başlangıç kat
-                <input name="kat_bas" type="number" defaultValue={1} className={inpCls} />
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Bitiş kat
-                <input name="kat_son" type="number" defaultValue={10} className={inpCls} />
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Taban fiyat ₺
-                <input name="taban_fiyat" type="number" placeholder="ör. 2800000" className={inpCls} />
-              </label>
-              <label className="flex flex-col gap-1 text-xs text-gray">
-                Kat şerefiyesi %
-                <input name="kat_artis" type="number" defaultValue={2} className={inpCls} />
-              </label>
-              <div className="flex items-end sm:col-span-2">
-                <button className={`${btnCls} w-full`}>Birimleri üret</button>
-              </div>
-            </form>
+            <GeneratorForm projeId={id} bloklar={bloklar ?? []} tipler={tipler ?? []} />
           ) : (
             <p className="mt-2 text-sm text-gray">
               Generator için en az 1 blok ve 1 daire tipi tanımla.

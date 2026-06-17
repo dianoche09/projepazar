@@ -20,7 +20,15 @@ type Birim = {
   durum_notu: string | null;
   son_guncelleme: string;
 };
-type Tip = { id: string; ad: string | null; oda: string | null; taban_fiyat?: number | null };
+type Tip = {
+  id: string;
+  ad: string | null;
+  oda: string | null;
+  taban_fiyat?: number | null;
+  banyo?: number | null;
+  balkon?: number | null;
+  otopark?: string | null;
+};
 type Blok = { id: string; ad: string | null; kat_sayisi: number | null };
 
 /**
@@ -125,6 +133,9 @@ export function BinaKesiti({
                                     taban_fiyat: tip?.taban_fiyat ?? null,
                                     tip_ad: tip?.ad ?? null,
                                     oda: tip?.oda ?? null,
+                                    banyo: tip?.banyo ?? null,
+                                    balkon: tip?.balkon ?? null,
+                                    otopark: tip?.otopark ?? null,
                                   }}
                                 />
                               );
