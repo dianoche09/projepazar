@@ -14,14 +14,12 @@ import {
 } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { BinaGorseli } from "@/components/BinaGorseli";
 import {
   ASAMA_ETIKET,
   zamanOnce,
-  type BirimDurum,
   type InsaatAsama,
 } from "@/lib/types";
-import { BirimHucre } from "@/components/BirimHucre";
+import { BinaKesiti } from "@/components/BinaKesiti";
 
 const inpCls =
   "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
@@ -86,7 +84,6 @@ export default async function ProjeDetay({
     .order("created_at", { ascending: false });
   const kunye = (proje.kunye ?? {}) as Record<string, unknown>;
 
-  const tipMap = new Map((tipler ?? []).map((t) => [t.id, t]));
   const tahsisKatlar = [
     ...new Set((birimler ?? []).map((b) => b.kat).filter((k): k is number => k != null)),
   ].sort((a, b) => a - b);
@@ -100,11 +97,7 @@ export default async function ProjeDetay({
         ← Kokpit
       </Link>
 
-      <div className="mt-3 h-40 overflow-hidden rounded-2xl border border-hair sm:h-52">
-        <BinaGorseli seed={[...id].reduce((a, c) => a + c.charCodeAt(0), 0)} />
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
+      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">{proje.ad}</h1>
           <p className="mt-1 text-sm text-gray">
@@ -255,64 +248,14 @@ export default async function ProjeDetay({
         </div>
       </div>
 
-      <div className="mt-4 space-y-6">
-        {(bloklar ?? []).map((blok) => {
-          const bb = (birimler ?? []).filter((b) => b.blok_id === blok.id);
-          const katlar = [...new Set(bb.map((b) => b.kat))]
-            .filter((k): k is number => k != null)
-            .sort((a, b) => b - a);
-          return (
-            <div key={blok.id} className="rounded-2xl border border-hair bg-card p-5">
-              <h3 className="font-display text-base font-semibold text-ink">{blok.ad}</h3>
-              {katlar.length === 0 ? (
-                <p className="mt-2 text-sm text-gray">Bu blokta henüz birim yok (generator ile üret).</p>
-              ) : (
-                <div className="mt-3 space-y-1.5 overflow-x-auto">
-                  {katlar.map((kat) => {
-                    const kb = bb
-                      .filter((b) => b.kat === kat)
-                      .sort((a, b) => (a.daire_no ?? "").localeCompare(b.daire_no ?? ""));
-                    return (
-                      <div key={kat} className="flex items-center gap-2">
-                        <span className="w-12 shrink-0 font-mono text-xs text-gray">{kat}. kat</span>
-                        <div className="flex gap-1.5">
-                          {kb.map((b) => {
-                            const tip = b.tip_id ? tipMap.get(b.tip_id) : null;
-                            return (
-                              <BirimHucre
-                                key={b.id}
-                                projeId={id}
-                                birim={{
-                                  id: b.id,
-                                  daire_no: b.daire_no,
-                                  kat: b.kat,
-                                  durum: b.durum as BirimDurum,
-                                  satilabilir: b.satilabilir,
-                                  liste_fiyati: b.liste_fiyati,
-                                  para_birimi: b.para_birimi,
-                                  net_m2: b.net_m2,
-                                  brut_m2: b.brut_m2,
-                                  yon: b.yon,
-                                  manzara: b.manzara,
-                                  durum_notu: b.durum_notu,
-                                  son_guncelleme: b.son_guncelleme,
-                                  serefiye: b.serefiye as { kat?: number; manzara?: number } | null,
-                                  taban_fiyat: tip?.taban_fiyat ?? null,
-                                  tip_ad: tip?.ad ?? null,
-                                  oda: tip?.oda ?? null,
-                                }}
-                              />
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className="mt-4">
+        <BinaKesiti
+          bloklar={bloklar ?? []}
+          birimler={(birimler ?? []) as never}
+          tipler={tipler ?? []}
+          mod="uretici"
+          projeId={id}
+        />
       </div>
 
       {/* ===== TAHSİS (MOAT) ===== */}

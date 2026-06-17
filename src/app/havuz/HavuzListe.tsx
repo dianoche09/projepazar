@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { zamanOnce } from "@/lib/types";
-import { BinaGorseli } from "@/components/BinaGorseli";
 
 export type ProjeKart = {
   id: string;
@@ -32,11 +31,6 @@ function fiyat(n: number): string {
 }
 function yil(iso: string | null): string {
   return iso ? `Teslim ${new Date(iso).getFullYear()}` : "";
-}
-function seedNo(id: string): number {
-  let s = 0;
-  for (let i = 0; i < id.length; i++) s = (s + id.charCodeAt(i) * (i + 7)) % 233280;
-  return s || 7;
 }
 
 /** Mini kat planı çipi (Ekranlar.html typchip .mini) */
@@ -185,8 +179,11 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
                 className="overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
               >
                 {/* thumb — render görsel */}
-                <Link href={`/havuz/proje/${p.id}`} className="relative block h-[150px]">
-                  <BinaGorseli seed={seedNo(p.id)} />
+                <Link href={`/havuz/proje/${p.id}`} className="relative block h-[150px] overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-navy-soft via-teal-soft to-soft" />
+                  <span className="absolute inset-0 flex items-center justify-center font-display text-6xl font-bold text-teal-d/25 select-none">
+                    {p.ad.charAt(0).toUpperCase()}
+                  </span>
                   {p.belge_dogrulandi && (
                     <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-teal-soft px-2 py-1 text-[11px] font-semibold text-teal-d shadow-sm">
                       ✓ Doğrulanmış

@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { ASAMA_ETIKET, zamanOnce, type BirimDurum, type InsaatAsama } from "@/lib/types";
-import { BirimHucre } from "@/components/BirimHucre";
-import { generateShareToken } from "@/lib/sharing";
+import { ASAMA_ETIKET, zamanOnce, type InsaatAsama } from "@/lib/types";
+import { BinaKesiti } from "@/components/BinaKesiti";
 
 function trTarih(iso: string | null): string {
   if (!iso) return "—";
@@ -52,7 +51,6 @@ export default async function HavuzProjeDetay({
       .eq("proje_id", id),
   ]);
 
-  const tipMap = new Map((tipler ?? []).map((t) => [t.id, t]));
   const toplam = birimler?.length ?? 0;
 
   return (
@@ -127,69 +125,21 @@ export default async function HavuzProjeDetay({
         </div>
       </div>
 
-      <div className="mt-4 space-y-6">
-        {(bloklar ?? []).map((blok) => {
-          const bb = (birimler ?? []).filter((b) => b.blok_id === blok.id);
-          if (bb.length === 0) return null;
-          const katlar = [...new Set(bb.map((b) => b.kat))]
-            .filter((k): k is number => k != null)
-            .sort((a, b) => b - a);
-          return (
-            <div key={blok.id} className="rounded-2xl border border-hair bg-card p-5">
-              <h3 className="font-display text-base font-semibold text-ink">{blok.ad}</h3>
-              <div className="mt-3 space-y-1.5 overflow-x-auto">
-                {katlar.map((kat) => {
-                  const kb = bb
-                    .filter((b) => b.kat === kat)
-                    .sort((a, b) => (a.daire_no ?? "").localeCompare(b.daire_no ?? ""));
-                  return (
-                    <div key={kat} className="flex items-center gap-2">
-                      <span className="w-12 shrink-0 font-mono text-xs text-gray">{kat}. kat</span>
-                      <div className="flex gap-1.5">
-                        {kb.map((b) => {
-                          const tip = b.tip_id ? tipMap.get(b.tip_id) : null;
-                          const shareToken = generateShareToken(emlakciId, b.id);
-                          const shareUrl = `${appUrl}/p/${emlakciId}/${b.id}/${shareToken}`;
-                          return (
-                            <BirimHucre
-                              key={b.id}
-                              projeId={id}
-                              mod="emlakci"
-                              projeAd={proje.ad}
-                              shareUrl={shareUrl}
-                              birim={{
-                                id: b.id,
-                                daire_no: b.daire_no,
-                                kat: b.kat,
-                                durum: b.durum as BirimDurum,
-                                satilabilir: b.satilabilir,
-                                liste_fiyati: b.liste_fiyati,
-                                para_birimi: b.para_birimi,
-                                net_m2: b.net_m2,
-                                brut_m2: b.brut_m2,
-                                yon: b.yon,
-                                manzara: b.manzara,
-                                durum_notu: b.durum_notu,
-                                son_guncelleme: b.son_guncelleme,
-                                serefiye: b.serefiye as { kat?: number; manzara?: number } | null,
-                                taban_fiyat: tip?.taban_fiyat ?? null,
-                                tip_ad: tip?.ad ?? null,
-                                oda: tip?.oda ?? null,
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+      <div className="mt-4">
         {toplam === 0 ? (
           <p className="text-sm text-gray">Bu projede sana tahsisli birim yok.</p>
-        ) : null}
+        ) : (
+          <BinaKesiti
+            bloklar={bloklar ?? []}
+            birimler={(birimler ?? []) as never}
+            tipler={tipler ?? []}
+            mod="emlakci"
+            projeId={id}
+            projeAd={proje.ad}
+            emlakciId={emlakciId}
+            appUrl={appUrl}
+          />
+        )}
       </div>
     </div>
   );
