@@ -4,8 +4,17 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { randomUUID } from "node:crypto";
 import * as XLSX from "xlsx";
+
+/** Public medya URL'inden bucket içi yolu çıkar (silme için). */
+function medyaYolu(url: string | null): string | null {
+  if (!url) return null;
+  const m = url.match(/\/proje-medya\/(.+)$/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
 
 /** Giriş yapan kullanıcının üretici (sahip) kaydının id'si. Yoksa null. */
 async function ureticiId(supabase: SupabaseClient): Promise<string | null> {
@@ -64,7 +73,8 @@ export async function projeOlustur(formData: FormData) {
   if (error) hataya("/uretici/proje/yeni", error.message);
 
   revalidatePath("/uretici");
-  redirect(`/uretici/proje/${proje!.id}`);
+  // Proje açılır açılmaz KURULUM'a düş: künye/imar + kapak + tanıtım envanteri + belgeler.
+  redirect(`/uretici/proje/${proje!.id}/kurulum`);
 }
 
 // ---- Blok ekle ----
@@ -349,27 +359,103 @@ export async function projeTazele(formData: FormData) {
   revalidatePath(`/uretici/proje/${id}`);
 }
 
-// ── Proje dokümanları (ruhsat / iskan / yapı denetim — belge-doğrulanmış proje rozeti) ──
-export async function belgeEkle(formData: FormData) {
-  const proje_id = String(formData.get("proje_id"));
-  const tip = String(formData.get("tip") ?? "diger");
-  const ad = String(formData.get("ad") ?? "").trim();
-  const url = String(formData.get("url") ?? "").trim();
-  if (!ad) hataya(`/uretici/proje/${proje_id}`, "Belge adı gerekli");
+// ── Proje medyası: kapak foto · tanıtım envanteri (foto/video/broşür) · resmi belgeler ──
+// Yükleme service-role ile (DEĞİŞMEZ #1: yalnız server). Sahiplik RLS select ile doğrulanır.
+const MEDYA_BUCKET = "proje-medya";
 
-  const supabase = await createClient();
-  const { error } = await supabase.from("proje_belge").insert({ proje_id, tip, ad, url: url || null });
-  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
-  revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Belge eklendi")}`);
+async function projeSahibiMi(supabase: SupabaseClient, proje_id: string): Promise<boolean> {
+  const uid = await ureticiId(supabase);
+  if (!uid) return false;
+  const { data } = await supabase
+    .from("proje")
+    .select("id, uretici_id")
+    .eq("id", proje_id)
+    .single();
+  return !!data && data.uretici_id === uid;
 }
 
-export async function belgeSil(formData: FormData) {
+/**
+ * Kapak/galeri/broşür/belge yükle (dosya) ya da tanıtım videosu/dış belge ekle (link).
+ * tip ∈ { kapak, foto, video, brosur, ruhsat, iskan, yapi_denetim, otopark, diger }.
+ */
+export async function medyaYukle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const tip = String(formData.get("tip") ?? "foto");
+  const geri = `/uretici/proje/${proje_id}/kurulum`;
+
+  const supabase = await createClient();
+  if (!(await projeSahibiMi(supabase, proje_id))) hataya("/uretici", "Bu projeye erişim yok");
+
+  const admin = createAdminClient();
+  const dosyalar = formData
+    .getAll("dosya")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  const url = String(formData.get("url") ?? "").trim();
+  const ad0 = String(formData.get("ad") ?? "").trim();
+
+  // Salt link (tanıtım videosu / dış belge)
+  if (dosyalar.length === 0) {
+    if (!url) hataya(geri, "Dosya veya link gerekli");
+    const { error } = await admin.from("proje_belge").insert({ proje_id, tip, ad: ad0 || url, url });
+    if (error) hataya(geri, error.message);
+    revalidatePath(geri);
+    redirect(`${geri}?mesaj=${encodeURIComponent("Eklendi")}`);
+  }
+
+  // Kapak tekildir → eski kapağı (dosya + kayıt) temizle
+  if (tip === "kapak") {
+    const { data: eski } = await admin
+      .from("proje_belge")
+      .select("id, url")
+      .eq("proje_id", proje_id)
+      .eq("tip", "kapak");
+    for (const e of eski ?? []) {
+      const yol = medyaYolu(e.url);
+      if (yol) await admin.storage.from(MEDYA_BUCKET).remove([yol]);
+      await admin.from("proje_belge").delete().eq("id", e.id);
+    }
+  }
+
+  for (const f of dosyalar) {
+    const uzanti = f.name.includes(".") ? f.name.split(".").pop()!.toLowerCase() : "bin";
+    const yol = `${proje_id}/${tip}/${randomUUID()}.${uzanti}`;
+    const buf = Buffer.from(await f.arrayBuffer());
+    const { error: upErr } = await admin.storage
+      .from(MEDYA_BUCKET)
+      .upload(yol, buf, { contentType: f.type || "application/octet-stream", upsert: false });
+    if (upErr) hataya(geri, `Yükleme hatası: ${upErr.message}`);
+    const { data: pub } = admin.storage.from(MEDYA_BUCKET).getPublicUrl(yol);
+    const { error: insErr } = await admin
+      .from("proje_belge")
+      .insert({ proje_id, tip, ad: ad0 || f.name, url: pub.publicUrl });
+    if (insErr) hataya(geri, insErr.message);
+  }
+
+  revalidatePath(geri);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`${geri}?mesaj=${encodeURIComponent("Yüklendi")}`);
+}
+
+export async function medyaSil(formData: FormData) {
   const id = z.string().uuid().safeParse(formData.get("belge_id"));
   const proje_id = String(formData.get("proje_id"));
   if (!id.success) return;
+
   const supabase = await createClient();
-  await supabase.from("proje_belge").delete().eq("id", id.data);
+  if (!(await projeSahibiMi(supabase, proje_id))) return;
+
+  const admin = createAdminClient();
+  const { data: belge } = await admin
+    .from("proje_belge")
+    .select("id, url")
+    .eq("id", id.data)
+    .single();
+  if (belge) {
+    const yol = medyaYolu(belge.url);
+    if (yol) await admin.storage.from(MEDYA_BUCKET).remove([yol]);
+    await admin.from("proje_belge").delete().eq("id", belge.id);
+  }
+  revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
   revalidatePath(`/uretici/proje/${proje_id}`);
 }
 
@@ -414,7 +500,8 @@ export async function projeKunyeGuncelle(formData: FormData) {
       son_guncelleme: new Date().toISOString(),
     })
     .eq("id", proje_id);
-  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Künye güncellendi")}`);
+  revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
+  redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Künye güncellendi")}`);
 }

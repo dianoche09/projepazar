@@ -8,12 +8,8 @@ import {
   excelImport,
   tahsisSil,
   projeTazele,
-  belgeEkle,
-  belgeSil,
-  projeKunyeGuncelle,
 } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
-import { SubmitButton } from "@/components/ui/SubmitButton";
 import {
   ASAMA_ETIKET,
   zamanOnce,
@@ -83,6 +79,7 @@ export default async function ProjeDetay({
     .eq("proje_id", id)
     .order("created_at", { ascending: false });
   const kunye = (proje.kunye ?? {}) as Record<string, unknown>;
+  const kapak = (belgeler ?? []).find((b) => b.tip === "kapak") ?? null;
 
   const tahsisKatlar = [
     ...new Set((birimler ?? []).map((b) => b.kat).filter((k): k is number => k != null)),
@@ -97,6 +94,13 @@ export default async function ProjeDetay({
         ← Kokpit
       </Link>
 
+      {kapak?.url ? (
+        <div className="mt-3 h-44 overflow-hidden rounded-2xl border border-hair sm:h-56">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={kapak.url} alt={proje.ad} className="h-full w-full object-cover" />
+        </div>
+      ) : null}
+
       <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">{proje.ad}</h1>
@@ -107,6 +111,12 @@ export default async function ProjeDetay({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/uretici/proje/${id}/kurulum`}
+            className="rounded-lg border border-hair bg-card px-2.5 py-1 text-xs font-semibold text-navy transition-colors hover:border-navy"
+          >
+            ⚙ Kurulum
+          </Link>
           <form action={projeTazele}>
             <input type="hidden" name="proje_id" value={id} />
             <button className="rounded-lg border border-hair bg-card px-2.5 py-1 text-xs font-semibold text-teal hover:border-teal transition-colors">
@@ -158,9 +168,14 @@ export default async function ProjeDetay({
         </div>
       </div>
 
-      {/* Künye · Parsel & İmar */}
+      {/* Künye · Parsel & İmar — salt-okunur özet (düzenleme: Proje Kurulumu) */}
       <details className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <summary className="cursor-pointer font-display text-base font-semibold text-ink">Künye · Parsel & İmar</summary>
+        <summary className="flex cursor-pointer items-center justify-between gap-2">
+          <span className="font-display text-base font-semibold text-ink">Künye · Parsel & İmar</span>
+          <Link href={`/uretici/proje/${id}/kurulum`} className="text-xs font-medium text-teal-d hover:underline">
+            Düzenle →
+          </Link>
+        </summary>
         <div className="mt-3 grid gap-x-6 text-sm sm:grid-cols-2">
           {([
             ["Ada / Parsel", `${proje.ada ?? "—"} / ${proje.parsel ?? "—"}`],
@@ -178,62 +193,13 @@ export default async function ProjeDetay({
             </div>
           ))}
         </div>
-        <form action={projeKunyeGuncelle} className="mt-4 grid gap-2 border-t border-hair pt-4 sm:grid-cols-2">
-          <input type="hidden" name="proje_id" value={id} />
-          <input name="ada" defaultValue={proje.ada ?? ""} placeholder="Ada" className={inpCls} />
-          <input name="parsel" defaultValue={proje.parsel ?? ""} placeholder="Parsel" className={inpCls} />
-          <input name="emsal" type="number" step="0.01" defaultValue={proje.emsal ?? ""} placeholder="Emsal (KAKS)" className={inpCls} />
-          <input name="taks" type="number" step="0.01" defaultValue={proje.taks ?? ""} placeholder="TAKS" className={inpCls} />
-          <input name="imar_durumu" defaultValue={(kunye.imar_durumu as string) ?? ""} placeholder="İmar (ör. Konut E:2.07)" className={inpCls} />
-          <input name="arsa_alani" type="number" defaultValue={(kunye.arsa_alani as number) ?? ""} placeholder="Arsa alanı m²" className={inpCls} />
-          <input name="toplam_insaat" type="number" defaultValue={(kunye.toplam_insaat as number) ?? ""} placeholder="Toplam inşaat m²" className={inpCls} />
-          <input name="ruhsat_tarihi" defaultValue={(kunye.ruhsat_tarihi as string) ?? ""} placeholder="Yapı ruhsatı (tarih)" className={inpCls} />
-          <input name="yapi_denetim" defaultValue={(kunye.yapi_denetim as string) ?? ""} placeholder="Yapı denetim firması" className={inpCls} />
-          <label className="flex items-center gap-2 text-sm text-ink">
-            <input type="checkbox" name="kat_karsiligi" defaultChecked={!!kunye.kat_karsiligi} className="size-4" /> Kat karşılığı
-          </label>
-          <textarea name="malzeme" defaultValue={Array.isArray(kunye.malzeme) ? (kunye.malzeme as string[]).join("\n") : ""} placeholder="Malzeme (her satır: Pencere · Schüco)" rows={3} className={`${inpCls} sm:col-span-2`} />
-          <input name="donati" defaultValue={Array.isArray(kunye.donati) ? (kunye.donati as string[]).join(", ") : ""} placeholder="Sosyal donatı (virgülle: Havuz, Fitness, Güvenlik)" className={`${inpCls} sm:col-span-2`} />
-          <div className="sm:col-span-2"><SubmitButton>Künyeyi kaydet</SubmitButton></div>
-        </form>
+        <p className="mt-3 border-t border-hair pt-3 text-xs text-gray">
+          📎 {belgeler?.length ?? 0} medya/belge ·{" "}
+          <Link href={`/uretici/proje/${id}/kurulum`} className="text-teal-d hover:underline">
+            Kurulumda yönet (kapak · tanıtım · ruhsat)
+          </Link>
+        </p>
       </details>
-
-      {/* Proje Dokümanları */}
-      <div className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h3 className="font-display text-base font-semibold text-ink">Proje Dokümanları</h3>
-        <p className="mt-1 text-xs text-gray">Ruhsat · iskan · yapı denetim — belge-doğrulanmış proje rozeti (güven protokolü).</p>
-        <div className="mt-3 space-y-2">
-          {(belgeler ?? []).map((b) => (
-            <div key={b.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
-              <span className="rounded bg-navy-soft px-2 py-0.5 text-xs font-medium text-navy">{b.tip}</span>
-              <span className="flex-1 text-ink">{b.ad}</span>
-              {b.dogrulandi ? <span className="text-xs text-teal-d">✓ doğrulandı</span> : null}
-              {b.url ? (
-                <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a>
-              ) : null}
-              <form action={belgeSil}>
-                <input type="hidden" name="belge_id" value={b.id} />
-                <input type="hidden" name="proje_id" value={id} />
-                <button className="text-xs text-red hover:underline">Sil</button>
-              </form>
-            </div>
-          ))}
-          {(belgeler?.length ?? 0) === 0 ? <p className="text-sm text-gray">Henüz belge yok — aşağıdan ekle.</p> : null}
-        </div>
-        <form action={belgeEkle} className="mt-3 flex flex-wrap items-center gap-2">
-          <input type="hidden" name="proje_id" value={id} />
-          <select name="tip" className={inpCls}>
-            <option value="ruhsat">Yapı ruhsatı</option>
-            <option value="iskan">İskan</option>
-            <option value="yapi_denetim">Yapı denetim</option>
-            <option value="otopark">Otopark belgesi</option>
-            <option value="diger">Diğer</option>
-          </select>
-          <input name="ad" required placeholder="Belge adı" className={`${inpCls} flex-1`} />
-          <input name="url" placeholder="Link (opsiyonel)" className={inpCls} />
-          <SubmitButton>Belge ekle</SubmitButton>
-        </form>
-      </div>
 
       {/* Birim ızgarası */}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
