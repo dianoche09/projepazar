@@ -19,9 +19,10 @@ export default async function UreticiLayout({ children }: { children: React.Reac
     .select("ad, rol")
     .eq("id", user.id)
     .single();
-  if (!profil || profil.rol !== "uretici") {
-    redirect(profil?.rol === "admin" ? "/admin" : "/");
+  if (!profil || (profil.rol !== "uretici" && profil.rol !== "admin")) {
+    redirect("/");
   }
+  const adminMi = profil.rol === "admin";
 
   const ad = profil.ad ?? user.email ?? "Üretici";
 
@@ -71,6 +72,12 @@ export default async function UreticiLayout({ children }: { children: React.Reac
             <UreticiNav mobil />
           </div>
 
+          {adminMi ? (
+            <div className="flex items-center justify-between gap-2 border-b border-amber/30 bg-amber-soft px-4 py-2 text-xs text-ink">
+              <span>Admin olarak görüntülüyorsun — değişiklikler gerçek veriyi etkiler.</span>
+              <Link href="/admin" className="shrink-0 font-semibold text-teal-d hover:underline">← Admin paneli</Link>
+            </div>
+          ) : null}
           <main className="min-w-0 flex-1">{children}</main>
         </div>
       </div>

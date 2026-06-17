@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { fmtPara } from "@/lib/types";
+import { Donut, Lejant } from "@/components/ui/Grafik";
 
-function Kpi({ etiket, deger, renk = "text-ink" }: { etiket: string; deger: number; renk?: string }) {
+const C = { navy: "#13314B", teal: "#1E9B8A", green: "#2FB36B", amber: "#E3A12C" };
+
+function Stat({ etiket, deger, alt, vurgu }: { etiket: string; deger: string; alt?: string; vurgu?: boolean }) {
   return (
-    <div className="rounded-2xl border border-hair bg-card p-4">
-      <p className="text-xs text-gray">{etiket}</p>
-      <p className={`mt-1 font-mono text-2xl font-semibold ${renk}`}>{deger}</p>
+    <div className={`rounded-xl border p-4 ${vurgu ? "border-teal/30 bg-teal-soft" : "border-hair bg-card"}`}>
+      <p className="text-xs uppercase tracking-wide text-gray">{etiket}</p>
+      <p className={`mt-1 font-mono text-3xl font-semibold tabular-nums leading-none ${vurgu ? "text-teal-d" : "text-ink"}`}>{deger}</p>
+      {alt ? <p className="mt-1 text-xs text-gray">{alt}</p> : null}
     </div>
   );
 }
@@ -37,58 +41,89 @@ export default async function AdminPanel() {
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("durum", "onay_bekliyor"),
   ]);
 
-  const emlakciSay = (profiller ?? []).filter((p) => p.rol === "emlakci").length;
+  const rolSay = (r: string) => (profiller ?? []).filter((p) => p.rol === r).length;
+  const uretici = rolSay("uretici");
+  const ofisYetkili = rolSay("ofis_yetkili");
+  const emlakci = rolSay("emlakci");
+  const toplamKul = uretici + ofisYetkili + emlakci;
   const dogrulanmamis = (ureticiler ?? []).filter((u) => !u.dogrulanmis).length;
   const paketFiyat = new Map((paketler ?? []).map((p) => [p.id, Number(p.fiyat_aylik) || 0]));
   const mrr = (abonelikler ?? []).reduce((t, a) => t + (paketFiyat.get(a.paket_id) ?? 0), 0);
   const bekleyen = bekleyenSay ?? 0;
 
-  return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <h1 className="font-display text-2xl font-semibold text-ink">Yönetim Paneli</h1>
-      <p className="mt-1 text-sm text-gray">
-        Platform işletmecisi: üyelik/abonelik, hesap tanımlama, kapasite/kota, doğrulama, gelir.
-      </p>
+  const donut = [
+    { etiket: "Üretici", deger: uretici, renk: C.navy },
+    { etiket: "Ofis yetkilisi", deger: ofisYetkili, renk: C.teal },
+    { etiket: "Emlakçı", deger: emlakci, renk: C.green },
+  ];
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <Kpi etiket="Onay bekleyen" deger={bekleyen} renk={bekleyen > 0 ? "text-amber" : "text-ink"} />
-        <Kpi etiket="Üretici" deger={ureticiler?.length ?? 0} />
-        <Kpi etiket="Ofis" deger={ofisler?.length ?? 0} />
-        <Kpi etiket="Emlakçı" deger={emlakciSay} />
-        <div className="rounded-2xl border border-hair bg-card p-4">
-          <p className="text-xs text-gray">MRR</p>
-          <p className="mt-1 font-mono text-2xl font-semibold text-teal">{fmtPara(mrr)}</p>
-        </div>
+  return (
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
+      <div>
+        <h1 className="font-display text-2xl font-semibold text-ink">Genel Bakış</h1>
+        <p className="mt-1 text-sm text-gray">Üyelik/abonelik, hesap, kapasite/kota, doğrulama, gelir.</p>
       </div>
 
-      {dogrulanmamis > 0 ? (
-        <p className="mt-4 rounded-lg border border-amber/30 bg-amber/10 px-3 py-2 text-sm text-ink">
-          {dogrulanmamis} üretici doğrulama bekliyor —{" "}
-          <Link href="/admin/ureticiler" className="font-medium text-teal hover:underline">
-            Üreticiler
-          </Link>
-        </p>
+      {bekleyen > 0 || dogrulanmamis > 0 ? (
+        <div className="flex flex-wrap gap-3">
+          {bekleyen > 0 ? (
+            <Link href="/admin/onay" className="inline-flex items-center gap-2 rounded-xl border border-amber/30 bg-amber-soft px-3.5 py-2 text-sm font-medium text-ink hover:border-amber">
+              <span className="rounded-full bg-amber px-2 py-0.5 font-mono text-xs text-white">{bekleyen}</span>
+              onay bekliyor →
+            </Link>
+          ) : null}
+          {dogrulanmamis > 0 ? (
+            <Link href="/admin/ureticiler" className="inline-flex items-center gap-2 rounded-xl border border-hair bg-card px-3.5 py-2 text-sm font-medium text-ink hover:border-teal">
+              <span className="rounded-full bg-navy px-2 py-0.5 font-mono text-xs text-white">{dogrulanmamis}</span>
+              üretici doğrulama bekliyor →
+            </Link>
+          ) : null}
+        </div>
       ) : null}
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {MODULLER.map((m) => (
-          <Link
-            key={m.href}
-            href={m.href}
-            className="group rounded-2xl border border-hair bg-card p-5 transition-colors hover:border-teal"
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-display text-base font-semibold text-ink">{m.etiket}</span>
-              {m.href === "/admin/onay" && bekleyen > 0 ? (
-                <span className="rounded-full bg-amber px-2 py-0.5 font-mono text-xs font-medium text-white">{bekleyen}</span>
-              ) : (
-                <span className="text-gray transition-transform group-hover:translate-x-0.5">→</span>
-              )}
+      {/* GENEL BAKIŞ — kullanıcı dağılımı + metrikler */}
+      <section className="grid gap-4 lg:grid-cols-3">
+        <div className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+          <h2 className="font-display text-sm font-semibold text-ink">Kullanıcı dağılımı</h2>
+          <div className="mt-4 flex items-center gap-6">
+            <Donut parcalar={donut} ortaUst={String(toplamKul)} ortaAlt="kullanıcı" />
+            <div className="flex-1">
+              <Lejant parcalar={donut} />
             </div>
-            <p className="mt-1 text-sm text-gray">{m.aciklama}</p>
-          </Link>
-        ))}
-      </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 lg:col-span-2">
+          <Stat etiket="MRR" deger={fmtPara(mrr)} alt={`${abonelikler?.length ?? 0} aktif abonelik`} vurgu />
+          <Stat etiket="Onay bekleyen" deger={String(bekleyen)} alt="kuyrukta" />
+          <Stat etiket="Üretici firma" deger={String(ureticiler?.length ?? 0)} alt={`${dogrulanmamis} doğrulanmamış`} />
+          <Stat etiket="Ofis" deger={String(ofisler?.length ?? 0)} alt="abonelik sahibi" />
+        </div>
+      </section>
+
+      {/* MODÜLLER */}
+      <section>
+        <h2 className="font-display text-lg font-semibold text-ink">Yönetim modülleri</h2>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {MODULLER.map((m) => (
+            <Link
+              key={m.href}
+              href={m.href}
+              className="group rounded-2xl border border-hair bg-card p-5 shadow-card transition-shadow hover:shadow-cardlg"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-display text-base font-semibold text-ink group-hover:text-teal-d">{m.etiket}</span>
+                {m.href === "/admin/onay" && bekleyen > 0 ? (
+                  <span className="rounded-full bg-amber px-2 py-0.5 font-mono text-xs font-medium text-white">{bekleyen}</span>
+                ) : (
+                  <span className="text-gray transition-transform group-hover:translate-x-0.5">→</span>
+                )}
+              </div>
+              <p className="mt-1 text-sm text-gray">{m.aciklama}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

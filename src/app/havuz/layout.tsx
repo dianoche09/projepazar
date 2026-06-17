@@ -20,9 +20,10 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
     .select("ad, rol")
     .eq("id", user.id)
     .single();
-  if (!profil || profil.rol !== "emlakci") {
+  if (!profil || (profil.rol !== "emlakci" && profil.rol !== "admin")) {
     redirect(profil ? panelYolu(profil.rol) : "/");
   }
+  const adminMi = profil.rol === "admin";
 
   return (
     <ToastSaglayici>
@@ -45,6 +46,12 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
           </div>
         </header>
 
+        {adminMi ? (
+          <div className="flex items-center justify-between gap-2 border-b border-amber/30 bg-amber-soft px-4 py-2 text-xs text-ink">
+            <span>Admin olarak görüntülüyorsun.</span>
+            <Link href="/admin" className="shrink-0 font-semibold text-teal-d hover:underline">← Admin paneli</Link>
+          </div>
+        ) : null}
         <main className="flex-1 pb-24 md:pb-8">{children}</main>
 
         <BottomNav />
