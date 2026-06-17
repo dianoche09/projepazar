@@ -8,7 +8,8 @@ function herkeseAcik(pathname: string): boolean {
     pathname.startsWith("/login") ||
     pathname.startsWith("/kayit") || // self-registration
     pathname.startsWith("/p/") || // imzalı paylaşım landing
-    pathname.startsWith("/proje/") // public proje microsite (PR-7)
+    pathname.startsWith("/proje/") || // public proje microsite (PR-7)
+    pathname.startsWith("/tasarim") // tasarım yönü örnekleri (geçici showcase)
   );
 }
 
