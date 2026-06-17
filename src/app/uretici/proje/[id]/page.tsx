@@ -11,26 +11,16 @@ import {
   tipGorseliYukle,
   excelImport,
   tahsisSil,
-  projeTazele,
 } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
 import { GeneratorForm } from "./GeneratorForm";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import {
-  ASAMA_ETIKET,
-  zamanOnce,
-  type InsaatAsama,
-} from "@/lib/types";
 import { BinaKesiti } from "@/components/BinaKesiti";
 import { SecimDuzenle } from "@/components/SecimDuzenle";
+import { ProjeKomutBari } from "@/components/ProjeKomutBari";
 
 const inpCls =
   "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
-
-function trTarih(iso: string | null): string {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("tr-TR", { year: "numeric", month: "short" });
-}
 
 function Lejant({ renk, etiket }: { renk: string; etiket: string }) {
   return (
@@ -92,47 +82,16 @@ export default async function ProjeDetay({
   const blokMap = new Map((bloklar ?? []).map((b) => [b.id, b.ad]));
   const ofisMap = new Map((ofisler ?? []).map((o) => [o.id, o.ad]));
   const toplam = birimler?.length ?? 0;
+  const stats = {
+    toplam,
+    musait: (birimler ?? []).filter((b) => b.durum === "musait").length,
+    opsiyon: (birimler ?? []).filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length,
+    satildi: (birimler ?? []).filter((b) => b.durum === "satildi").length,
+  };
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <Link href="/uretici" className="text-sm font-medium text-teal hover:underline">
-        ← Kokpit
-      </Link>
-
-      {kapak?.url ? (
-        <div className="mt-3 h-44 overflow-hidden rounded-2xl border border-hair sm:h-56">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={kapak.url} alt={proje.ad} className="h-full w-full object-cover" />
-        </div>
-      ) : null}
-
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">{proje.ad}</h1>
-          <p className="mt-1 text-sm text-gray">
-            {[proje.mahalle, proje.ilce, proje.il].filter(Boolean).join(", ") || "—"}
-            {proje.ada ? ` · Ada ${proje.ada}` : ""}
-            {proje.parsel ? ` / Parsel ${proje.parsel}` : ""}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link
-            href={`/uretici/proje/${id}/kurulum`}
-            className="rounded-lg border border-hair bg-card px-2.5 py-1 text-xs font-semibold text-navy transition-colors hover:border-navy"
-          >
-            ⚙ Kurulum
-          </Link>
-          <form action={projeTazele}>
-            <input type="hidden" name="proje_id" value={id} />
-            <button className="rounded-lg border border-hair bg-card px-2.5 py-1 text-xs font-semibold text-teal hover:border-teal transition-colors">
-              ✓ Bilgileri Teyit Et (Stok Güncel)
-            </button>
-          </form>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-hair bg-card px-3 py-1 font-mono text-xs text-gray">
-            <span className="size-1.5 rounded-full bg-green" /> {zamanOnce(proje.son_guncelleme)}
-          </span>
-        </div>
-      </div>
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      <ProjeKomutBari proje={proje} kapakUrl={kapak?.url ?? null} stats={stats} />
 
       {hata ? (
         <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">
@@ -144,34 +103,6 @@ export default async function ProjeDetay({
           {mesaj}
         </p>
       ) : null}
-
-      {/* İnşaat zaman çizelgesi (MVP-12) */}
-      <div className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <div className="flex items-center justify-between">
-          <span className="font-medium text-ink">
-            İnşaat: {ASAMA_ETIKET[proje.insaat_asamasi as InsaatAsama]}
-            {proje.etap ? ` · ${proje.etap}` : ""}
-          </span>
-          <span className="font-mono text-sm text-teal">%{proje.ilerleme_yuzde}</span>
-        </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-hair">
-          <div className="h-full bg-teal" style={{ width: `${proje.ilerleme_yuzde}%` }} />
-        </div>
-        <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
-          <div>
-            <p className="text-xs text-gray">Başlama</p>
-            <p className="font-mono text-ink">{trTarih(proje.baslama_tarihi)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray">Teslim</p>
-            <p className="font-mono text-ink">{trTarih(proje.teslim_tarihi)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray">İskan</p>
-            <p className="font-mono text-ink">{trTarih(proje.iskan_tarihi)}</p>
-          </div>
-        </div>
-      </div>
 
       {/* Künye · Parsel & İmar — salt-okunur özet (düzenleme: Proje Kurulumu) */}
       <details className="mt-6 rounded-2xl border border-hair bg-card p-5">
