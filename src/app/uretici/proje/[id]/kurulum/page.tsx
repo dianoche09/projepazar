@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { medyaYukle, medyaSil, projeKunyeGuncelle } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { StokKurulumu } from "../StokKurulumu";
 
 const inpCls =
   "w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
@@ -99,6 +100,11 @@ export default async function ProjeKurulum({
     .order("created_at", { ascending: false });
   const belgeler = (belgelerRaw ?? []) as Belge[];
   const kunye = (proje.kunye ?? {}) as Record<string, unknown>;
+
+  const [{ data: bloklar }, { data: tipler }] = await Promise.all([
+    supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
+    supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, plan_url").eq("proje_id", id).order("ad"),
+  ]);
 
   const kapak = belgeler.find((b) => b.tip === "kapak") ?? null;
   const fotolar = belgeler.filter((b) => b.tip === "foto");
@@ -200,6 +206,22 @@ export default async function ProjeKurulum({
           <div className="sm:col-span-2"><SubmitButton>Künyeyi kaydet</SubmitButton></div>
         </form>
       </Bolum>
+
+      {/* ── Stok Kurulumu (bir kez) ── */}
+      <section className="mt-5">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full bg-teal" aria-hidden />
+          <div>
+            <h2 className="font-display text-base font-semibold text-ink">Stok Kurulumu</h2>
+            <p className="text-xs text-gray">
+              Bloklar, daire tipleri ve birim üretimi — bir kez. Günlük satış/takip proje ekranında (bina kesiti).
+            </p>
+          </div>
+        </div>
+        <div className="mt-4">
+          <StokKurulumu projeId={id} bloklar={bloklar ?? []} tipler={tipler ?? []} />
+        </div>
+      </section>
 
       {/* 2 — TANITIM ENVANTERİ */}
       <Bolum baslik="Tanıtım Envanteri" aciklama="Render & cephe görselleri, tanıtım videosu, broşür/katalog.">
