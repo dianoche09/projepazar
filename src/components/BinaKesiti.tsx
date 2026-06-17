@@ -24,9 +24,6 @@ type Tip = {
   ad: string | null;
   oda: string | null;
   taban_fiyat?: number | null;
-  banyo?: number | null;
-  balkon?: number | null;
-  otopark?: string | null;
   plan_url?: string | null;
 };
 type Blok = { id: string; ad: string | null; kat_sayisi: number | null };
@@ -128,9 +125,6 @@ export function BinaKesiti({
                                     taban_fiyat: tip?.taban_fiyat ?? null,
                                     tip_ad: tip?.ad ?? null,
                                     oda: tip?.oda ?? null,
-                                    banyo: tip?.banyo ?? null,
-                                    balkon: tip?.balkon ?? null,
-                                    otopark: tip?.otopark ?? null,
                                     plan_url: tip?.plan_url ?? null,
                                   }}
                                 />

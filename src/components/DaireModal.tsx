@@ -30,9 +30,6 @@ export type ModalBirim = {
   taban_fiyat: number | null;
   tip_ad: string | null;
   oda: string | null;
-  banyo?: number | null;
-  balkon?: number | null;
-  otopark?: string | null;
   plan_url?: string | null;
 };
 
@@ -127,7 +124,7 @@ export function DaireModal({
           )}
         </div>
 
-        {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara || birim.oda || birim.banyo || birim.balkon || birim.otopark ? (
+        {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara || birim.oda ? (
           <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
             {birim.oda ? (
               <div><span className="text-gray">Oda </span><span className="text-ink">{birim.oda}</span></div>
@@ -137,15 +134,6 @@ export function DaireModal({
             ) : null}
             {birim.brut_m2 ? (
               <div><span className="text-gray">Brüt </span><span className="font-mono text-ink">{birim.brut_m2} m²</span></div>
-            ) : null}
-            {birim.banyo ? (
-              <div><span className="text-gray">Banyo </span><span className="text-ink">{birim.banyo}</span></div>
-            ) : null}
-            {birim.balkon ? (
-              <div><span className="text-gray">Balkon </span><span className="text-ink">{birim.balkon}</span></div>
-            ) : null}
-            {birim.otopark ? (
-              <div><span className="text-gray">Otopark </span><span className="text-ink">{birim.otopark}</span></div>
             ) : null}
             {birim.yon ? (
               <div><span className="text-gray">Yön </span><span className="text-ink">{birim.yon}</span></div>

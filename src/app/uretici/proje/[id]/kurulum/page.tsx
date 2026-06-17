@@ -5,7 +5,9 @@ import { medyaYukle, medyaSil, projeKunyeGuncelle } from "@/app/uretici/actions"
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
 const inpCls =
-  "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
+  "w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
+const fileCls =
+  "w-full text-sm text-gray file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-navy-soft file:px-3 file:py-2 file:text-sm file:font-medium file:text-navy hover:file:bg-navy/10";
 
 type Belge = { id: string; tip: string | null; ad: string | null; url: string | null; dogrulandi: boolean };
 
@@ -17,16 +19,66 @@ const BELGE_TIPLERI = [
   ["diger", "Diğer"],
 ] as const;
 
-/** Bir medya kaydını sil butonu (form) */
-function SilForm({ belgeId, projeId }: { belgeId: string; projeId: string }) {
+function Sil({ belgeId, projeId }: { belgeId: string; projeId: string }) {
   return (
     <form action={medyaSil}>
       <input type="hidden" name="belge_id" value={belgeId} />
       <input type="hidden" name="proje_id" value={projeId} />
-      <button className="text-xs font-medium text-red hover:underline" aria-label="Sil">
+      <button
+        className="rounded-md px-2 py-1 text-xs font-medium text-red transition-colors hover:bg-red-soft"
+        aria-label="Sil"
+      >
         Sil
       </button>
     </form>
+  );
+}
+
+/** Tamamlanma rozeti (kurulum checklist). */
+function Rozet({ ok, etiket }: { ok: boolean; etiket: string }) {
+  return (
+    <div
+      className={`flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm font-medium ${
+        ok ? "border-green/30 bg-green-soft text-teal-d" : "border-hair bg-card text-gray"
+      }`}
+    >
+      <span
+        className={`grid size-5 shrink-0 place-items-center rounded-full text-[11px] ${
+          ok ? "bg-green text-white" : "border border-hair bg-soft text-gray"
+        }`}
+      >
+        {ok ? "✓" : "•"}
+      </span>
+      {etiket}
+    </div>
+  );
+}
+
+/** Numaralı bölüm kabuğu. */
+function Bolum({
+  no,
+  baslik,
+  aciklama,
+  children,
+}: {
+  no: number;
+  baslik: string;
+  aciklama: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-5 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-navy text-sm font-semibold text-white">
+          {no}
+        </span>
+        <div>
+          <h2 className="font-display text-base font-semibold text-ink">{baslik}</h2>
+          <p className="text-xs text-gray">{aciklama}</p>
+        </div>
+      </div>
+      <div className="mt-4">{children}</div>
+    </section>
   );
 }
 
@@ -60,51 +112,79 @@ export default async function ProjeKurulum({
     (b) => b.tip && ["ruhsat", "iskan", "yapi_denetim", "otopark", "diger"].includes(b.tip),
   );
 
+  const konum = [proje.mahalle, proje.ilce, proje.il].filter(Boolean).join(", ");
+  const kunyeDolu = !!(proje.ada || proje.emsal || kunye.imar_durumu);
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
-      <Link href={`/uretici/proje/${id}`} className="text-sm font-medium text-teal hover:underline">
-        ← Proje
-      </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Proje Kurulumu</h1>
-      <p className="mt-1 text-sm text-gray">
-        {proje.ad} — künye/imar, kapak görseli, tanıtım envanteri ve resmi belgeler. Stok/birim
-        yönetimi proje ekranındadır.
-      </p>
+    <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+      {/* Başlık satırı */}
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <Link href={`/uretici/proje/${id}`} className="text-xs font-medium text-teal hover:underline">
+            ← {proje.ad}
+          </Link>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Proje Kurulumu</h1>
+          <p className="text-sm text-gray">Künye, kapak, tanıtım envanteri ve belgeler — proje kimliği.</p>
+        </div>
+        <Link
+          href={`/uretici/proje/${id}`}
+          className="btn rounded-lg bg-navy px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ink"
+        >
+          Projeyi Gör →
+        </Link>
+      </div>
 
       {hata ? (
-        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">
+        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red-soft px-3 py-2 text-sm text-red">
           {hata}
         </p>
       ) : null}
       {mesaj ? (
-        <p className="mt-4 rounded-lg border border-green/30 bg-green/10 px-3 py-2 text-sm text-ink">
+        <p className="mt-4 rounded-lg border border-green/30 bg-green-soft px-3 py-2 text-sm text-teal-d">
           {mesaj}
         </p>
       ) : null}
 
-      {/* ── Kapak görseli ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Kapak görseli</h2>
-        <p className="mt-1 text-xs text-gray">Havuz kartında ve proje üstünde görünür (tek görsel).</p>
-        {kapak?.url ? (
-          <div className="mt-3 flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={kapak.url} alt="Kapak" className="h-24 w-40 rounded-lg border border-hair object-cover" />
-            <SilForm belgeId={kapak.id} projeId={id} />
-          </div>
-        ) : null}
-        <form action={medyaYukle} className="mt-3 flex flex-wrap items-center gap-2">
+      {/* KAPAK HERO */}
+      <div className="relative mt-5 overflow-hidden rounded-2xl border border-hair bg-soft shadow-card">
+        <div className="aspect-[21/9] w-full">
+          {kapak?.url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={kapak.url} alt={proje.ad} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-navy-soft via-teal-soft to-soft">
+              <span className="font-display text-6xl font-bold text-teal-d/25 select-none">
+                {(proje.ad ?? "P").charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/75 to-transparent p-4">
+          <h2 className="font-display text-lg font-semibold text-white drop-shadow">{proje.ad}</h2>
+          {konum ? <p className="text-xs text-white/85">{konum}</p> : null}
+        </div>
+        <form
+          action={medyaYukle}
+          className="absolute right-3 top-3 flex items-center gap-2 rounded-xl border border-hair bg-card/95 p-1.5 shadow-card backdrop-blur"
+        >
           <input type="hidden" name="proje_id" value={id} />
           <input type="hidden" name="tip" value="kapak" />
-          <input type="file" name="dosya" accept="image/*" required className="text-sm text-gray" />
-          <SubmitButton>{kapak ? "Kapağı değiştir" : "Kapak yükle"}</SubmitButton>
+          <input type="file" name="dosya" accept="image/*" required className="max-w-[160px] text-xs text-gray file:mr-2 file:rounded-md file:border-0 file:bg-navy-soft file:px-2 file:py-1 file:text-xs file:font-medium file:text-navy" />
+          <SubmitButton className="!px-3 !py-1.5 !text-xs">{kapak ? "Değiştir" : "Yükle"}</SubmitButton>
         </form>
-      </section>
+      </div>
 
-      {/* ── Künye · Parsel & İmar ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Künye · Parsel & İmar</h2>
-        <form action={projeKunyeGuncelle} className="mt-3 grid gap-2 sm:grid-cols-2">
+      {/* TAMAMLANMA */}
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Rozet ok={kunyeDolu} etiket="Künye / İmar" />
+        <Rozet ok={!!kapak} etiket="Kapak görseli" />
+        <Rozet ok={fotolar.length > 0} etiket={`${fotolar.length} Tanıtım görseli`} />
+        <Rozet ok={belgelerResmi.length > 0} etiket={`${belgelerResmi.length} Resmi belge`} />
+      </div>
+
+      {/* 1 — KİMLİK & İMAR */}
+      <Bolum no={1} baslik="Kimlik & İmar" aciklama="Ada/parsel, emsal, ruhsat, otopark kuralı, malzeme & donatı.">
+        <form action={projeKunyeGuncelle} className="grid gap-2 sm:grid-cols-2">
           <input type="hidden" name="proje_id" value={id} />
           <input name="ada" defaultValue={proje.ada ?? ""} placeholder="Ada" className={inpCls} />
           <input name="parsel" defaultValue={proje.parsel ?? ""} placeholder="Parsel" className={inpCls} />
@@ -115,27 +195,28 @@ export default async function ProjeKurulum({
           <input name="toplam_insaat" type="number" defaultValue={(kunye.toplam_insaat as number) ?? ""} placeholder="Toplam inşaat m²" className={inpCls} />
           <input name="ruhsat_tarihi" defaultValue={(kunye.ruhsat_tarihi as string) ?? ""} placeholder="Yapı ruhsatı (tarih)" className={inpCls} />
           <input name="yapi_denetim" defaultValue={(kunye.yapi_denetim as string) ?? ""} placeholder="Yapı denetim firması" className={inpCls} />
-          <label className="flex items-center gap-2 text-sm text-ink">
-            <input type="checkbox" name="kat_karsiligi" defaultChecked={!!kunye.kat_karsiligi} className="size-4" /> Kat karşılığı
+          <input name="otopark" defaultValue={(kunye.otopark as string) ?? ""} placeholder="Otopark kuralı (ör. Her daireye 1 kapalı)" className={`${inpCls} sm:col-span-2`} />
+          <label className="flex items-center gap-2 text-sm text-ink sm:col-span-2">
+            <input type="checkbox" name="kat_karsiligi" defaultChecked={!!kunye.kat_karsiligi} className="size-4" /> Kat karşılığı proje
           </label>
           <textarea name="malzeme" defaultValue={Array.isArray(kunye.malzeme) ? (kunye.malzeme as string[]).join("\n") : ""} placeholder="Malzeme (her satır: Pencere · Schüco)" rows={3} className={`${inpCls} sm:col-span-2`} />
           <input name="donati" defaultValue={Array.isArray(kunye.donati) ? (kunye.donati as string[]).join(", ") : ""} placeholder="Sosyal donatı (virgülle: Havuz, Fitness, Güvenlik)" className={`${inpCls} sm:col-span-2`} />
           <div className="sm:col-span-2"><SubmitButton>Künyeyi kaydet</SubmitButton></div>
         </form>
-      </section>
+      </Bolum>
 
-      {/* ── Tanıtım galerisi ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Tanıtım fotoğrafları</h2>
-        <p className="mt-1 text-xs text-gray">Render, cephe, sosyal alan görselleri (çoklu yükleme).</p>
+      {/* 2 — TANITIM ENVANTERİ */}
+      <Bolum no={2} baslik="Tanıtım Envanteri" aciklama="Render & cephe görselleri, tanıtım videosu, broşür/katalog.">
+        {/* Galeri */}
+        <p className="text-sm font-medium text-ink">Tanıtım görselleri</p>
         {fotolar.length > 0 ? (
-          <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+          <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
             {fotolar.map((f) => (
               <div key={f.id} className="group relative overflow-hidden rounded-lg border border-hair">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={f.url ?? ""} alt={f.ad ?? "Foto"} className="aspect-square w-full object-cover" />
-                <div className="absolute right-1 top-1 rounded bg-ink/70 px-1.5 py-0.5 opacity-0 transition-opacity group-hover:opacity-100">
-                  <SilForm belgeId={f.id} projeId={id} />
+                <div className="absolute right-1 top-1 rounded-md bg-card/90 opacity-0 shadow-sm backdrop-blur transition-opacity group-hover:opacity-100">
+                  <Sil belgeId={f.id} projeId={id} />
                 </div>
               </div>
             ))}
@@ -144,87 +225,85 @@ export default async function ProjeKurulum({
         <form action={medyaYukle} className="mt-3 flex flex-wrap items-center gap-2">
           <input type="hidden" name="proje_id" value={id} />
           <input type="hidden" name="tip" value="foto" />
-          <input type="file" name="dosya" accept="image/*" multiple required className="text-sm text-gray" />
-          <SubmitButton>Fotoğraf yükle</SubmitButton>
+          <input type="file" name="dosya" accept="image/*" multiple required className={`${fileCls} flex-1`} />
+          <SubmitButton varyant="outline">Görsel yükle</SubmitButton>
         </form>
-      </section>
 
-      {/* ── Tanıtım videosu (link) ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Tanıtım videosu</h2>
-        <p className="mt-1 text-xs text-gray">YouTube / Vimeo bağlantısı.</p>
-        {videolar.length > 0 ? (
-          <div className="mt-3 space-y-2">
-            {videolar.map((v) => (
-              <div key={v.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
-                <span className="flex-1 truncate text-ink">{v.ad}</span>
-                {v.url ? <a href={v.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
-                <SilForm belgeId={v.id} projeId={id} />
-              </div>
-            ))}
-          </div>
-        ) : null}
-        <form action={medyaYukle} className="mt-3 flex flex-wrap items-center gap-2">
-          <input type="hidden" name="proje_id" value={id} />
-          <input type="hidden" name="tip" value="video" />
-          <input name="ad" placeholder="Başlık (opsiyonel)" className={inpCls} />
-          <input name="url" type="url" required placeholder="https://youtube.com/..." className={`${inpCls} flex-1`} />
-          <SubmitButton>Video ekle</SubmitButton>
-        </form>
-      </section>
+        {/* Video */}
+        <div className="mt-5 border-t border-hair pt-4">
+          <p className="text-sm font-medium text-ink">Tanıtım videosu</p>
+          {videolar.length > 0 ? (
+            <div className="mt-2 space-y-2">
+              {videolar.map((v) => (
+                <div key={v.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
+                  <span className="flex-1 truncate text-ink">▶ {v.ad}</span>
+                  {v.url ? <a href={v.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
+                  <Sil belgeId={v.id} projeId={id} />
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <form action={medyaYukle} className="mt-2 flex flex-wrap items-center gap-2">
+            <input type="hidden" name="proje_id" value={id} />
+            <input type="hidden" name="tip" value="video" />
+            <input name="ad" placeholder="Başlık (opsiyonel)" className={`${inpCls} w-40`} />
+            <input name="url" type="url" required placeholder="https://youtube.com/..." className={`${inpCls} flex-1`} />
+            <SubmitButton varyant="outline">Video ekle</SubmitButton>
+          </form>
+        </div>
 
-      {/* ── Broşür / katalog ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Broşür / katalog</h2>
-        <p className="mt-1 text-xs text-gray">PDF tanıtım dosyaları.</p>
-        {brosurler.length > 0 ? (
-          <div className="mt-3 space-y-2">
-            {brosurler.map((b) => (
-              <div key={b.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
-                <span className="flex-1 truncate text-ink">📄 {b.ad}</span>
-                {b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
-                <SilForm belgeId={b.id} projeId={id} />
-              </div>
-            ))}
-          </div>
-        ) : null}
-        <form action={medyaYukle} className="mt-3 flex flex-wrap items-center gap-2">
-          <input type="hidden" name="proje_id" value={id} />
-          <input type="hidden" name="tip" value="brosur" />
-          <input type="file" name="dosya" accept="application/pdf" required className="text-sm text-gray" />
-          <SubmitButton>Broşür yükle</SubmitButton>
-        </form>
-      </section>
+        {/* Broşür */}
+        <div className="mt-5 border-t border-hair pt-4">
+          <p className="text-sm font-medium text-ink">Broşür / katalog (PDF)</p>
+          {brosurler.length > 0 ? (
+            <div className="mt-2 space-y-2">
+              {brosurler.map((b) => (
+                <div key={b.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
+                  <span className="flex-1 truncate text-ink">📄 {b.ad}</span>
+                  {b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
+                  <Sil belgeId={b.id} projeId={id} />
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <form action={medyaYukle} className="mt-2 flex flex-wrap items-center gap-2">
+            <input type="hidden" name="proje_id" value={id} />
+            <input type="hidden" name="tip" value="brosur" />
+            <input type="file" name="dosya" accept="application/pdf" required className={`${fileCls} flex-1`} />
+            <SubmitButton varyant="outline">Broşür yükle</SubmitButton>
+          </form>
+        </div>
+      </Bolum>
 
-      {/* ── Resmi belgeler ── */}
-      <section className="mt-6 rounded-2xl border border-hair bg-card p-5">
-        <h2 className="font-display text-base font-semibold text-ink">Resmi belgeler</h2>
-        <p className="mt-1 text-xs text-gray">Ruhsat · iskan · yapı denetim — belge-doğrulanmış proje rozeti (güven protokolü).</p>
+      {/* 3 — RESMİ BELGELER */}
+      <Bolum no={3} baslik="Resmi Belgeler" aciklama="Ruhsat · iskan · yapı denetim — belge-doğrulanmış proje rozeti (güven protokolü).">
         {belgelerResmi.length > 0 ? (
-          <div className="mt-3 space-y-2">
+          <div className="space-y-2">
             {belgelerResmi.map((b) => (
               <div key={b.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-hair px-3 py-2 text-sm">
                 <span className="rounded bg-navy-soft px-2 py-0.5 text-xs font-medium text-navy">{b.tip}</span>
                 <span className="flex-1 truncate text-ink">{b.ad}</span>
-                {b.dogrulandi ? <span className="text-xs text-teal-d">✓ doğrulandı</span> : null}
+                {b.dogrulandi ? <span className="text-xs font-medium text-teal-d">✓ doğrulandı</span> : null}
                 {b.url ? <a href={b.url} target="_blank" rel="noopener noreferrer" className="text-xs font-medium text-teal-d hover:underline">Aç</a> : null}
-                <SilForm belgeId={b.id} projeId={id} />
+                <Sil belgeId={b.id} projeId={id} />
               </div>
             ))}
           </div>
-        ) : null}
+        ) : (
+          <p className="text-sm text-gray">Henüz belge yok — aşağıdan yükle.</p>
+        )}
         <form action={medyaYukle} className="mt-3 flex flex-wrap items-end gap-2">
           <input type="hidden" name="proje_id" value={id} />
-          <select name="tip" className={inpCls} defaultValue="ruhsat">
+          <select name="tip" className={`${inpCls} w-40`} defaultValue="ruhsat">
             {BELGE_TIPLERI.map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}
           </select>
-          <input name="ad" placeholder="Belge adı (opsiyonel)" className={inpCls} />
-          <input type="file" name="dosya" accept="application/pdf,image/*" required className="text-sm text-gray" />
-          <SubmitButton>Belge yükle</SubmitButton>
+          <input name="ad" placeholder="Belge adı (opsiyonel)" className={`${inpCls} w-44`} />
+          <input type="file" name="dosya" accept="application/pdf,image/*" required className={`${fileCls} flex-1`} />
+          <SubmitButton varyant="outline">Belge yükle</SubmitButton>
         </form>
-      </section>
+      </Bolum>
     </div>
   );
 }

@@ -62,7 +62,7 @@ export default async function ProjeDetay({
 
   const { data: tipler } = await supabase
     .from("daire_tipi")
-    .select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark, plan_url")
+    .select("id, ad, oda, net_m2, taban_fiyat, plan_url")
     .eq("proje_id", id)
     .order("ad");
 
@@ -191,6 +191,7 @@ export default async function ProjeDetay({
             ["Toplam inşaat", kunye.toplam_insaat ? `${kunye.toplam_insaat} m²` : "—"],
             ["Yapı ruhsatı", (kunye.ruhsat_tarihi as string) ?? "—"],
             ["Yapı denetim", (kunye.yapi_denetim as string) ?? "—"],
+            ["Otopark", (kunye.otopark as string) ?? "—"],
           ] as [string, string | number][]).map(([k, v]) => (
             <div key={k} className="flex justify-between border-t border-hair py-1.5">
               <span className="text-gray">{k}</span>
@@ -330,7 +331,7 @@ export default async function ProjeDetay({
             </form>
           </div>
 
-          {/* Daire tipleri — düzenle / sil (oda · banyo · balkon · otopark) */}
+          {/* Daire tipleri — düzenle / sil (oda · m² · taban fiyat · plan görseli) */}
           <div className="rounded-2xl border border-hair bg-card p-5">
             <h3 className="font-medium text-ink">Daire tipleri ({tipler?.length ?? 0})</h3>
             <ul className="mt-2 space-y-1.5">
@@ -354,9 +355,6 @@ export default async function ProjeDetay({
                         <input name="oda" defaultValue={t.oda ?? ""} placeholder="2+1" className={inpCls} />
                         <input name="net_m2" type="number" defaultValue={t.net_m2 ?? ""} placeholder="net m²" className={inpCls} />
                         <input name="taban_fiyat" type="number" defaultValue={t.taban_fiyat ?? ""} placeholder="taban ₺" className={inpCls} />
-                        <input name="banyo" type="number" defaultValue={t.banyo ?? ""} placeholder="banyo" className={inpCls} />
-                        <input name="balkon" type="number" defaultValue={t.balkon ?? ""} placeholder="balkon" className={inpCls} />
-                        <input name="otopark" defaultValue={t.otopark ?? ""} placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
                         <div className="col-span-2"><SubmitButton>Kaydet</SubmitButton></div>
                       </form>
                       <div className="mt-3 border-t border-hair pt-3">
@@ -388,9 +386,6 @@ export default async function ProjeDetay({
               <input name="oda" placeholder="2+1" className={inpCls} />
               <input name="net_m2" type="number" placeholder="net m²" className={inpCls} />
               <input name="taban_fiyat" type="number" placeholder="taban fiyat ₺" className={inpCls} />
-              <input name="banyo" type="number" placeholder="banyo" className={inpCls} />
-              <input name="balkon" type="number" placeholder="balkon" className={inpCls} />
-              <input name="otopark" placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
               <SubmitButton className="col-span-2 w-full">Tip ekle</SubmitButton>
             </form>
           </div>

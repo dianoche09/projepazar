@@ -138,9 +138,6 @@ function tipAlanlari(formData: FormData) {
     oda: String(formData.get("oda") ?? "").trim() || null,
     net_m2: tamsayi(formData.get("net_m2")),
     taban_fiyat: tamsayi(formData.get("taban_fiyat")),
-    banyo: tamsayi(formData.get("banyo")),
-    balkon: tamsayi(formData.get("balkon")),
-    otopark: String(formData.get("otopark") ?? "").trim() || null,
   };
 }
 
@@ -710,6 +707,7 @@ export async function projeKunyeGuncelle(formData: FormData) {
     toplam_insaat: sayi(formData.get("toplam_insaat")),
     imar_durumu: metin(formData.get("imar_durumu")),
     kat_karsiligi: formData.get("kat_karsiligi") === "on",
+    otopark: metin(formData.get("otopark")), // proje geneli otopark kuralı (ör. "Her daireye 1 kapalı")
     malzeme: String(formData.get("malzeme") ?? "")
       .split("\n")
       .map((s) => s.trim())
