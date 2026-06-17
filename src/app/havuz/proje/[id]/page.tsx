@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ASAMA_ETIKET, zamanOnce, type InsaatAsama } from "@/lib/types";
 import { BinaKesiti } from "@/components/BinaKesiti";
+import { generateShareToken } from "@/lib/sharing";
 
 function trTarih(iso: string | null): string {
   if (!iso) return "—";
@@ -42,7 +43,7 @@ export default async function HavuzProjeDetay({
 
   const [{ data: bloklar }, { data: tipler }, { data: birimler }] = await Promise.all([
     supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
-    supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark").eq("proje_id", id).order("ad"),
+    supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark, plan_url").eq("proje_id", id).order("ad"),
     supabase
       .from("birim")
       .select(
@@ -52,6 +53,13 @@ export default async function HavuzProjeDetay({
   ]);
 
   const toplam = birimler?.length ?? 0;
+  // Paylaşım URL'leri server'da üretilir (HMAC secret client'a sızmaz — DEĞİŞMEZ #1)
+  const shareUrlMap = Object.fromEntries(
+    (birimler ?? []).map((b) => [
+      b.id,
+      `${appUrl}/p/${emlakciId}/${b.id}/${generateShareToken(emlakciId, b.id)}`,
+    ]),
+  );
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
@@ -136,8 +144,7 @@ export default async function HavuzProjeDetay({
             mod="emlakci"
             projeId={id}
             projeAd={proje.ad}
-            emlakciId={emlakciId}
-            appUrl={appUrl}
+            shareUrlMap={shareUrlMap}
           />
         )}
       </div>

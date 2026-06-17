@@ -190,6 +190,39 @@ export async function tipSil(formData: FormData) {
   redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Daire tipi silindi")}`);
 }
 
+// ---- Daire tipi plan görseli yükle (daire_tipi.plan_url; daireye basınca modalda görünür) ----
+export async function tipGorseliYukle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const tip_id = String(formData.get("tip_id"));
+  const geri = `/uretici/proje/${proje_id}`;
+
+  const supabase = await createClient();
+  if (!(await projeSahibiMi(supabase, proje_id))) hataya("/uretici", "Bu projeye erişim yok");
+
+  const dosya = formData.get("dosya");
+  if (!(dosya instanceof File) || dosya.size === 0) hataya(geri, "Görsel seçilmedi");
+
+  const admin = createAdminClient();
+  // eski plan görselini sil (varsa)
+  const { data: tip } = await admin.from("daire_tipi").select("plan_url").eq("id", tip_id).single();
+  const eskiYol = medyaYolu(tip?.plan_url ?? null);
+  if (eskiYol) await admin.storage.from(MEDYA_BUCKET).remove([eskiYol]);
+
+  const uzanti = dosya.name.includes(".") ? dosya.name.split(".").pop()!.toLowerCase() : "png";
+  const yol = `${proje_id}/tip/${tip_id}-${randomUUID()}.${uzanti}`;
+  const buf = Buffer.from(await dosya.arrayBuffer());
+  const { error: upErr } = await admin.storage
+    .from(MEDYA_BUCKET)
+    .upload(yol, buf, { contentType: dosya.type || "image/png", upsert: false });
+  if (upErr) hataya(geri, `Yükleme hatası: ${upErr.message}`);
+
+  const { data: pub } = admin.storage.from(MEDYA_BUCKET).getPublicUrl(yol);
+  const { error } = await admin.from("daire_tipi").update({ plan_url: pub.publicUrl }).eq("id", tip_id);
+  if (error) hataya(geri, error.message);
+  revalidatePath(geri);
+  redirect(`${geri}?mesaj=${encodeURIComponent("Tip görseli yüklendi")}`);
+}
+
 // ---- Generator: tip × kat → birimler (toplu üretim) ----
 export async function birimGenerator(formData: FormData) {
   const supabase = await createClient();
@@ -286,6 +319,38 @@ export async function birimDurumGuncelle(formData: FormData) {
     .from("birim")
     .update({ durum: durum.data, durum_notu, son_guncelleme: new Date().toISOString() })
     .eq("id", birim_id);
+  if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+}
+
+// ---- Tek daire tam düzenle (ızgaradan modal) ----
+export async function birimGuncelle(formData: FormData) {
+  const supabase = await createClient();
+  const proje_id = String(formData.get("proje_id"));
+  const birim_id = String(formData.get("birim_id"));
+  const metin = (v: FormDataEntryValue | null) => (String(v ?? "").trim() ? String(v).trim() : null);
+  const sayi = (v: FormDataEntryValue | null) => {
+    const s = String(v ?? "").trim();
+    return s === "" ? null : Number(s);
+  };
+
+  const guncelle: Record<string, unknown> = {
+    daire_no: metin(formData.get("daire_no")),
+    kat: sayi(formData.get("kat")),
+    liste_fiyati: sayi(formData.get("liste_fiyati")),
+    yon: metin(formData.get("yon")),
+    manzara: metin(formData.get("manzara")),
+    net_m2: sayi(formData.get("net_m2")),
+    brut_m2: sayi(formData.get("brut_m2")),
+    satilabilir: formData.get("satilabilir") === "on",
+    son_guncelleme: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("birim")
+    .update(guncelle)
+    .eq("id", birim_id)
+    .eq("proje_id", proje_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
 }

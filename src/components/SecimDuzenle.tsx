@@ -67,6 +67,16 @@ export function SecimDuzenle({ projeId, children }: { projeId: string; children:
           <span className="rounded-full bg-teal/10 px-2.5 py-1 text-sm font-semibold text-teal-d">
             {secili.size} seçili
           </span>
+          {([["musait", "Aç", "green"], ["opsiyonlu", "Opsiyon", "navy"], ["stop", "Kapat", "red"]] as const).map(
+            ([d, etiket, v]) => (
+              <form key={d} action={birimTopluGuncelle}>
+                <input type="hidden" name="proje_id" value={projeId} />
+                <input type="hidden" name="birim_idler" value={idler} />
+                <input type="hidden" name="durum" value={d} />
+                <SubmitButton varyant={v}>{etiket}</SubmitButton>
+              </form>
+            ),
+          )}
           <form action={birimTopluGuncelle} className="flex flex-wrap items-center gap-2">
             <input type="hidden" name="proje_id" value={projeId} />
             <input type="hidden" name="birim_idler" value={idler} />

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { birimDurumGuncelle } from "@/app/uretici/actions";
+import { birimDurumGuncelle, birimGuncelle } from "@/app/uretici/actions";
 import { opsiyonAl, opsiyonBirak } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 import { KatPlani } from "@/components/KatPlani";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
+const inp =
+  "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
 
 export type ModalBirim = {
   id: string;
@@ -30,6 +32,7 @@ export type ModalBirim = {
   banyo?: number | null;
   balkon?: number | null;
   otopark?: string | null;
+  plan_url?: string | null;
 };
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
@@ -125,9 +128,14 @@ export function DaireModal({
           </span>
         ) : null}
 
-        {/* Daire planı (şematik) */}
+        {/* Daire planı — tip görseli varsa onu, yoksa şematik plan */}
         <div className="mt-4 overflow-hidden rounded-xl border border-hair">
-          <KatPlani etiket={birim.oda ?? birim.tip_ad ?? undefined} buyuk />
+          {birim.plan_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={birim.plan_url} alt={`${birim.tip_ad ?? "Daire"} planı`} className="max-h-72 w-full object-contain bg-paper" />
+          ) : (
+            <KatPlani etiket={birim.oda ?? birim.tip_ad ?? undefined} buyuk />
+          )}
         </div>
 
         {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara || birim.oda || birim.banyo || birim.balkon || birim.otopark ? (
@@ -193,6 +201,7 @@ export function DaireModal({
         ) : null}
 
         {mod === "uretici" ? (
+          <>
           <form
             action={async (fd) => {
               await birimDurumGuncelle(fd);
@@ -238,6 +247,32 @@ export function DaireModal({
               <Kaydet />
             </div>
           </form>
+
+          <details className="mt-3 rounded-lg border border-hair">
+            <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-ink">Daireyi düzenle (no · kat · fiyat · yön · m²)</summary>
+            <form
+              action={async (fd) => {
+                await birimGuncelle(fd);
+                onKapat();
+              }}
+              className="grid grid-cols-2 gap-2 p-3"
+            >
+              <input type="hidden" name="birim_id" value={birim.id} />
+              <input type="hidden" name="proje_id" value={projeId} />
+              <input name="daire_no" defaultValue={birim.daire_no ?? ""} placeholder="Daire no" className={inp} />
+              <input name="kat" type="number" defaultValue={birim.kat ?? ""} placeholder="Kat" className={inp} />
+              <input name="liste_fiyati" type="number" defaultValue={birim.liste_fiyati ?? ""} placeholder="Fiyat ₺" className={inp} />
+              <input name="net_m2" type="number" defaultValue={birim.net_m2 ?? ""} placeholder="Net m²" className={inp} />
+              <input name="brut_m2" type="number" defaultValue={birim.brut_m2 ?? ""} placeholder="Brüt m²" className={inp} />
+              <input name="yon" defaultValue={birim.yon ?? ""} placeholder="Yön" className={inp} />
+              <input name="manzara" defaultValue={birim.manzara ?? ""} placeholder="Manzara" className={`${inp} col-span-2`} />
+              <label className="col-span-2 flex items-center gap-2 text-sm text-ink">
+                <input type="checkbox" name="satilabilir" defaultChecked={birim.satilabilir} className="size-4" /> Satılabilir (arsa payı değil)
+              </label>
+              <div className="col-span-2"><Kaydet /></div>
+            </form>
+          </details>
+          </>
         ) : (
           <div className="mt-4 space-y-2">
             <a

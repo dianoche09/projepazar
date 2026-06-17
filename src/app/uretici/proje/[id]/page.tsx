@@ -8,6 +8,7 @@ import {
   daireTipiEkle,
   tipGuncelle,
   tipSil,
+  tipGorseliYukle,
   excelImport,
   tahsisSil,
   projeTazele,
@@ -63,7 +64,7 @@ export default async function ProjeDetay({
 
   const { data: tipler } = await supabase
     .from("daire_tipi")
-    .select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark")
+    .select("id, ad, oda, net_m2, taban_fiyat, banyo, balkon, otopark, plan_url")
     .eq("proje_id", id)
     .order("ad");
 
@@ -360,7 +361,20 @@ export default async function ProjeDetay({
                         <input name="otopark" defaultValue={t.otopark ?? ""} placeholder="otopark (ör. 1 kapalı)" className={`${inpCls} col-span-2`} />
                         <div className="col-span-2"><SubmitButton>Kaydet</SubmitButton></div>
                       </form>
-                      <form action={tipSil} className="mt-2">
+                      <div className="mt-3 border-t border-hair pt-3">
+                        <p className="text-xs font-medium text-gray">Plan / tip görseli — daireye basınca açılır</p>
+                        {t.plan_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={t.plan_url} alt="plan" className="mt-2 h-24 rounded-lg border border-hair object-contain bg-paper" />
+                        ) : null}
+                        <form action={tipGorseliYukle} className="mt-2 flex flex-wrap items-center gap-2">
+                          <input type="hidden" name="proje_id" value={id} />
+                          <input type="hidden" name="tip_id" value={t.id} />
+                          <input type="file" name="dosya" accept="image/*" required className="text-xs text-gray" />
+                          <SubmitButton varyant="outline">{t.plan_url ? "Görseli değiştir" : "Görsel yükle"}</SubmitButton>
+                        </form>
+                      </div>
+                      <form action={tipSil} className="mt-3">
                         <input type="hidden" name="proje_id" value={id} />
                         <input type="hidden" name="tip_id" value={t.id} />
                         <SubmitButton varyant="outline" className="!border-red/40 !text-red">Tipi sil</SubmitButton>

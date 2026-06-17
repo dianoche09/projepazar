@@ -1,14 +1,13 @@
 import { BirimHucre } from "@/components/BirimHucre";
-import { generateShareToken } from "@/lib/sharing";
 import type { BirimDurum } from "@/lib/types";
 
-type Birim = {
+export type BinaBirim = {
   id: string;
   blok_id: string | null;
   tip_id: string | null;
   kat: number | null;
   daire_no: string | null;
-  durum: BirimDurum;
+  durum: string;
   liste_fiyati: number | null;
   para_birimi: string;
   satilabilir: boolean;
@@ -28,6 +27,7 @@ type Tip = {
   banyo?: number | null;
   balkon?: number | null;
   otopark?: string | null;
+  plan_url?: string | null;
 };
 type Blok = { id: string; ad: string | null; kat_sayisi: number | null };
 
@@ -43,20 +43,17 @@ export function BinaKesiti({
   mod = "uretici",
   projeId,
   projeAd = "",
-  emlakciId,
-  appUrl,
+  shareUrlMap,
 }: {
   bloklar: Blok[];
-  birimler: Birim[];
+  birimler: BinaBirim[];
   tipler: Tip[];
   mod?: "uretici" | "emlakci";
   projeId: string;
   projeAd?: string;
-  emlakciId?: string;
-  appUrl?: string;
+  shareUrlMap?: Record<string, string>;
 }) {
   const tipMap = new Map(tipler.map((t) => [t.id, t]));
-  const base = appUrl || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   return (
     <div className="space-y-8">
@@ -105,9 +102,7 @@ export function BinaKesiti({
                           <div className="flex flex-1 flex-wrap gap-1.5">
                             {kb.map((b) => {
                               const tip = b.tip_id ? tipMap.get(b.tip_id) : null;
-                              const shareUrl = emlakciId
-                                ? `${base}/p/${emlakciId}/${b.id}/${generateShareToken(emlakciId, b.id)}`
-                                : "";
+                              const shareUrl = shareUrlMap?.[b.id] ?? "";
                               return (
                                 <BirimHucre
                                   key={b.id}
@@ -119,7 +114,7 @@ export function BinaKesiti({
                                     id: b.id,
                                     daire_no: b.daire_no,
                                     kat: b.kat,
-                                    durum: b.durum,
+                                    durum: b.durum as BirimDurum,
                                     satilabilir: b.satilabilir,
                                     liste_fiyati: b.liste_fiyati,
                                     para_birimi: b.para_birimi,
@@ -136,6 +131,7 @@ export function BinaKesiti({
                                     banyo: tip?.banyo ?? null,
                                     balkon: tip?.balkon ?? null,
                                     otopark: tip?.otopark ?? null,
+                                    plan_url: tip?.plan_url ?? null,
                                   }}
                                 />
                               );
