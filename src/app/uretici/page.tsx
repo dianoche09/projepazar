@@ -27,12 +27,6 @@ export default async function UreticiKokpit() {
 
   const { data: birimler } = await supabase.from("birim").select("proje_id, durum");
 
-  const { data: leads } = await supabase
-    .from("lead")
-    .select(`id, ad, telefon, durum, created_at, birim:birim_id(daire_no), proje:proje_id(ad), atanan:profiles!atanan_id(ad, telefon)`)
-    .order("created_at", { ascending: false })
-    .limit(8);
-
   const { data: kapaklar } = await supabase.from("proje_belge").select("proje_id, url").eq("tip", "kapak");
   const kapakMap = new Map((kapaklar ?? []).map((k) => [k.proje_id, k.url as string | null]));
 
@@ -182,36 +176,22 @@ export default async function UreticiKokpit() {
         </div>
       </section>
 
-      {/* SICAK TALEPLER */}
-      <section>
-        <h2 className="font-display text-lg font-semibold text-ink">Gelen sıcak talepler</h2>
-        <div className="mt-4 overflow-hidden rounded-2xl border border-hair bg-card shadow-card">
-          {leads && leads.length > 0 ? (
-            <div className="divide-y divide-hair">
-              {leads.map((l) => (
-                <div key={l.id} className="flex flex-wrap items-center justify-between gap-4 p-4 text-sm">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-ink">{l.ad}</span>
-                      <span className="font-mono text-xs text-gray">{l.telefon}</span>
-                    </div>
-                    <p className="text-xs text-gray">
-                      {(l.proje as { ad?: string } | null)?.ad} · Daire {(l.birim as { daire_no?: string } | null)?.daire_no || "—"}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 text-right">
-                    <div className="text-xs">
-                      <p className="font-medium text-ink">{(l.atanan as { ad?: string } | null)?.ad || "—"}</p>
-                      <p className="font-mono text-gray">{(l.atanan as { telefon?: string } | null)?.telefon || ""}</p>
-                    </div>
-                    <span className="rounded-full bg-teal/10 px-2.5 py-0.5 text-xs font-semibold uppercase text-teal-d">{l.durum}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="p-10 text-center text-sm text-gray">Henüz ağ üzerinden gelen bir talep yok.</p>
-          )}
+      {/* MÜŞTERİ SORGULA — kim-getirdi görünürlüğü (akış DEĞİL, sorgu) */}
+      <section className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="max-w-xl">
+            <h2 className="font-display text-lg font-semibold text-ink">Müşteri sorgula</h2>
+            <p className="mt-1 text-sm text-gray">
+              Bir müşteri sana doğrudan geldiyse ad veya telefonla sorgula — bu kişi ağda ilk kimin
+              lead&apos;i olarak kaydedilmiş, gör. Lead&apos;ler sana otomatik akmaz; yalnız sorgu.
+            </p>
+          </div>
+          <Link
+            href="/uretici/lead-sorgu"
+            className="btn rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ink"
+          >
+            Sorgula →
+          </Link>
         </div>
       </section>
     </div>

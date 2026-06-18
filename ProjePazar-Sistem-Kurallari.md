@@ -46,13 +46,19 @@ Admin minimal değildir; platformun yönetim katmanıdır (gelir modeli Bölüm 
 
 ---
 
-## 3. GELİR MODELİ (DEĞİŞMEZ kademe — docx Bölüm 19)
-İlke: **komisyona dokunmadan** yazılım/erişim/veriden gelir.
+## 3. GELİR MODELİ (DEĞİŞMEZ ilke + fazlı kademe — docx Bölüm 19; 2026-06-18 güncellendi)
+İlke: **komisyona dokunmadan** yazılım/erişim/veriden gelir. (**KOMİSYON YOK = değişmez.**)
 
-1. **① Ofis / Franchise abonelik (SaaS)** — en mantıklı **ilk gelir** (bütçe sahibi + ekip yönetimi + havuz erişimi).
-2. **② Müteahhit** — proje yayını / premium tahsis / talep zekası (AI-4); değer kanıtlanınca öder.
-3. **③ Emlakçı** — freemium (temel bedava = benimseme; Paylaşım Stüdyosu/içerik premium).
-4. **④ İşlem ücreti** — satış-başı küçük pay (opsiyonel, Faz 3, iz zinciri olgunlaşınca).
+**ERKEN AŞAMA (MVP / şu an):**
+- **Ana gelir = MÜTEAHHİT ANLAŞMASI.** Müteahhitle birebir anlaşma ile para alınır (manuel/B2B deal; sabit SaaS paketi şart değil).
+- **Emlakçı = BEDAVA (basic).** Temel erişim ücretsiz → benimseme kaldıracı.
+
+**SONRAKİ AŞAMA (değer kanıtlanınca — "o zaman bakarız"):**
+- **Emlakçı premium** — emlakçıya özel hizmetler (Paylaşım Stüdyosu / içerik vb.).
+- **Ofis / Franchise abonelik (SaaS)** — bütçe sahibi + ekip yönetimi + havuz erişimi.
+- **İşlem ücreti** — satış-başı küçük pay (opsiyonel, iz zinciri olgunlaşınca).
+
+> Not: `abonelik_paketi` / `abonelik` şema tabloları **sonraki-faz iskeleti** olarak durur; erken aşamada müteahhit anlaşması Admin'de manuel yönetilir.
 
 ---
 
@@ -68,7 +74,7 @@ Admin minimal değildir; platformun yönetim katmanıdır (gelir modeli Bölüm 
 
 ## 5. BEŞ KAÇINILMAZLIK KALDIRACI (docx Bölüm 25.2 — "sistemden vazgeçilmez ol")
 1. **Özel Stok** — "bu daireler yalnız platformda" → emlakçı girmek zorunda.
-2. **Lead Engine** — platform talebi kendi üretir (landing+reklam+yabancı/yatırımcı lead) → emlakçıya dağıtır. **"Platform müşteri getiriyor mu?" işin kaderini belirleyen tek soru.** Lead Engine V0.1 MVP'de ZORUNLU çarpan.
+2. **Lead Takibi + Kim-Getirdi GÖRÜNÜRLÜĞÜ** (2026-06-18 — Lead Engine kaldırıldı) — danışman müşteri adayını platformda kaydeder/takip eder. Müteahhit ad/telefon **SORGULAYINCA** o müşterinin İLK kimin lead'i olarak kaydedildiğini görür (danışman atlanırsa şeffaflık). Platform sahiplik **garanti etmez**, arbitraj yapmaz, talep **üretmez/lead dağıtmaz**; çözüm taraflar arasıdır.
 3. **Fiyat/Talep Zekası** (AI-4, Faz 2) — veri → güç.
 4. **Paylaşım = Kazanç** — getiren kazanır + ilk-paylaşan 48s avantajı → viral, bilgi-saklama kırılır.
 5. **Lock-in** — satış geçmişi + müşteri + performans + tahsilat burada → çıkarsa kaybeder. *"Üretici sistemden çıkamaz hâle gelirse bu iş unicorn olur."*
@@ -76,7 +82,7 @@ Admin minimal değildir; platformun yönetim katmanıdır (gelir modeli Bölüm 
 ---
 
 ## 6. GÜVEN PROTOKOLÜ — somut mekanizmalar (docx Bölüm 27)
-- **Lead Protection ("İlk Bayrağı Ben Diktim"):** emlakçı paylaşınca müşteri telefonu (normalize) ona eşlenir; müteahhit numarayı girince "bu lead'i X getirdi" çıkar. **Pazarlamanın en önünde** (Topli defansı, Bölüm 28.2).
+- **Kim-Getirdi GÖRÜNÜRLÜĞÜ (garanti DEĞİL — 2026-06-18):** danışman müşteri adayını kaydeder (telefon normalize). Müteahhit ad/telefon **SORGULADIĞINDA** o müşterinin İLK kimin lead'i olarak kaydedildiğini görür — danışman atlanırsa şeffaflık. **Tüm danışmanların lead'i müteahhide iletilmez; yalnız SORGU sonucu gösterilir.** Platform sahiplik garanti etmez, arbitraj yapmaz; çözüm taraflar arasıdır.
 - **Tazelik Sigortası (Stale-Data Fuse):** 15 gün hareketsiz proje → müteahhite butonlu WhatsApp teyit; cevapsızsa "Canlı" rozeti sarıya döner.
 - **Syndication (fiyat/içerik senkron):** müteahhit %10 zam → tüm emlakçı PWA'sı saniyeler içinde güncellenir, eski fiyata kırmızı çizgi. Emlakçı yalnız onaylı/markalı materyal paylaşır.
 - **Arsa sahibi:** salt-okunur kendi payları + (Faz 2) pay bildirimi (viral kaldıraç, Bölüm 28.1).

@@ -10,10 +10,10 @@
 ## Özet (karar verici için)
 
 - Türkiye'de **"üretici-kontrollü + granüler ofis/danışman tahsisi + canlı tek-doğru stok havuzu"** üçlüsünü birlikte sunan yerel B2B SaaS **yok**. Boşluk gerçek.
-- **En yakın rakip: Topli.io** (Kasım 2025 İstanbul'a girdi) — ama **komisyon modeli** (SaaS değil). Bizim wedge: sabit/öngörülebilir **ofis SaaS aboneliği + komisyona dokunmama**.
+- **En yakın rakip: Topli.io** (Kasım 2025 İstanbul'a girdi) — ama **komisyon modeli** (satış başına pay). Bizim wedge: **komisyona dokunmama** + **emlakçıya bedava erişim**. Erken gelir = müteahhitle birebir **anlaşma** (abonelik/ofis kademesi sonraki faz).
 - **Kavramsal ikiz: Relata (Hindistan)** — geliştirici-kontrollü canlı envanter + broker ağı. Türkiye'de **yok**. Biz "Türkiye'ye özel Relata" konumuna oynayabiliriz.
 - İlan portalları (Sahibinden, Hepsiemlak, Zingat, Emlakjet) **farklı katman** — müteahhide stok sahipliği vermez. Hepsiemlak yönetimi birinci-el açığını **kendi kabul ediyor**.
-- **Düzenleyici tetikleyici (DÜZELTİLMİŞ):** EİDS yetki doğrulaması **satılık konut için 1 Şubat 2026'da yürürlüğe girdi** (Perplexity "1 Oca 2025" demişti — yanlış; o tarih sadece kiralık). Bugün itibarıyla **canlı mevzuat**. → üründe yetki-belgesi alanı + emlakçı doğrulaması gerekçesi.
+- **Düzenleyici (DÜZELTİLMİŞ + KAPSAM):** EİDS yetki doğrulaması satılık konutta **1 Şub 2026**'da yürürlüğe girdi (Perplexity "1 Oca 2025" demişti — yanlış; o tarih yalnız kiralık). **ANCAK** EİDS **ilan platformlarını** bağlar; ProjePazar **kapalı-devre B2B**'dir (son kullanıcıya açık ilan YOK; emlakçı tahsisli birimi auth arkasında görür, WhatsApp deep-link ile birebir paylaşır) → EİDS bizi **doğrudan bağlamaz**. Tek gri alan: public proje microsite (`public_slug`) hukuken "ilan" sayılır mı → **Prompt 3 (yasal)** netleştirecek, blocker değil.
 
 ---
 
@@ -46,7 +46,7 @@
 | Tapu.com | Online marketplace | Banka/şirket envanteri | İşlem komisyonu | ❌ | ❌ | ❌ | Yok |
 | Akıllı Satış Ofisi | Müteahhit CRM | Konut üreticisi | SaaS | ✅ (içeride) | ⚠️ kısmi | ❌ dış kanal yok | Orta |
 | BrokersApp/CRMx/Emsis | Emlakçı CRM | Emlak ofisi | Aylık abonelik (3K–30K TL) | ❌ | ❌ | ❌ | Düşük (veri kaynağı katmanı) |
-| **ProjePazar** | **B2B stok altyapısı** | **Ofis/Franchise > Müteahhit** | **Ofis SaaS (ana)** | **✅ üretici kontrolü** | **✅ canlı/tek kaynak** | **✅ granüler tahsis** | — |
+| **ProjePazar** | **B2B stok altyapısı** | **Müteahhit (erken) → Ofis (sonra)** | **Müteahhit anlaşma; emlakçı bedava** | **✅ üretici kontrolü** | **✅ canlı/tek kaynak** | **✅ granüler tahsis** | — |
 
 ---
 
@@ -55,7 +55,7 @@
 1. **Ürün moatı** — canlı tek-doğru kaynak + granüler tahsis + üretici kontrolü birlikte piyasada yok. (Teknik Değişmez #1/#2/#3 ile birebir.)
 2. **Ağ etkisi** — her ofis müteahhide daha geniş dağıtım, her müteahhit ofise daha zengin havuz. (Kaçınılmazlık #1/#4.)
 3. **Veri yerçekimi** — anlık stok-fiyat hareketi, REIDIN/Endeksa'nın erişemeyeceği birincil veri. (Kaçınılmazlık #3, events Faz-1'den.)
-4. **Zero rent-seeking** — Topli komisyonla her satışta maliyet bindirir; biz sabit SaaS. (Gelir modeli Bölüm 3, "komisyona dokunmaz".)
+4. **Zero rent-seeking** — Topli komisyonla her satışta maliyet bindirir; biz komisyona dokunmayız. Erken model: müteahhitle anlaşma, emlakçı bedava. (Gelir modeli Bölüm 3 — fazlı kademe güncellendi; "komisyona dokunmaz" değişmez.)
 5. **Düzenleyici uyum** — EİDS yürürlükte; "doğrulanmış kanal" altyapısı talebi artıyor. (Güven protokolü Bölüm 6.)
 
 ---
@@ -71,7 +71,7 @@
 
 ### B. Konumlandırma / copy — **düşük risk, uygulanabilir**
 - **B1 (MVP, UI):** Landing/public sayfada net konum: *"İlan portalı değiliz — müteahhitin canlı stok kontrol merkezi ve güvenilir dağıtım altyapısıyız."* Sahibinden/Hepsiemlak'tan ayrışma. Dosya: `src/app/page.tsx`.
-- **B2 (MVP, UI):** Topli karşıtı mesaj: "komisyona dokunmayan, sabit abonelik" vurgusu — büyük müteahhit alımına uygun.
+- **B2 (MVP, UI):** Topli karşıtı mesaj: **"komisyona dokunmuyoruz"** + emlakçıya **bedava erişim** vurgusu (benimseme kaldıracı). "Abonelik" dilini kullanma — erken model müteahhit anlaşması.
 
 ### C. Strateji / doküman — **kod yok**
 - **C1:** Sistem Kuralları Bölüm 0 "Ne DEĞİLİZ" listesine Topli (komisyon) ve Relata (TR'de yok) ayrımını ekle — opsiyonel netleştirme.

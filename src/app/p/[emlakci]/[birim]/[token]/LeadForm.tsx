@@ -118,7 +118,16 @@ export default function LeadForm({
           className="mt-0.5 size-4 rounded border-hair text-teal focus:ring-teal"
         />
         <label htmlFor="kvkk" className="text-xs leading-normal text-gray">
-          Aydınlatma metni çerçevesinde kişisel verilerimin işlenmesini ve danışmanın benimle iletişime geçmesini onaylıyorum.
+          <a
+            href="/kvkk-aydinlatma"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-medium text-teal-d underline"
+          >
+            Aydınlatma metni
+          </a>{" "}
+          çerçevesinde kişisel verilerimin işlenmesini ve danışmanın benimle iletişime geçmesini onaylıyorum.
         </label>
       </div>
 

@@ -13,7 +13,7 @@ export default async function Leadler() {
     <div className="mx-auto max-w-2xl px-4 py-5">
       <h1 className="font-display text-2xl font-semibold text-ink">Lead&apos;lerim</h1>
       <p className="mt-1 text-sm text-gray">
-        Paylaşımlarından gelen sıcak müşteriler · &quot;ilk bayrağı sen diktin&quot;.
+        Paylaşımlarından gelen müşteri adayları — kendi takibin için.
       </p>
 
       <div className="mt-5 space-y-2.5">

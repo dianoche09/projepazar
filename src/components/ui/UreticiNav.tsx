@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const LINKLER = [
   { yol: "/uretici", etiket: "Kokpit", tam: true },
+  { yol: "/uretici/leadler", etiket: "Lead'ler", tam: false },
   { yol: "/uretici/proje/yeni", etiket: "Yeni Proje", tam: false },
 ];
 
@@ -16,6 +17,15 @@ function Ikon({ ad }: { ad: string }) {
         <rect x="11.5" y="2.5" width="6" height="6" rx="1.2" />
         <rect x="2.5" y="11.5" width="6" height="6" rx="1.2" />
         <rect x="11.5" y="11.5" width="6" height="6" rx="1.2" />
+      </svg>
+    );
+  }
+  if (ad === "/uretici/leadler") {
+    return (
+      <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
       </svg>
     );
   }
