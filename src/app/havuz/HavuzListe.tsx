@@ -83,35 +83,22 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   const filtreProps = { il, setIl, ilce, setIlce, tip, tipAcKapa, durum, setDurum, iller, ilceler };
 
   return (
-    <div className="mx-auto flex max-w-6xl gap-0 px-0">
-      {/* SOL FİLTRE — konum hiyerarşisi */}
-      <aside className="hidden w-60 shrink-0 border-r border-hair bg-card px-4 py-5 md:block">
-        <HavuzFiltreler {...filtreProps} />
-        {il || ilce ? (
-          <p className="mt-3 font-mono text-[11px] text-gray">
-            Türkiye › {il || "…"}
-            {ilce ? <> › <b className="text-teal-d">{ilce}</b></> : null}
-          </p>
-        ) : null}
-      </aside>
+    <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+      {/* Filtrele — açılır panel (tüm ekranlar) */}
+      <details className="mb-4 rounded-xl border border-hair bg-card">
+        <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium text-ink">
+          <span>Filtrele</span>
+          {aktifSayi > 0 ? (
+            <span className="rounded-full bg-navy px-2 py-0.5 font-mono text-xs text-white">{aktifSayi}</span>
+          ) : null}
+          <span className="ml-auto text-xs text-gray">{liste.length} proje</span>
+        </summary>
+        <div className="border-t border-hair px-4 py-4">
+          <HavuzFiltreler {...filtreProps} />
+        </div>
+      </details>
 
-      {/* ANA ALAN */}
-      <div className="min-w-0 flex-1 px-4 py-5 sm:px-6">
-        {/* Mobil filtre — açılır */}
-        <details className="mb-4 rounded-xl border border-hair bg-card md:hidden">
-          <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium text-ink">
-            <span>Filtrele</span>
-            {aktifSayi > 0 ? (
-              <span className="rounded-full bg-navy px-2 py-0.5 font-mono text-xs text-white">{aktifSayi}</span>
-            ) : null}
-            <span className="ml-auto text-xs text-gray">{liste.length} proje</span>
-          </summary>
-          <div className="border-t border-hair px-4 py-4">
-            <HavuzFiltreler {...filtreProps} />
-          </div>
-        </details>
-
-        <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-xl font-extrabold text-ink">
               {il ? `${ilce || il} · Yetkili Projeler` : "Yetkili Projeler"}
@@ -240,7 +227,6 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 }

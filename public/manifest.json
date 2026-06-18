@@ -4,8 +4,8 @@
   "description": "Çok-müteahhitli, üretici-kontrollü canlı konut stoğu dağıtım ağı.",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#f4f2ee",
+  "orientation": "any",
+  "background_color": "#eef1f5",
   "theme_color": "#13314b",
   "lang": "tr",
   "icons": [
