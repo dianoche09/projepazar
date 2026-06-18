@@ -260,6 +260,10 @@ export function DaireModal({
             >
               WhatsApp ile Paylaş
             </a>
+            {/* Yasal: sosyal medyada gayrimenkul ilanı yasak (Tic. Bak. 2024). Link birebir paylaşım içindir. */}
+            <p className="text-center text-[11px] leading-snug text-gray">
+              Yalnız müşterinle birebir paylaş — sosyal medyada yayınlama (yetkisiz ilan = yasal risk).
+            </p>
 
             {birim.durum === "musait" && birim.satilabilir ? (
               <button
