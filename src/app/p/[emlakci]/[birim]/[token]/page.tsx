@@ -58,6 +58,14 @@ export default async function PublicBirimPage({
   /* eslint-enable @typescript-eslint/no-explicit-any */
   const b = birimData;
 
+  const { data: kapakBelge } = await supabase
+    .from("proje_belge")
+    .select("url")
+    .eq("proje_id", p?.id)
+    .eq("tip", "kapak")
+    .maybeSingle();
+  const kapak = kapakBelge?.url ?? null;
+
   const bDurum = b.durum as BirimDurum;
   const liste = b.liste_fiyati;
 
@@ -83,6 +91,12 @@ export default async function PublicBirimPage({
       </header>
 
       <main className="mx-auto mt-8 max-w-5xl px-6">
+        {kapak ? (
+          <div className="mb-6 overflow-hidden rounded-2xl border border-hair shadow-sm">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={kapak} alt={p?.ad} className="h-48 w-full object-cover sm:h-72" />
+          </div>
+        ) : null}
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Sol Kolon: Proje & Daire Detayları */}
           <div className="lg:col-span-2 space-y-6">
@@ -212,12 +226,27 @@ export default async function PublicBirimPage({
                 )}
                 <h3 className="mt-3 font-display text-lg font-semibold text-ink">{profile.ad || "—"}</h3>
                 <p className="text-xs text-gray mt-0.5">Gayrimenkul Danışmanı</p>
-                <a
-                  href={`tel:${profile.telefon}`}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg border border-hair px-4 py-2 text-sm font-semibold text-ink hover:bg-paper transition-colors"
-                >
-                  📞 {profile.telefon || "Arayın"}
-                </a>
+                <div className="mt-4 flex w-full flex-col gap-2">
+                  <a
+                    href={`tel:${profile.telefon}`}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-hair px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-paper"
+                  >
+                    <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z" />
+                    </svg>
+                    {profile.telefon || "Ara"}
+                  </a>
+                  {profile.telefon ? (
+                    <a
+                      href={`https://wa.me/${profile.telefon.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-green px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    >
+                      WhatsApp ile yaz
+                    </a>
+                  ) : null}
+                </div>
               </div>
             </div>
 
