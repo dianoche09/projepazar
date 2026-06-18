@@ -48,15 +48,18 @@ export default async function LeadSorgu({
     const digits = sorgu.replace(/\D/g, "");
     const telefonAramasi = digits.length >= 7;
 
+    // Sorgu-only ilke: TOPLU listeleme YOK. Telefon = normalize birebir; ad = birebir
+    // (büyük/küçük harf duyarsız, wildcard yok) — müşteri "adını soyadını söyleyince" eşleşir,
+    // substring fishing ("a" → tüm havuz) engellenir.
     let q1 = admin
       .from("lead")
       .select("id, ad, telefon, durum, created_at, proje_id, birim_id, ilk_paylasan_id")
       .in("proje_id", projeIds)
       .order("created_at", { ascending: false })
-      .limit(50);
+      .limit(25);
     q1 = telefonAramasi
       ? q1.eq("telefon_norm", normalizeTelefon(sorgu))
-      : q1.ilike("ad", `%${sorgu}%`);
+      : q1.ilike("ad", sorgu);
     const { data: leads } = await q1;
 
     const emlakciIds = [
