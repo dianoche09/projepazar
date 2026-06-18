@@ -10,6 +10,7 @@ const YONETIM = [
   { href: "/admin/ureticiler", etiket: "Üreticiler" },
   { href: "/admin/ofisler", etiket: "Ofisler" },
   { href: "/admin/uyelik", etiket: "Üyelik" },
+  { href: "/admin/denetim", etiket: "Denetim" },
 ];
 
 const PANELLER = [
