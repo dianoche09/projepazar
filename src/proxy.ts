@@ -10,9 +10,11 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Statik dosyalar ve PWA varlıkları hariç tüm rotalar:
-     * _next/static, _next/image, favicon, sw.js, manifest, ikon/görsel uzantıları.
+     * Şunlar HARİÇ tüm rotalar:
+     * - api: API rotaları kendi auth'unu yönetir (cron = CRON_SECRET, lead = public). Middleware
+     *   /login'e yönlendirmesin → yoksa /api/cron 307 olur, hiç çalışmaz.
+     * - statik/PWA: _next/static, _next/image, favicon, sw.js, manifest, ikon/görsel uzantıları.
      */
-    "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|sw.js|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
