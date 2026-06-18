@@ -142,6 +142,5 @@ export async function leadDurumGuncelle(leadId: string, yeniDurum: string): Prom
 
   revalidatePath("/havuz/leadler");
   revalidatePath("/uretici");
-  revalidatePath("/uretici/leadler");
   return { ok: true };
 }
