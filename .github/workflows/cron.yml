@@ -1,0 +1,31 @@
+# ProjePazar zamanlanmış işler — Vercel Hobby cron sınırı (max 2/günlük) yerine GitHub Actions.
+# 15 dakikada bir 3 cron rotasını tetikler (rotalar idempotent; bir şey yoksa no-op).
+#   - option-expiry: süresi dolan 48s opsiyon kilidini temizler (zaman-hassas)
+#   - stok-acilis:   açılış tarihi gelen planlı birimi 'müsait' yapar
+#   - freshness:     15 günden eski stoğu 'bayat' işaretler (DEĞİŞMEZ #5)
+# GEREKLİ: GitHub repo Secrets'a CRON_SECRET + Vercel env'e AYNI CRON_SECRET (rotalar Bearer ile doğrular).
+name: cron
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {} # elle tetikleme (test)
+
+# Aynı anda tek koşu; gecikenler birikmesin
+concurrency:
+  group: cron
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    env:
+      BASE: https://projepazar.vercel.app
+      AUTH: "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+    steps:
+      - name: option-expiry
+        run: curl -fsS -X GET -H "$AUTH" "$BASE/api/cron/option-expiry"
+      - name: stok-acilis
+        run: curl -fsS -X GET -H "$AUTH" "$BASE/api/cron/stok-acilis"
+      - name: freshness
+        run: curl -fsS -X GET -H "$AUTH" "$BASE/api/cron/freshness"
