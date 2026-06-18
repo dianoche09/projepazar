@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { zamanOnce } from "@/lib/types";
 import { YiginBar } from "@/components/ui/Grafik";
+import { HavuzFiltreler } from "./HavuzFiltreler";
 
 export type ProjeKart = {
   id: string;
@@ -47,9 +48,7 @@ function MiniPlan() {
   );
 }
 
-const TIP_FILTRE = ["1+1", "2+1", "3+1", "4+1", "Dubleks"];
-
-/** Emlakçı Havuzu — Berrak Güven (ProjePazar-Ekranlar.html 01 birebir). */
+/** Emlakçı Havuzu — mobil-önce; filtreler masaüstü sidebar + mobil açılır panel. */
 export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   const [il, setIl] = useState("");
   const [ilce, setIlce] = useState("");
@@ -80,78 +79,38 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
 
   const toplamBirim = projeler.reduce((t, p) => t + p.toplam, 0);
   const tipAcKapa = (t: string) => setTip((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
+  const aktifSayi = (il ? 1 : 0) + (ilce ? 1 : 0) + tip.length + (durum ? 1 : 0);
+  const filtreProps = { il, setIl, ilce, setIlce, tip, tipAcKapa, durum, setDurum, iller, ilceler };
 
   return (
     <div className="mx-auto flex max-w-6xl gap-0 px-0">
       {/* SOL FİLTRE — konum hiyerarşisi */}
       <aside className="hidden w-60 shrink-0 border-r border-hair bg-card px-4 py-5 md:block">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray">Konum</h4>
-        <select
-          value={il}
-          onChange={(e) => {
-            setIl(e.target.value);
-            setIlce("");
-          }}
-          className="mt-2 w-full rounded-lg border border-hair bg-card px-3 py-2 text-sm text-ink outline-none focus:border-teal"
-        >
-          <option value="">Türkiye · tüm iller</option>
-          {iller.map((i) => (
-            <option key={i} value={i}>{i}</option>
-          ))}
-        </select>
-        <select
-          value={ilce}
-          onChange={(e) => setIlce(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-hair bg-card px-3 py-2 text-sm text-ink outline-none focus:border-teal"
-        >
-          <option value="">İlçe · tümü</option>
-          {ilceler.map((i) => (
-            <option key={i} value={i}>{i}</option>
-          ))}
-        </select>
-        {(il || ilce) && (
-          <p className="mt-2 font-mono text-[11px] text-gray">
-            Türkiye › {il || "…"}{ilce ? <> › <b className="text-teal-d">{ilce}</b></> : null}
+        <HavuzFiltreler {...filtreProps} />
+        {il || ilce ? (
+          <p className="mt-3 font-mono text-[11px] text-gray">
+            Türkiye › {il || "…"}
+            {ilce ? <> › <b className="text-teal-d">{ilce}</b></> : null}
           </p>
-        )}
-
-        <h4 className="mt-5 text-[11px] font-bold uppercase tracking-wider text-gray">Daire Tipi</h4>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {TIP_FILTRE.map((t) => (
-            <button
-              key={t}
-              onClick={() => tipAcKapa(t)}
-              className={`rounded-lg border px-2.5 py-1.5 text-[12.5px] transition-colors ${
-                tip.includes(t) ? "border-navy bg-navy text-white" : "border-hair bg-card text-ink hover:border-teal"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
-
-        <h4 className="mt-5 text-[11px] font-bold uppercase tracking-wider text-gray">Durum</h4>
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {([
-            ["", "Tümü"],
-            ["musait", "Müsait"],
-            ["opsiyon", "Opsiyonlu"],
-          ] as const).map(([v, et]) => (
-            <button
-              key={v}
-              onClick={() => setDurum(v)}
-              className={`rounded-lg border px-2.5 py-1.5 text-[12.5px] transition-colors ${
-                durum === v ? "border-navy bg-navy text-white" : "border-hair bg-card text-ink hover:border-teal"
-              }`}
-            >
-              {et}
-            </button>
-          ))}
-        </div>
+        ) : null}
       </aside>
 
       {/* ANA ALAN */}
-      <div className="min-w-0 flex-1 px-5 py-5 sm:px-6">
+      <div className="min-w-0 flex-1 px-4 py-5 sm:px-6">
+        {/* Mobil filtre — açılır */}
+        <details className="mb-4 rounded-xl border border-hair bg-card md:hidden">
+          <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium text-ink">
+            <span>Filtrele</span>
+            {aktifSayi > 0 ? (
+              <span className="rounded-full bg-navy px-2 py-0.5 font-mono text-xs text-white">{aktifSayi}</span>
+            ) : null}
+            <span className="ml-auto text-xs text-gray">{liste.length} proje</span>
+          </summary>
+          <div className="border-t border-hair px-4 py-4">
+            <HavuzFiltreler {...filtreProps} />
+          </div>
+        </details>
+
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <h2 className="font-display text-xl font-extrabold text-ink">
