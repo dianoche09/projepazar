@@ -48,7 +48,12 @@ export default async function Home() {
       </h1>
 
       <p className="max-w-xl text-balance text-gray">
-        Tek doğru kaynak · granüler tahsis · çift-satış kalkanı · görünür tazelik. Gayrimenkulün güven protokolü.
+        İlan portalı değiliz — müteahhidin <b className="text-ink">canlı stok kontrol merkezi</b> ve
+        danışman ağına güvenilir dağıtım altyapısı. <b className="text-ink">Komisyona dokunmayız;</b>{" "}
+        danışman ve ofis için ücretsiz.
+      </p>
+      <p className="max-w-xl text-balance text-xs text-gray">
+        Tek doğru kaynak · granüler tahsis · çift-satış kalkanı · görünür tazelik — gayrimenkulün güven protokolü.
       </p>
 
       <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-sm text-ink">
