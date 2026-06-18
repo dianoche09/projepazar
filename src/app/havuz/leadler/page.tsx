@@ -1,14 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { zamanOnce } from "@/lib/types";
-
-const DURUM_ROZET: Record<string, string> = {
-  yeni: "bg-green-soft text-teal-d",
-  arandi: "bg-amber-soft text-amber",
-  gorusme: "bg-navy-soft text-navy",
-  opsiyon: "bg-amber-soft text-amber",
-  kazanildi: "bg-green-soft text-teal-d",
-  kaybedildi: "bg-red-soft text-red",
-};
+import { LeadDurum } from "./LeadDurum";
 
 export default async function Leadler() {
   const supabase = await createClient();
@@ -35,14 +27,14 @@ export default async function Leadler() {
                   <p className="font-medium text-ink">{l.ad}</p>
                   <a href={`tel:${l.telefon}`} className="font-mono text-sm text-teal-d">{l.telefon}</a>
                 </div>
-                <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${DURUM_ROZET[l.durum] ?? "bg-gray/10 text-gray"}`}>
-                  {l.durum}
-                </span>
               </div>
               <p className="mt-2 text-xs text-gray">
                 {proje?.ad ?? "—"}
                 {birim?.daire_no ? ` · Daire ${birim.daire_no}` : ""} · {zamanOnce(l.created_at)}
               </p>
+              <div className="mt-3">
+                <LeadDurum leadId={l.id} durum={l.durum} />
+              </div>
               <div className="mt-3 flex gap-2">
                 <a
                   href={`tel:${l.telefon}`}

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const uuid = z.string().uuid();
 
@@ -111,4 +112,35 @@ export async function opsiyonBirakSessiz(
   revalidatePath(`/havuz/proje/${p.data}`);
   revalidatePath("/havuz");
   return error ? { ok: false, mesaj: "Bırakılamadı" } : { ok: true, mesaj: "Opsiyon bırakıldı" };
+}
+
+/**
+ * Lead durumunu ilerlet (yeni→arandı→görüşme→opsiyon→kazanıldı/kaybedildi).
+ * lead_update RLS politikası yok → sahiplik RLS-select ile doğrulanır, sonra
+ * service-role ile yazılır (DEĞİŞMEZ #1: yalnız server).
+ */
+const LEAD_DURUM = z.enum(["yeni", "arandi", "gorusme", "opsiyon", "kazanildi", "kaybedildi"]);
+
+export async function leadDurumGuncelle(leadId: string, yeniDurum: string): Promise<{ ok: boolean }> {
+  const id = uuid.safeParse(leadId);
+  const durum = LEAD_DURUM.safeParse(yeniDurum);
+  if (!id.success || !durum.success) return { ok: false };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false };
+
+  // Yetki: bu lead'i görebiliyor muyum? (RLS lead_select = atanan/ilk_paylasan/proje sahibi/admin)
+  const { data: lead } = await supabase.from("lead").select("id").eq("id", id.data).single();
+  if (!lead) return { ok: false };
+
+  const admin = createAdminClient();
+  const { error } = await admin.from("lead").update({ durum: durum.data }).eq("id", id.data);
+  if (error) return { ok: false };
+
+  revalidatePath("/havuz/leadler");
+  revalidatePath("/uretici");
+  return { ok: true };
 }
