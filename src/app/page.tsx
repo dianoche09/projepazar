@@ -70,6 +70,12 @@ export default async function Home() {
           Kayıt ol
         </Link>
       </div>
+
+      <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray">
+        <Link href="/kullanim-kosullari" className="transition-colors hover:text-ink hover:underline">Kullanım Koşulları</Link>
+        <Link href="/gizlilik" className="transition-colors hover:text-ink hover:underline">Gizlilik</Link>
+        <Link href="/kvkk-aydinlatma" className="transition-colors hover:text-ink hover:underline">KVKK Aydınlatma</Link>
+      </footer>
     </main>
   );
 }

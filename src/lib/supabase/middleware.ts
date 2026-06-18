@@ -9,6 +9,9 @@ function herkeseAcik(pathname: string): boolean {
     pathname.startsWith("/kayit") || // self-registration
     pathname.startsWith("/p/") || // imzalı paylaşım landing
     pathname.startsWith("/proje/") || // public proje microsite (PR-7)
+    pathname.startsWith("/kvkk-aydinlatma") || // KVKK aydınlatma (lead formundan, anonim erişim)
+    pathname.startsWith("/kullanim-kosullari") || // hukuki sayfa (public)
+    pathname.startsWith("/gizlilik") || // hukuki sayfa (public)
     pathname.startsWith("/tasarim") // tasarım yönü örnekleri (geçici showcase)
   );
 }
