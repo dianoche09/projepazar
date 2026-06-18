@@ -1,5 +1,6 @@
 -- Mahal Listesi — proje teslim standardı (her mahal için zemin/duvar/tavan kaplaması).
--- Browser → SQL Editor'den çalıştır. RLS: üretici kendi projesini yönetir; tahsisli emlakçı okur.
+-- Browser → SQL Editor'den çalıştır. Idempotent: tekrar çalıştırılabilir.
+-- RLS: üretici kendi projesini yönetir; tahsisli emlakçı okur.
 create table if not exists mahal (
   id         uuid primary key default gen_random_uuid(),
   proje_id   uuid not null references proje(id) on delete cascade,
@@ -13,6 +14,10 @@ create table if not exists mahal (
 );
 
 alter table mahal enable row level security;
+
+-- Politikaları güvenle (drop varsa + yeniden) kur — CREATE POLICY IF NOT EXISTS yok
+drop policy if exists mahal_owner on mahal;
+drop policy if exists mahal_read on mahal;
 
 create policy mahal_owner on mahal for all using (
   is_admin() or exists (
