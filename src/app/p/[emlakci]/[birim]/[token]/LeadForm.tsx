@@ -21,7 +21,7 @@ export default function LeadForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!kvkk) {
-      setHata("Lütfen KVKK metnini onaylayın.");
+      setHata("Lütfen açık rıza onayını işaretleyin.");
       return;
     }
 
@@ -107,9 +107,22 @@ export default function LeadForm({
         />
       </div>
 
-      <div className="flex items-start gap-2 pt-1">
+      {/* Aydınlatma = bilgilendirme (rıza DEĞİL). Açık rıza AYRI + boş checkbox (KVKK İlke Kararı 2026/347). */}
+      <p className="pt-1 text-xs leading-normal text-gray">
+        Kişisel verileriniz,{" "}
+        <a
+          href="/kvkk-aydinlatma"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-medium text-teal-d underline"
+        >
+          Aydınlatma Metni
+        </a>{" "}
+        kapsamında işlenir.
+      </p>
+      <div className="flex items-start gap-2">
         <input
-          id="kvkk"
+          id="riza"
           type="checkbox"
           required
           disabled={yukleniyor}
@@ -117,17 +130,9 @@ export default function LeadForm({
           onChange={(e) => setKvkk(e.target.checked)}
           className="mt-0.5 size-4 rounded border-hair text-teal focus:ring-teal"
         />
-        <label htmlFor="kvkk" className="text-xs leading-normal text-gray">
-          <a
-            href="/kvkk-aydinlatma"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="font-medium text-teal-d underline"
-          >
-            Aydınlatma metni
-          </a>{" "}
-          çerçevesinde kişisel verilerimin işlenmesini ve danışmanın benimle iletişime geçmesini onaylıyorum.
+        <label htmlFor="riza" className="text-xs leading-normal text-gray">
+          Ad-soyad ve telefon bilgilerimin, talebimi ileten emlak danışmanı/ofisi ile paylaşılmasına ve
+          benimle iletişime geçilmesine <b>açık rıza</b> veriyorum.
         </label>
       </div>
 
