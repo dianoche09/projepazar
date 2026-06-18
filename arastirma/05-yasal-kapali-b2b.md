@@ -32,9 +32,12 @@
 ## ProjePazar'a Etki → Aksiyon
 
 ### 🔴 Kod/uyum (yapılacak)
-- **KVKK-1:** Token'lı lead formuna **aydınlatma metni linki** + `/kvkk-aydinlatma` sayfası. *(küçük kod — onay bekliyor)*
-- **KVKK-2:** Danışman/ofis ile **Veri İşleyen Sözleşmesi** şablonu (hukuki metin) + VERBİS değerlendirmesi. *(operasyon/hukuk)*
-- **POLİTİKA:** "Paylaşım linki birebir/WhatsApp içindir, sosyal medyaya açık paylaşım yasaktır" → kullanım koşulları + (ileride) paylaşım ekranında uyarı.
+- **KVKK-1:** Token'lı lead formunda **aydınlatma = bilgilendirme (linkli), açık rıza = AYRI + boş checkbox** — KVKK İlke Kararı **2026/347**: birleşik tek-kutu geçersiz. ✅ uygulandı + `/kvkk-aydinlatma` sayfası.
+- **KVKK-2:** Danışman/ofis ile **Veri İşleyen Sözleşmesi** şablonu + **VERBİS** eşik takibi (50 çalışan / 25M TL bilanço). *(operasyon/hukuk)*
+- **KVKK-3:** "Hizmet koşulu olarak açık rıza geçersiz" (İlke Kararı 2025/1072) — rıza vermeyen de platformu kullanabilmeli.
+- **KDV:** Her dairede ruhsat tarihi + net m² → doğru KDV oranı (%1 / %10 / %20) + "KDV dahil mi" gösterimi. *(ürün — Faz değerlendir)*
+- **DOĞRULAMA (güven rozeti):** yetki belgesi = **TTBS** (muhtemelen API), tüzel kişilik = **MERSİS**, denetim = **YDS/YİBF**, iskan = e-Devlet (çoğu manuel). Müteahhit doğrulama onboarding akışı.
+- **POLİTİKA:** Paylaşım linki birebir/WhatsApp içindir, sosyal medyaya açık paylaşım yasak → kullanım koşulları + paylaşım ekranında uyarı.
 
 ### 🟢 Validasyon (mevcut karar doğru)
 - `usd_endeksli` = bilgi amaçlı, TL sözleşme → Sistem Kuralları Bölüm 12 ile **birebir doğru**.
