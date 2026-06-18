@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { kayitYaz } from "@/lib/events";
 
 const uuid = z.string().uuid();
 
@@ -31,6 +32,15 @@ export async function opsiyonAl(formData: FormData) {
     durum: "opsiyonlu",
     kilit_bitis: kilit,
   });
+  if (!error) {
+    await kayitYaz({
+      tip: "opsiyon",
+      profileId: user.id,
+      projeId: proje.data,
+      birimId: birim.data,
+      payload: { eylem: "al", kilit_bitis: kilit },
+    });
+  }
   revalidatePath(`/havuz/proje/${proje.data}`);
   revalidatePath("/havuz");
   redirect(
@@ -52,12 +62,21 @@ export async function opsiyonBirak(formData: FormData) {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  await supabase
+  const { error } = await supabase
     .from("opsiyon")
     .delete()
     .eq("birim_id", birim.data)
     .eq("satici_id", user.id)
     .in("durum", ["opsiyonlu", "satis_beklemede"]);
+  if (!error) {
+    await kayitYaz({
+      tip: "opsiyon",
+      profileId: user.id,
+      projeId: proje.data,
+      birimId: birim.data,
+      payload: { eylem: "iptal" },
+    });
+  }
   revalidatePath(`/havuz/proje/${proje.data}`);
   revalidatePath("/havuz");
   redirect(`/havuz/proje/${proje.data}?mesaj=${encodeURIComponent("Opsiyon bırakıldı")}`);
@@ -82,6 +101,15 @@ export async function opsiyonAlSessiz(
   const { error } = await supabase
     .from("opsiyon")
     .insert({ birim_id: b.data, satici_id: user.id, durum: "opsiyonlu", kilit_bitis: kilit });
+  if (!error) {
+    await kayitYaz({
+      tip: "opsiyon",
+      profileId: user.id,
+      projeId: p.data,
+      birimId: b.data,
+      payload: { eylem: "al", kilit_bitis: kilit },
+    });
+  }
   revalidatePath(`/havuz/proje/${p.data}`);
   revalidatePath("/havuz");
   return error
@@ -109,6 +137,15 @@ export async function opsiyonBirakSessiz(
     .eq("birim_id", b.data)
     .eq("satici_id", user.id)
     .in("durum", ["opsiyonlu", "satis_beklemede"]);
+  if (!error) {
+    await kayitYaz({
+      tip: "opsiyon",
+      profileId: user.id,
+      projeId: p.data,
+      birimId: b.data,
+      payload: { eylem: "iptal" },
+    });
+  }
   revalidatePath(`/havuz/proje/${p.data}`);
   revalidatePath("/havuz");
   return error ? { ok: false, mesaj: "Bırakılamadı" } : { ok: true, mesaj: "Opsiyon bırakıldı" };

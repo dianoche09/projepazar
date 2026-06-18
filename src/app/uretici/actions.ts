@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { kayitYaz, kayitlarYaz, durumTip } from "@/lib/events";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import * as XLSX from "xlsx";
@@ -321,6 +322,19 @@ export async function birimDurumGuncelle(formData: FormData) {
     .update({ durum: durum.data, durum_notu, son_guncelleme: new Date().toISOString() })
     .eq("id", birim_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+
+  // Audit (MVP-17): satış/opsiyon/durum olayı
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  await kayitYaz({
+    tip: durumTip(durum.data),
+    profileId: user?.id ?? null,
+    projeId: proje_id,
+    birimId: birim_id,
+    payload: { eylem: "uretici_durum", durum: durum.data, durum_notu },
+  });
+
   revalidatePath(`/uretici/proje/${proje_id}`);
 }
 
@@ -386,6 +400,23 @@ export async function birimTopluGuncelle(formData: FormData) {
     .in("id", idler)
     .eq("proje_id", proje_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
+
+  // Audit (MVP-17): toplu durum değişimini birim başına logla (yalnız durum değiştiyse)
+  if (durum.success) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    await kayitlarYaz(
+      idler.map((bid) => ({
+        tip: durumTip(durum.data),
+        profileId: user?.id ?? null,
+        projeId: proje_id,
+        birimId: bid,
+        payload: { eylem: "uretici_durum_toplu", durum: durum.data },
+      })),
+    );
+  }
+
   revalidatePath(`/uretici/proje/${proje_id}`);
   redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(`${idler.length} birim güncellendi`)}`);
 }
