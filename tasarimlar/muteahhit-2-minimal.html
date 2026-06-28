@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar — Müteahhit Kokpit · Demosaha İnşaat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['"Geist Mono"', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          available: '#2FB36B',
+          option: '#E3A12C',
+          sold: '#D15A4E',
+          ink: '#1A2230',
+          muted: '#6B7280',
+          faint: '#9AA2AE',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --card: #ffffff;
+    --line: #ececee;
+    --line-soft: #f1f2f4;
+    --ink: #1a2230;
+    --muted: #6b7280;
+    --faint: #9aa2ae;
+    --available: #2fb36b;
+    --option: #e3a12c;
+    --sold: #d15a4e;
+    --teal: #1e9b8a;
+  }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { background: var(--bg); color: var(--ink); font-feature-settings: 'cv11','ss01'; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(16,24,40,0.03), 0 1px 3px rgba(16,24,40,0.02);
+  }
+  .hairline { border-color: var(--line); }
+  .nav-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 8px 11px; border-radius: 9px;
+    color: var(--muted); font-size: 13.5px; font-weight: 450;
+    transition: background .12s ease, color .12s ease;
+    position: relative;
+  }
+  .nav-item:hover { background: #f2f3f5; color: var(--ink); }
+  .nav-item.active { background: #eef0f3; color: var(--ink); font-weight: 550; }
+  .nav-item.active::before {
+    content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 16px; border-radius: 3px; background: var(--ink);
+  }
+  .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; stroke-width: 1.7; }
+  .freshness { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500; }
+  .freshness .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .live-pulse { position: relative; }
+  .live-pulse::after {
+    content: ''; position: absolute; inset: -4px; border-radius: 50%;
+    background: var(--available); opacity: .35; animation: pulse 2.4s ease-out infinite;
+  }
+  @keyframes pulse { 0% { transform: scale(.6); opacity: .5; } 100% { transform: scale(2.4); opacity: 0; } }
+  .cell {
+    width: 100%; aspect-ratio: 1.45 / 1; border-radius: 7px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    font-family: 'Geist Mono', monospace; cursor: pointer;
+    transition: transform .1s ease, box-shadow .1s ease; border: 1px solid transparent;
+  }
+  .cell:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(16,24,40,.10); z-index: 2; }
+  .cell-available { background: #eafaf1; border-color: #cfeedd; color: #1e7a49; }
+  .cell-option { background: #fdf4e3; border-color: #f3e0bb; color: #9a6c12; }
+  .cell-sold { background: #fbecea; border-color: #f2d2cd; color: #a83f33; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #dadde2; border-radius: 6px; }
+  .btn-primary {
+    background: var(--ink); color: #fff; font-weight: 550; font-size: 13px;
+    border-radius: 9px; padding: 9px 15px; min-height: 38px;
+    transition: opacity .12s ease; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-primary:hover { opacity: .88; }
+  .btn-ghost {
+    background: #fff; color: var(--ink); font-weight: 500; font-size: 13px;
+    border: 1px solid var(--line); border-radius: 9px; padding: 9px 14px; min-height: 38px;
+    transition: background .12s ease; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-ghost:hover { background: #f6f7f9; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 550;
+    padding: 3px 8px; border-radius: 999px; line-height: 1;
+  }
+  .stack-seg { height: 100%; transition: width .4s ease; }
+  .insight-mark { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+</style>
+</head>
+<body class="font-sans antialiased">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SOL SIDEBAR ============ -->
+  <aside class="hidden lg:flex flex-col w-[228px] shrink-0 bg-white border-r hairline sticky top-0 h-screen">
+    <!-- Marka -->
+    <div class="px-5 pt-5 pb-4">
+      <div class="flex items-center gap-2.5">
+        <div class="grid grid-cols-3 gap-[2px] w-[22px] h-[22px]">
+          <span class="bg-ink/85 rounded-[1.5px]"></span><span class="bg-ink/85 rounded-[1.5px]"></span><span class="bg-ink/85 rounded-[1.5px]"></span>
+          <span class="bg-ink/85 rounded-[1.5px]"></span><span class="rounded-[1.5px]" style="background:var(--available)"></span><span class="bg-ink/85 rounded-[1.5px]"></span>
+          <span class="bg-ink/85 rounded-[1.5px]"></span><span class="bg-ink/85 rounded-[1.5px]"></span><span class="bg-ink/85 rounded-[1.5px]"></span>
+        </div>
+        <div class="leading-none">
+          <div class="text-[15px] font-bold tracking-tight text-ink">ProjePazar</div>
+          <div class="text-[10.5px] text-faint font-medium mt-[3px]">Canlı Stok Ağı</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigasyon -->
+    <nav class="flex-1 px-3 space-y-[2px] overflow-y-auto scrollbar-thin">
+      <a class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Kokpit
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/><path d="M9 9v.01M9 13v.01M9 17v.01"/></svg>
+        Projeler
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v6l9 4 9-4V7"/><path d="M3 13v4l9 4 9-4v-4"/></svg>
+        Stok
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M17 11l2 2 4-4"/></svg>
+        Tahsis
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        Opsiyonlar
+        <span class="ml-auto text-[10.5px] font-mono font-600 tnum px-1.5 py-[1px] rounded-full" style="background:#fdf4e3;color:#9a6c12">4</span>
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 9-9M21 12a9 9 0 0 1-9 9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v2M12 19v2"/></svg>
+        Talep Radarı
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Müşteri Sorgula
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-8M20 16v-3"/></svg>
+        Raporlar
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 4 13.6H4a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 5 6.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 11 4.6V4a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 21 11h.1a2 2 0 1 1 0 4H21a1.6 1.6 0 0 0-1.5 1z"/></svg>
+        Ayarlar
+      </a>
+    </nav>
+
+    <!-- Kullanıcı -->
+    <div class="px-3 py-3 border-t hairline">
+      <div class="flex items-center gap-2.5 px-2 py-1.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold text-white shrink-0" style="background:linear-gradient(135deg,#1e9b8a,#13314b)">Dİ</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-[12.5px] font-600 text-ink truncate">Demosaha İnşaat</div>
+          <div class="text-[10.5px] text-faint">Üretici · Doğrulanmış</div>
+        </div>
+        <button class="text-faint hover:text-ink" title="Çıkış">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ ANA ALAN ============ -->
+  <main class="flex-1 min-w-0">
+
+    <!-- Komuta başlığı -->
+    <header class="sticky top-0 z-20 bg-[#f7f8fa]/85 backdrop-blur-md border-b hairline">
+      <div class="px-5 sm:px-8 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-3.5 flex-wrap">
+          <h1 class="text-[22px] sm:text-[26px] font-bold tracking-[-0.02em] text-ink leading-none">Kokpit</h1>
+          <span class="chip" style="background:#eafaf1;color:#1e7a49">
+            <span class="live-pulse"><span class="block w-[6px] h-[6px] rounded-full" style="background:var(--available)"></span></span>
+            Canlı
+          </span>
+          <span class="freshness text-faint">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+            son senkron <span class="font-mono tnum">2 sa</span> önce
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <div class="hidden sm:flex items-center gap-2 px-3 h-[38px] rounded-[9px] border hairline bg-white text-faint">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" placeholder="Birim, blok veya proje ara…" class="bg-transparent outline-none text-[13px] text-ink placeholder:text-faint w-[180px]" />
+          </div>
+          <button class="btn-primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+            Yeni proje
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="px-5 sm:px-8 py-6 space-y-6 max-w-[1340px]">
+
+      <!-- ============ KPI ŞERİDİ ============ -->
+      <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <!-- Toplam -->
+        <div class="card p-4">
+          <div class="text-[11.5px] font-550 text-muted uppercase tracking-wide">Toplam Birim</div>
+          <div class="mt-2 font-mono font-600 text-[30px] tnum text-ink leading-none">160</div>
+          <div class="mt-2 text-[11px] text-faint">2 aktif proje</div>
+        </div>
+        <!-- Müsait -->
+        <div class="card p-4 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-[2.5px]" style="background:var(--available)"></div>
+          <div class="text-[11.5px] font-550 text-muted uppercase tracking-wide">Müsait</div>
+          <div class="mt-2 font-mono font-600 text-[30px] tnum leading-none" style="color:var(--available)">149</div>
+          <div class="mt-2 text-[11px] text-faint">stoğun %93'ü</div>
+        </div>
+        <!-- Opsiyon -->
+        <div class="card p-4 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-[2.5px]" style="background:var(--option)"></div>
+          <div class="text-[11.5px] font-550 text-muted uppercase tracking-wide">Opsiyon</div>
+          <div class="mt-2 font-mono font-600 text-[30px] tnum leading-none" style="color:var(--option)">4</div>
+          <div class="mt-2 text-[11px] text-faint">teyit bekliyor</div>
+        </div>
+        <!-- Satıldı -->
+        <div class="card p-4 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-[2.5px]" style="background:var(--sold)"></div>
+          <div class="text-[11.5px] font-550 text-muted uppercase tracking-wide">Satıldı</div>
+          <div class="mt-2 font-mono font-600 text-[30px] tnum leading-none" style="color:var(--sold)">6</div>
+          <div class="mt-2 text-[11px] text-faint">kapanan</div>
+        </div>
+        <!-- Satış oranı -->
+        <div class="card p-4 col-span-2 sm:col-span-1">
+          <div class="text-[11.5px] font-550 text-muted uppercase tracking-wide">Satış Oranı</div>
+          <div class="mt-2 font-mono font-600 text-[30px] tnum text-ink leading-none">%4</div>
+          <div class="mt-2 text-[11px] text-faint">erken evre</div>
+        </div>
+      </section>
+
+      <!-- ============ STOK DAĞILIMI + PROJELER ============ -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Stok dağılımı (donut + lejant) -->
+        <section class="card p-5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-[14.5px] font-600 text-ink">Stok Dağılımı</h2>
+            <span class="freshness" style="color:var(--available)"><span class="dot" style="background:var(--available)"></span><span class="font-mono tnum">2 sa</span> önce</span>
+          </div>
+
+          <div class="mt-5 flex items-center gap-6">
+            <!-- Donut -->
+            <div class="relative w-[124px] h-[124px] shrink-0">
+              <svg viewBox="0 0 42 42" class="w-full h-full -rotate-90">
+                <circle cx="21" cy="21" r="15.915" fill="none" stroke="#f1f2f4" stroke-width="5.5"/>
+                <!-- müsait 149/160 = 93.1% -->
+                <circle cx="21" cy="21" r="15.915" fill="none" stroke="#2FB36B" stroke-width="5.5" stroke-dasharray="93.1 6.9" stroke-dashoffset="0" stroke-linecap="round"/>
+                <!-- opsiyon 4/160 = 2.5% -->
+                <circle cx="21" cy="21" r="15.915" fill="none" stroke="#E3A12C" stroke-width="5.5" stroke-dasharray="2.5 97.5" stroke-dashoffset="-93.1"/>
+                <!-- satıldı 6/160 = 3.75% -->
+                <circle cx="21" cy="21" r="15.915" fill="none" stroke="#D15A4E" stroke-width="5.5" stroke-dasharray="3.75 96.25" stroke-dashoffset="-95.6"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <div class="font-mono font-600 text-[22px] tnum text-ink leading-none">160</div>
+                <div class="text-[9.5px] text-faint mt-1 uppercase tracking-wide">birim</div>
+              </div>
+            </div>
+
+            <!-- Lejant -->
+            <div class="flex-1 space-y-2.5">
+              <div class="flex items-center justify-between text-[12.5px]">
+                <span class="flex items-center gap-2 text-muted"><span class="w-2.5 h-2.5 rounded-[3px]" style="background:var(--available)"></span>Müsait</span>
+                <span class="font-mono font-600 tnum text-ink">149</span>
+              </div>
+              <div class="flex items-center justify-between text-[12.5px]">
+                <span class="flex items-center gap-2 text-muted"><span class="w-2.5 h-2.5 rounded-[3px]" style="background:var(--option)"></span>Opsiyon</span>
+                <span class="font-mono font-600 tnum text-ink">4</span>
+              </div>
+              <div class="flex items-center justify-between text-[12.5px]">
+                <span class="flex items-center gap-2 text-muted"><span class="w-2.5 h-2.5 rounded-[3px]" style="background:var(--sold)"></span>Satıldı</span>
+                <span class="font-mono font-600 tnum text-ink">6</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Yığın bar -->
+          <div class="mt-5">
+            <div class="flex h-2.5 rounded-full overflow-hidden bg-[#f1f2f4]">
+              <div class="stack-seg" style="width:93.1%;background:var(--available)"></div>
+              <div class="stack-seg" style="width:2.5%;background:var(--option)"></div>
+              <div class="stack-seg" style="width:3.75%;background:var(--sold)"></div>
+            </div>
+            <div class="mt-2 flex justify-between text-[10.5px] text-faint font-mono tnum">
+              <span>149 müsait</span><span>4 ops · 6 satıldı</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Projeler (2 kart) -->
+        <section class="lg:col-span-2 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-[14.5px] font-600 text-ink">Projeler</h2>
+            <a class="text-[12.5px] font-550 text-muted hover:text-ink flex items-center gap-1">Tümü <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></a>
+          </div>
+
+          <!-- PROJE A -->
+          <div class="card p-5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-[3px]" style="background:var(--available)"></div>
+            <div class="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-[16px] font-700 tracking-tight text-ink">Çankaya Vadi Konakları</h3>
+                  <span class="chip" style="background:#eef0f3;color:#1e7a49"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>Belgeli</span>
+                </div>
+                <div class="text-[12px] text-muted mt-1 flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                  Ankara · Çankaya
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono font-600 text-[14px] tnum text-ink whitespace-nowrap">₺6.2M – ₺14.8M</div>
+                <span class="freshness mt-1.5" style="color:var(--available)"><span class="dot" style="background:var(--available)"></span><span class="font-mono tnum">2 sa</span> önce</span>
+              </div>
+            </div>
+
+            <!-- stok barı -->
+            <div class="mt-4 flex h-2 rounded-full overflow-hidden bg-[#f1f2f4]">
+              <div style="width:93.3%;background:var(--available)"></div>
+              <div style="width:0%;background:var(--option)"></div>
+              <div style="width:6.7%;background:var(--sold)"></div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-4 gap-3 text-center">
+              <div><div class="font-mono font-600 text-[18px] tnum text-ink">90</div><div class="text-[10.5px] text-faint mt-0.5">birim</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--available)">84</div><div class="text-[10.5px] text-faint mt-0.5">müsait</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--option)">0</div><div class="text-[10.5px] text-faint mt-0.5">opsiyon</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--sold)">6</div><div class="text-[10.5px] text-faint mt-0.5">satıldı</div></div>
+            </div>
+
+            <div class="mt-4 pt-3.5 border-t border-[#f1f2f4] flex items-center justify-between text-[11.5px]">
+              <div class="flex items-center gap-4 text-muted">
+                <span>İnşaat <b class="font-mono font-600 text-ink ml-0.5">%62</b></span>
+                <span class="h-3 w-px bg-[#e6e8eb]"></span>
+                <span>Teslim <b class="font-mono font-600 text-ink ml-0.5">2026 Ara</b></span>
+              </div>
+              <div class="w-[64px] h-1.5 rounded-full bg-[#f1f2f4] overflow-hidden"><div class="h-full rounded-full" style="width:62%;background:var(--teal)"></div></div>
+            </div>
+          </div>
+
+          <!-- PROJE B -->
+          <div class="card p-5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-[3px]" style="background:var(--option)"></div>
+            <div class="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-[16px] font-700 tracking-tight text-ink">Test Konakları</h3>
+                  <span class="chip" style="background:#fdf4e3;color:#9a6c12">Belge bekliyor</span>
+                </div>
+                <div class="text-[12px] text-muted mt-1 flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                  Ankara · Yenimahalle
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono font-600 text-[14px] tnum text-ink whitespace-nowrap">₺4.1M – ₺9.3M</div>
+                <span class="freshness mt-1.5" style="color:var(--option)"><span class="dot" style="background:var(--option)"></span><span class="font-mono tnum">11 gün</span> önce</span>
+              </div>
+            </div>
+
+            <div class="mt-4 flex h-2 rounded-full overflow-hidden bg-[#f1f2f4]">
+              <div style="width:92.9%;background:var(--available)"></div>
+              <div style="width:5.7%;background:var(--option)"></div>
+              <div style="width:0%;background:var(--sold)"></div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-4 gap-3 text-center">
+              <div><div class="font-mono font-600 text-[18px] tnum text-ink">70</div><div class="text-[10.5px] text-faint mt-0.5">birim</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--available)">65</div><div class="text-[10.5px] text-faint mt-0.5">müsait</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--option)">4</div><div class="text-[10.5px] text-faint mt-0.5">opsiyon</div></div>
+              <div><div class="font-mono font-600 text-[18px] tnum" style="color:var(--sold)">0</div><div class="text-[10.5px] text-faint mt-0.5">satıldı</div></div>
+            </div>
+
+            <div class="mt-4 pt-3.5 border-t border-[#f1f2f4] flex items-center justify-between text-[11.5px]">
+              <div class="flex items-center gap-4 text-muted">
+                <span>İnşaat <b class="font-mono font-600 text-ink ml-0.5">%28</b></span>
+                <span class="h-3 w-px bg-[#e6e8eb]"></span>
+                <span>Teslim <b class="font-mono font-600 text-ink ml-0.5">2027 Haz</b></span>
+              </div>
+              <div class="w-[64px] h-1.5 rounded-full bg-[#f1f2f4] overflow-hidden"><div class="h-full rounded-full" style="width:28%;background:var(--teal)"></div></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============ BİNA KESİTİ (İMZA) ============ -->
+      <section class="card p-5 sm:p-6">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h2 class="text-[15px] font-600 text-ink">Bina Kesiti</h2>
+              <span class="chip" style="background:#f0f9f6;color:#16766a">İmza görünüm</span>
+            </div>
+            <p class="text-[12px] text-muted mt-1">Çankaya Vadi Konakları · A Blok · daire başına canlı durum</p>
+          </div>
+          <!-- mini lejant -->
+          <div class="flex items-center gap-4 text-[11.5px] text-muted">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-[3px]" style="background:#eafaf1;border:1px solid #cfeedd"></span>Müsait</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-[3px]" style="background:#fdf4e3;border:1px solid #f3e0bb"></span>Opsiyon</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-[3px]" style="background:#fbecea;border:1px solid #f2d2cd"></span>Satıldı</span>
+          </div>
+        </div>
+
+        <!-- Katlar -->
+        <div class="mt-5 space-y-2.5 overflow-x-auto scrollbar-thin pb-1">
+
+          <!-- Kat 8 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K8</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-46</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺14.8M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-45</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺13.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-44</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺10.2M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-43</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺10.1M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-42</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺13.7M</span></div>
+              <div class="cell cell-sold"><span class="text-[11px] font-600">A-41</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · satıldı</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 7 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K7</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-40</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺12.4M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-39</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺12.1M</span></div>
+              <div class="cell cell-sold"><span class="text-[11px] font-600">A-38</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · satıldı</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-37</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺9.4M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-36</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺11.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-35</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺11.7M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 6 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K6</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-34</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺11.2M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-33</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺8.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-32</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺8.8M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-31</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺11.0M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-30</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺10.8M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-29</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺10.6M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 5 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K5</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-28</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺10.3M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-27</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺10.1M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-26</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺8.3M</span></div>
+              <div class="cell cell-sold"><span class="text-[11px] font-600">A-25</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · satıldı</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-24</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-23</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.8M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 4 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K4</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-22</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.5M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-21</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺7.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-20</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺7.8M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-19</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.2M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-18</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.1M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-17</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺9.0M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 3 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K3</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-16</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-15</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.8M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-14</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺7.4M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-13</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺7.3M</span></div>
+              <div class="cell cell-available ring-1 ring-ink/15"><span class="text-[11px] font-600">A-12</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.75M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-11</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.6M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 2 -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">K2</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-10</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.4M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-09</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.2M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-08</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺7.0M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-07</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺6.9M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-06</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺8.0M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-05</span><span class="text-[9px] opacity-70 mt-0.5">3+1 · ₺7.9M</span></div>
+            </div>
+          </div>
+
+          <!-- Kat 1 (zemin) -->
+          <div class="flex items-center gap-3 min-w-[640px]">
+            <div class="w-12 shrink-0 text-right text-[11px] font-mono tnum text-faint">Zemin</div>
+            <div class="grid grid-cols-6 gap-2 flex-1">
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-04</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺6.6M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-03</span><span class="text-[9px] opacity-70 mt-0.5">2+1 · ₺6.4M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-02</span><span class="text-[9px] opacity-70 mt-0.5">1+1 · ₺6.3M</span></div>
+              <div class="cell cell-available"><span class="text-[11px] font-600">A-01</span><span class="text-[9px] opacity-70 mt-0.5">1+1 · ₺6.2M</span></div>
+              <div class="flex items-center justify-center text-[10px] text-faint border border-dashed border-[#e2e4e8] rounded-[7px]">Lobi</div>
+              <div class="flex items-center justify-center text-[10px] text-faint border border-dashed border-[#e2e4e8] rounded-[7px]">Ticari</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-[#f1f2f4] flex items-center justify-between flex-wrap gap-3">
+          <div class="text-[11.5px] text-muted flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v4h1"/></svg>
+            Bir hücreye dokun → net/brüt · cephe · son güncelleme + <b class="text-ink font-550">Paylaş</b> / <b class="text-ink font-550">Opsiyon Al</b>
+          </div>
+          <button class="btn-ghost">B Blok'a geç</button>
+        </div>
+      </section>
+
+      <!-- ============ TALEP RADARI + MÜŞTERİ SORGULA ============ -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Talep Radarı -->
+        <section class="lg:col-span-2 card p-5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <h2 class="text-[14.5px] font-600 text-ink">Talep Radarı</h2>
+              <span class="chip" style="background:#f0f9f6;color:#16766a">Satış zekâsı</span>
+            </div>
+            <span class="text-[11.5px] text-muted">son 7 gün</span>
+          </div>
+
+          <div class="mt-4 space-y-2.5">
+            <!-- Insight 1 -->
+            <div class="flex items-start gap-3 p-3.5 rounded-[12px] border border-[#f1f2f4] hover:border-[#e6e8eb] transition-colors">
+              <div class="insight-mark" style="background:#eafaf1;color:#1e7a49">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M21 7v5h-5"/></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[13px] text-ink leading-snug"><b class="font-600">A Blok 7. kat 3+1</b> daireler son 7 günde <span class="font-mono font-600" style="color:var(--available)">%42</span> daha fazla görüntülendi.</p>
+                <p class="text-[11px] text-faint mt-1">Yükselen talep · fiyat sabit tutuldu</p>
+              </div>
+            </div>
+
+            <!-- Insight 2 -->
+            <div class="flex items-start gap-3 p-3.5 rounded-[12px] border border-[#f1f2f4] hover:border-[#e6e8eb] transition-colors">
+              <div class="insight-mark" style="background:#f0f9f6;color:#16766a">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[13px] text-ink leading-snug"><b class="font-600">Çankaya Vadi Konakları</b> en çok paylaşılan proje — <span class="font-mono font-600 text-ink">38</span> paylaşım.</p>
+                <p class="text-[11px] text-faint mt-1">Emlakçı ağı en aktif burada çalışıyor</p>
+              </div>
+            </div>
+
+            <!-- Insight 3 -->
+            <div class="flex items-start gap-3 p-3.5 rounded-[12px] border border-[#f1f2f4] hover:border-[#e6e8eb] transition-colors">
+              <div class="insight-mark" style="background:#fdf4e3;color:#9a6c12">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[13px] text-ink leading-snug"><span class="font-mono font-600" style="color:var(--option)">12 birim</span> 15 günden eski güncelleme — <b class="font-600">bayatlama riski.</b></p>
+                <p class="text-[11px] text-faint mt-1">Fiyat/durum teyidi öner → tazeliği geri kazan</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Müşteri Sorgula -->
+        <section class="card p-5 flex flex-col">
+          <div class="flex items-center gap-2.5">
+            <h2 class="text-[14.5px] font-600 text-ink">Müşteri Sorgula</h2>
+          </div>
+          <p class="text-[12px] text-muted mt-1 leading-snug">Bir müşterinin ağdaki geçmişini, opsiyonunu ve hangi emlakçıyla ilerlediğini gör.</p>
+
+          <div class="mt-4 space-y-2.5">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6"/></svg>
+              </span>
+              <input type="text" placeholder="Ad Soyad" class="w-full pl-9 pr-3 h-[40px] rounded-[10px] border hairline bg-[#fafbfc] text-[13px] text-ink placeholder:text-faint outline-none focus:border-[#cfd3da] focus:bg-white transition-colors" />
+            </div>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>
+              </span>
+              <input type="tel" placeholder="0 5XX XXX XX XX" class="w-full pl-9 pr-3 h-[40px] rounded-[10px] border hairline bg-[#fafbfc] text-[13px] text-ink font-mono placeholder:text-faint placeholder:font-sans outline-none focus:border-[#cfd3da] focus:bg-white transition-colors" />
+            </div>
+            <button class="btn-primary w-full justify-center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              Sorgula
+            </button>
+          </div>
+
+          <div class="mt-4 pt-3.5 border-t border-[#f1f2f4] text-[11px] text-faint leading-relaxed flex items-start gap-2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mt-px shrink-0"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            Çift-satış kalkanı: aynı müşteri için aktif opsiyon varsa anında uyarılırsın.
+          </div>
+        </section>
+      </div>
+
+      <!-- Alt boşluk -->
+      <div class="h-2"></div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

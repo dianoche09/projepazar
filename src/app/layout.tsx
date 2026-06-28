@@ -33,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
+  themeColor: "#f4f4f5",
   width: "device-width",
   initialScale: 1,
 };
@@ -44,11 +44,10 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${outfit.variable} ${geistMono.variable} h-full antialiased dark`}
-      style={{ colorScheme: "dark" }}
+      className={`${outfit.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
-        <NextTopLoader color="#06b6d4" height={3} shadow="0 0 8px #06b6d4" showSpinner={false} speed={250} />
+        <NextTopLoader color="#2563eb" height={3} shadow="0 0 8px #2563eb" showSpinner={false} speed={250} />
         {children}
         <PwaKur />
       </body>

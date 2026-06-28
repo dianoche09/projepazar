@@ -72,18 +72,18 @@ export function HavuzFiltreler({
   setMinKira: (v: string) => void;
 }) {
   const inp =
-    "w-full rounded-xl border border-white/5 bg-[#0f172a] px-3.5 py-3 font-sans text-xs text-white/90 outline-none transition-all focus:border-teal/30 focus:bg-[#090d16]";
+    "w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 font-sans text-xs text-slate-800 outline-none transition-all focus:border-teal focus:bg-white";
   const cip = (aktif: boolean) =>
-    `rounded-xl border px-3 py-2 text-[12px] font-semibold transition-all duration-300 ${
+    `rounded-xl border px-3 py-2 text-[12px] font-bold transition-all duration-200 ${
       aktif
-        ? "border-white/10 bg-teal text-navy shadow-[0_0_10px_var(--color-teal)]"
-        : "border-white/5 bg-[#0f172a] text-gray/70 hover:border-white/10 hover:bg-white/5 hover:text-white"
+        ? "border-teal bg-teal text-white shadow-sm"
+        : "border-slate-200 bg-white text-slate-600 hover:border-teal/30 hover:bg-slate-50"
     }`;
-  const baslik = "mt-5 text-[10px] font-bold uppercase tracking-widest text-gray/50 font-mono";
+  const baslik = "mt-5 text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono";
 
   return (
     <div>
-      <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray/50 font-mono">Konum</h4>
+      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Konum</h4>
       <select
         value={il}
         onChange={(e) => {

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProjePazar · Müteahhit Kokpiti — Bina Kesiti</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --zemin:#eef1f6; --zemin-2:#e7ebf2;
+    --ink:#10243a; --ink-soft:#46586b; --ink-faint:#7d8da0;
+    --navy:#13314b; --teal:#1e9b8a;
+    --musait:#2fb36b; --opsiyon:#e3a12c; --satildi:#d15a4e; --pasif:#98a2b3;
+    --kart:#fff; --cizgi:rgba(16,36,58,.08);
+    --golge-2:0 2px 6px rgba(16,36,58,.05),0 12px 28px rgba(16,36,58,.08);
+    --golge-3:0 4px 12px rgba(16,36,58,.07),0 24px 56px rgba(16,36,58,.12);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 78% -8%, rgba(30,155,138,.10), transparent 60%),
+      radial-gradient(1000px 600px at -6% 8%, rgba(19,49,75,.07), transparent 55%),
+      linear-gradient(180deg,#eef1f6,#e9edf4);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  h1,h2,h3,h4,.font-display{font-family:'Outfit',sans-serif;letter-spacing:-.01em}
+  .mono{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+  .kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:20px;box-shadow:var(--golge-2)}
+  .kart-strip{position:relative;overflow:hidden}
+  .kart-strip::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--teal)}
+  .kart-strip.s-musait::before{background:var(--musait)}
+  .kart-strip.s-opsiyon::before{background:var(--opsiyon)}
+  .kart-strip.s-satildi::before{background:var(--satildi)}
+  .kart-strip.s-teal::before{background:var(--teal)}
+
+  /* tazelik */
+  .freshdot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+  .f-0{background:var(--musait)}      /* 0-24sa */
+  .f-1{background:var(--teal)}        /* 1-7g */
+  .f-2{background:var(--opsiyon)}     /* 7-15g */
+  .f-3{background:var(--pasif)}       /* 15g+ */
+
+  .live-pulse{position:relative}
+  .live-pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:var(--musait);opacity:.35;animation:pulse 2s ease-out infinite}
+  @keyframes pulse{0%{transform:scale(.6);opacity:.5}100%{transform:scale(2.2);opacity:0}}
+
+  /* sidebar nav */
+  .nav-item{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:11px;color:var(--ink-soft);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .15s;position:relative}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav-item.active{background:linear-gradient(180deg,rgba(30,155,138,.20),rgba(30,155,138,.10));color:#fff}
+  .nav-item.active::before{content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:0 3px 3px 0;background:var(--teal)}
+  .nav-ico{width:17px;height:17px;flex:none;opacity:.85}
+
+  /* logo grid 3x3 */
+  .logo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2.5px;width:26px;height:26px}
+  .logo-grid span{border-radius:2px;background:rgba(255,255,255,.28)}
+  .logo-grid span.on{background:var(--teal)}
+
+  /* BINA KESITI */
+  .kesit-wrap{display:flex;flex-direction:column;gap:7px}
+  .kat-row{display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:stretch}
+  .kat-label{display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;background:var(--zemin-2);border:1px solid var(--cizgi)}
+  .kat-cells{display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+  .cell{
+    position:relative;border-radius:9px;padding:9px 9px 8px;min-height:60px;
+    display:flex;flex-direction:column;justify-content:space-between;
+    border:1px solid transparent;cursor:pointer;transition:transform .12s,box-shadow .12s,filter .12s;
+    color:#fff;overflow:hidden;
+  }
+  .cell:hover{transform:translateY(-2px);box-shadow:var(--golge-2);filter:saturate(1.12)}
+  .cell .ct{font-size:11px;font-weight:600;line-height:1;opacity:.95}
+  .cell .cp{font-size:11.5px;font-weight:600;letter-spacing:-.02em}
+  .cell .cno{font-size:9.5px;opacity:.78;font-weight:500}
+  .c-musait{background:linear-gradient(150deg,#34c178,#1f9a5d);border-color:rgba(47,179,107,.6)}
+  .c-opsiyon{background:linear-gradient(150deg,#eeb24a,#cf8f1f);border-color:rgba(227,161,44,.6)}
+  .c-satildi{background:linear-gradient(150deg,#dc6e62,#b8473c);border-color:rgba(209,90,78,.6)}
+  .c-empty{background:repeating-linear-gradient(135deg,rgba(16,36,58,.04),rgba(16,36,58,.04) 6px,rgba(16,36,58,.07) 6px,rgba(16,36,58,.07) 12px);border:1px dashed var(--cizgi)}
+  .cell.fresh-amber::after{content:"";position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--opsiyon);box-shadow:0 0 0 2px rgba(255,255,255,.55)}
+
+  .seg{display:inline-flex;background:var(--zemin-2);border:1px solid var(--cizgi);border-radius:11px;padding:3px}
+  .seg button{font-size:12px;font-weight:600;color:var(--ink-soft);padding:5px 12px;border-radius:8px;border:none;background:transparent;cursor:pointer}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:var(--golge-2)}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--cizgi)}
+  .chip-musait{background:rgba(47,179,107,.10);color:#1f8a52;border-color:rgba(47,179,107,.25)}
+  .chip-belge{background:rgba(30,155,138,.10);color:#157a6d;border-color:rgba(30,155,138,.25)}
+  .chip-opsiyon{background:rgba(227,161,44,.12);color:#b67e16;border-color:rgba(227,161,44,.28)}
+
+  .kpi-mini{display:flex;flex-direction:column;gap:2px;padding:12px 13px;border-radius:14px;background:#fff;border:1px solid var(--cizgi)}
+  .kpi-mini .k-val{font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .kpi-mini .k-lbl{font-size:10.5px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em}
+
+  .insight{display:flex;gap:10px;padding:11px;border-radius:13px;background:var(--zemin);border:1px solid var(--cizgi)}
+  .insight .ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-weight:600;font-size:13px;border-radius:11px;border:1px solid transparent;cursor:pointer;transition:all .15s;min-height:40px;padding:0 15px}
+  .btn-navy{background:var(--navy);color:#fff}
+  .btn-navy:hover{background:#1b4063}
+  .btn-teal{background:var(--teal);color:#fff}
+  .btn-teal:hover{background:#188578}
+  .btn-ghost{background:#fff;border-color:var(--cizgi);color:var(--ink-soft)}
+  .btn-ghost:hover{border-color:rgba(16,36,58,.18);color:var(--ink)}
+
+  .stok-bar{height:9px;border-radius:999px;overflow:hidden;display:flex;background:var(--zemin-2)}
+  .stok-bar>i{display:block;height:100%}
+
+  .scrolly::-webkit-scrollbar{width:7px;height:7px}
+  .scrolly::-webkit-scrollbar-thumb{background:rgba(16,36,58,.16);border-radius:99px}
+  .scrolly::-webkit-scrollbar-track{background:transparent}
+
+  .donut{--p:62;width:104px;height:104px;border-radius:50%;
+    background:
+      conic-gradient(var(--musait) 0 calc(var(--p)*1%),
+                     var(--zemin-2) calc(var(--p)*1%) 100%);
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .donut::after{content:"";position:absolute;inset:13px;border-radius:50%;background:#fff;box-shadow:inset 0 1px 3px rgba(16,36,58,.08)}
+  .donut .dc{position:relative;z-index:1;text-align:center}
+
+  @media(max-width:1180px){
+    .grid-main{grid-template-columns:1fr !important}
+    .rail{order:-1}
+    .kat-cells{grid-template-columns:repeat(6,1fr)}
+  }
+  @media(max-width:760px){
+    .sidebar{display:none}
+    .app{grid-template-columns:1fr !important}
+    .kat-cells{grid-template-columns:repeat(3,1fr)}
+    .kat-row{grid-template-columns:38px 1fr}
+    .bottom-strip{grid-template-columns:1fr !important}
+  }
+</style>
+</head>
+<body>
+
+<div class="app" style="display:grid;grid-template-columns:236px 1fr;min-height:100vh;">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" style="background:linear-gradient(180deg,#102a40,#0d2236);padding:18px 16px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;">
+    <div style="display:flex;align-items:center;gap:11px;padding:0 4px 18px;">
+      <div class="logo-grid">
+        <span class="on"></span><span></span><span class="on"></span>
+        <span></span><span class="on"></span><span></span>
+        <span class="on"></span><span></span><span class="on"></span>
+      </div>
+      <div>
+        <div class="font-display" style="color:#fff;font-weight:700;font-size:15.5px;letter-spacing:-.02em;line-height:1;">ProjePazar</div>
+        <div class="mono" style="color:rgba(255,255,255,.42);font-size:9px;letter-spacing:.14em;margin-top:3px;">CANLI STOK AĞI</div>
+      </div>
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:3px;">
+      <div class="nav-item active"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Kokpit</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h0M9 13h0M9 17h0M15 9h0M15 13h0M15 17h0"/></svg>Projeler</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Stok</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Tahsis</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Opsiyonlar</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>Talep Radarı</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-3.5-3.5"/></svg>Müşteri Sorgula</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>Raporlar</div>
+      <div class="nav-item"><svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Ayarlar</div>
+    </nav>
+
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08);">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 6px;">
+        <div style="width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#1e9b8a,#13314b);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex:none;">D</div>
+        <div style="min-width:0;">
+          <div style="color:#fff;font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Demosaha İnşaat</div>
+          <div class="mono" style="color:rgba(255,255,255,.4);font-size:9.5px;letter-spacing:.06em;">ÜRETİCİ · 2 PROJE</div>
+        </div>
+      </div>
+      <button class="nav-item" style="width:100%;margin-top:4px;color:rgba(255,255,255,.55);">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Çıkış
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="padding:20px 24px 28px;max-width:1480px;width:100%;">
+
+    <!-- BASLIK -->
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <h1 class="font-display" style="font-size:27px;font-weight:700;margin:0;">Kokpit</h1>
+        <span style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--cizgi);border-radius:999px;padding:5px 12px 5px 13px;box-shadow:var(--golge-2);">
+          <span class="live-pulse" style="width:7px;height:7px;border-radius:50%;background:var(--musait);"></span>
+          <span style="font-size:12.5px;font-weight:600;color:var(--ink);">Canlı</span>
+          <span style="width:1px;height:13px;background:var(--cizgi);"></span>
+          <span class="mono" style="font-size:11.5px;color:var(--ink-faint);">son senkron 2 sa önce</span>
+        </span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn-ghost"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-4.3-4.3M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z"/></svg>Ara</button>
+        <button class="btn btn-navy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Yeni proje</button>
+      </div>
+    </header>
+
+    <!-- ============ GRID: KESIT (sol/orta büyük) + RAIL (sağ dikey) ============ -->
+    <div class="grid-main" style="display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start;">
+
+      <!-- ====== MERKEZ: BINA KESITI BASROL ====== -->
+      <section class="kart kart-strip s-musait" style="padding:18px 18px 16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
+              <h2 class="font-display" style="font-size:18.5px;font-weight:700;margin:0;">Çankaya Vadi Konakları</h2>
+              <span class="chip chip-belge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Belgeli</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:5px;color:var(--ink-faint);font-size:12.5px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Ankara · Çankaya
+              <span style="width:3px;height:3px;border-radius:50%;background:var(--ink-faint);"></span>
+              <span class="mono">teslim 2026 Ara</span>
+              <span style="width:3px;height:3px;border-radius:50%;background:var(--ink-faint);"></span>
+              <span style="display:inline-flex;align-items:center;gap:5px;"><span class="freshdot f-0"></span><span class="mono" style="color:#1f8a52;">2 sa önce</span></span>
+            </div>
+          </div>
+          <div class="seg">
+            <button class="on">Bina Kesiti</button>
+            <button>Tablo</button>
+            <button>Radar</button>
+          </div>
+        </div>
+
+        <!-- ust ozet sayilari -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:15px;">
+          <div style="background:var(--zemin);border:1px solid var(--cizgi);border-radius:11px;padding:9px 11px;">
+            <div class="mono" style="font-size:18px;font-weight:600;">90</div>
+            <div style="font-size:10px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;">toplam</div>
+          </div>
+          <div style="background:rgba(47,179,107,.07);border:1px solid rgba(47,179,107,.2);border-radius:11px;padding:9px 11px;">
+            <div class="mono" style="font-size:18px;font-weight:600;color:#1f8a52;">84</div>
+            <div style="font-size:10px;font-weight:600;color:#1f8a52;text-transform:uppercase;letter-spacing:.03em;">müsait</div>
+          </div>
+          <div style="background:rgba(227,161,44,.07);border:1px solid rgba(227,161,44,.2);border-radius:11px;padding:9px 11px;">
+            <div class="mono" style="font-size:18px;font-weight:600;color:#b67e16;">0</div>
+            <div style="font-size:10px;font-weight:600;color:#b67e16;text-transform:uppercase;letter-spacing:.03em;">opsiyon</div>
+          </div>
+          <div style="background:rgba(209,90,78,.07);border:1px solid rgba(209,90,78,.2);border-radius:11px;padding:9px 11px;">
+            <div class="mono" style="font-size:18px;font-weight:600;color:#b8473c;">6</div>
+            <div style="font-size:10px;font-weight:600;color:#b8473c;text-transform:uppercase;letter-spacing:.03em;">satıldı</div>
+          </div>
+          <div style="background:var(--zemin);border:1px solid var(--cizgi);border-radius:11px;padding:9px 11px;">
+            <div class="mono" style="font-size:18px;font-weight:600;">%62</div>
+            <div style="font-size:10px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.03em;">doluluk</div>
+          </div>
+        </div>
+
+        <!-- A BLOK kesiti -->
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px;">
+          <span class="mono" style="font-size:11px;font-weight:600;background:var(--navy);color:#fff;padding:3px 9px;border-radius:7px;letter-spacing:.05em;">A BLOK</span>
+          <span style="font-size:11.5px;color:var(--ink-faint);">15 kat · zemin ticari · ₺6.2M–₺14.8M</span>
+          <span style="flex:1;height:1px;background:var(--cizgi);"></span>
+          <span class="mono" style="font-size:11px;color:var(--ink-faint);">fiyat aralığı canlı</span>
+        </div>
+
+        <div class="kesit-wrap scrolly" style="max-height:none;">
+          <!-- KAT 15 -->
+          <div class="kat-row">
+            <div class="kat-label"><span class="mono" style="font-size:13px;font-weight:600;">15</span><span style="font-size:8.5px;color:var(--ink-faint);">KAT</span></div>
+            <div class="kat-cells">
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺14.8M</div><div class="cno">A-1501 · 198m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺14.2M</div><div class="cno">A-1502 · 192m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺11.9M</div><div class="cno">A-1503 · 158m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺11.7M</div><div class="cno">A-1504 · 156m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺8.9M</div><div class="cno">A-1505 · 118m²</div></div></div>
+              <div class="cell c-satildi"><div class="ct">2+1</div><div><div class="cp">₺8.8M</div><div class="cno">A-1506 · satıldı</div></div></div>
+            </div>
+          </div>
+          <!-- KAT 12 -->
+          <div class="kat-row">
+            <div class="kat-label"><span class="mono" style="font-size:13px;font-weight:600;">12</span><span style="font-size:8.5px;color:var(--ink-faint);">KAT</span></div>
+            <div class="kat-cells">
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺13.4M</div><div class="cno">A-1201 · 192m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺13.1M</div><div class="cno">A-1202 · 190m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺10.8M</div><div class="cno">A-1203 · 156m²</div></div></div>
+              <div class="cell c-satildi"><div class="ct">3+1</div><div><div class="cp">₺10.6M</div><div class="cno">A-1204 · satıldı</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺8.2M</div><div class="cno">A-1205 · 116m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺8.1M</div><div class="cno">A-1206 · 115m²</div></div></div>
+            </div>
+          </div>
+          <!-- KAT 8 -->
+          <div class="kat-row">
+            <div class="kat-label"><span class="mono" style="font-size:13px;font-weight:600;">08</span><span style="font-size:8.5px;color:var(--ink-faint);">KAT</span></div>
+            <div class="kat-cells">
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺12.1M</div><div class="cno">A-801 · 190m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺11.9M</div><div class="cno">A-802 · 188m²</div></div></div>
+              <div class="cell c-musait fresh-amber"><div class="ct">3+1</div><div><div class="cp">₺9.8M</div><div class="cno">A-803 · yeni fiyat</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺9.7M</div><div class="cno">A-804 · 154m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺7.6M</div><div class="cno">A-805 · 114m²</div></div></div>
+              <div class="cell c-satildi"><div class="ct">2+1</div><div><div class="cp">₺7.5M</div><div class="cno">A-806 · satıldı</div></div></div>
+            </div>
+          </div>
+          <!-- KAT 4 -->
+          <div class="kat-row">
+            <div class="kat-label"><span class="mono" style="font-size:13px;font-weight:600;">04</span><span style="font-size:8.5px;color:var(--ink-faint);">KAT</span></div>
+            <div class="kat-cells">
+              <div class="cell c-satildi"><div class="ct">4+1</div><div><div class="cp">₺10.2M</div><div class="cno">A-401 · satıldı</div></div></div>
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺10.4M</div><div class="cno">A-402 · 188m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺8.6M</div><div class="cno">A-403 · 152m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺8.5M</div><div class="cno">A-404 · 151m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺6.9M</div><div class="cno">A-405 · 112m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺6.8M</div><div class="cno">A-406 · 111m²</div></div></div>
+            </div>
+          </div>
+          <!-- KAT 1 -->
+          <div class="kat-row">
+            <div class="kat-label"><span class="mono" style="font-size:13px;font-weight:600;">01</span><span style="font-size:8.5px;color:var(--ink-faint);">KAT</span></div>
+            <div class="kat-cells">
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺9.4M</div><div class="cno">A-101 · 186m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">4+1</div><div><div class="cp">₺9.2M</div><div class="cno">A-102 · 184m²</div></div></div>
+              <div class="cell c-satildi"><div class="ct">3+1</div><div><div class="cp">₺7.4M</div><div class="cno">A-103 · satıldı</div></div></div>
+              <div class="cell c-musait"><div class="ct">3+1</div><div><div class="cp">₺7.5M</div><div class="cno">A-104 · 150m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺6.3M</div><div class="cno">A-105 · 110m²</div></div></div>
+              <div class="cell c-musait"><div class="ct">2+1</div><div><div class="cp">₺6.2M</div><div class="cno">A-106 · 109m²</div></div></div>
+            </div>
+          </div>
+          <!-- ZEMIN ticari -->
+          <div class="kat-row">
+            <div class="kat-label" style="background:var(--navy);border-color:var(--navy);"><span class="mono" style="font-size:11px;font-weight:600;color:#fff;">Z</span><span style="font-size:8px;color:rgba(255,255,255,.6);">TİCARİ</span></div>
+            <div class="kat-cells">
+              <div class="cell c-empty" style="grid-column:span 2;color:var(--ink-faint);justify-content:center;align-items:center;"><span style="font-size:11px;font-weight:600;">Dükkan · kapsam dışı</span></div>
+              <div class="cell c-empty" style="grid-column:span 2;color:var(--ink-faint);justify-content:center;align-items:center;"><span style="font-size:11px;font-weight:600;">Dükkan · kapsam dışı</span></div>
+              <div class="cell c-empty" style="grid-column:span 2;color:var(--ink-faint);justify-content:center;align-items:center;"><span style="font-size:11px;font-weight:600;">Lobi</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- kesit legend + aksiyonlar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px solid var(--cizgi);">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);font-weight:500;"><span style="width:11px;height:11px;border-radius:4px;background:var(--musait);"></span>Müsait</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);font-weight:500;"><span style="width:11px;height:11px;border-radius:4px;background:var(--opsiyon);"></span>Opsiyon</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);font-weight:500;"><span style="width:11px;height:11px;border-radius:4px;background:var(--satildi);"></span>Satıldı</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft);font-weight:500;"><span style="width:8px;height:8px;border-radius:50%;background:var(--opsiyon);box-shadow:0 0 0 2px #fff;"></span>Yeni fiyat</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:9px;">
+            <span class="mono" style="font-size:11px;color:var(--ink-faint);">A · B · C blok</span>
+            <button class="btn btn-ghost" style="min-height:36px;">Tüm kesiti aç</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SAG RAIL ====== -->
+      <aside class="rail" style="display:flex;flex-direction:column;gap:14px;position:sticky;top:20px;">
+
+        <!-- KPI mini sutun -->
+        <div class="kart" style="padding:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+            <span style="font-size:11px;font-weight:700;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;">Portföy Özeti</span>
+            <span style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#1f8a52;font-weight:600;"><span class="freshdot f-0"></span>canlı</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div class="kpi-mini"><div class="k-val mono">160</div><div class="k-lbl">Toplam Birim</div></div>
+            <div class="kpi-mini" style="background:rgba(47,179,107,.06);border-color:rgba(47,179,107,.2);"><div class="k-val mono" style="color:#1f8a52;">149</div><div class="k-lbl" style="color:#1f8a52;">Müsait</div></div>
+            <div class="kpi-mini" style="background:rgba(227,161,44,.06);border-color:rgba(227,161,44,.2);"><div class="k-val mono" style="color:#b67e16;">4</div><div class="k-lbl" style="color:#b67e16;">Opsiyon</div></div>
+            <div class="kpi-mini" style="background:rgba(209,90,78,.06);border-color:rgba(209,90,78,.2);"><div class="k-val mono" style="color:#b8473c;">6</div><div class="k-lbl" style="color:#b8473c;">Satıldı</div></div>
+          </div>
+          <!-- donut + sayilar -->
+          <div style="display:flex;align-items:center;gap:14px;margin-top:13px;padding-top:13px;border-top:1px solid var(--cizgi);">
+            <div class="donut" style="--p:4;background:conic-gradient(var(--satildi) 0 4%, var(--opsiyon) 4% 6.5%, var(--musait) 6.5% 100%);">
+              <div class="dc">
+                <div class="mono" style="font-size:18px;font-weight:700;line-height:1;">%4</div>
+                <div style="font-size:9px;font-weight:600;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.04em;">satış</div>
+              </div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);"><span style="width:9px;height:9px;border-radius:3px;background:var(--musait);"></span>Müsait</span><span class="mono" style="font-weight:600;">149</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);"><span style="width:9px;height:9px;border-radius:3px;background:var(--opsiyon);"></span>Opsiyon</span><span class="mono" style="font-weight:600;">4</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;"><span style="display:inline-flex;align-items:center;gap:6px;color:var(--ink-soft);"><span style="width:9px;height:9px;border-radius:3px;background:var(--satildi);"></span>Satıldı</span><span class="mono" style="font-weight:600;">6</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:11.5px;padding-top:5px;border-top:1px solid var(--cizgi);"><span style="color:var(--ink-faint);">2 proje</span><span class="mono" style="font-weight:600;color:var(--ink-faint);">Ankara</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TALEP RADARI -->
+        <div class="kart kart-strip s-teal" style="padding:15px 14px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <span class="font-display" style="font-size:14.5px;font-weight:700;">Talep Radarı</span>
+            <span style="margin-left:auto;font-size:10px;color:var(--ink-faint);font-weight:600;">son 7 gün</span>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <div class="insight">
+              <div class="ico" style="background:rgba(47,179,107,.14);color:#1f8a52;">↑</div>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;line-height:1.35;color:var(--ink);">A Blok 7. kat <b>3+1</b> daireler son 7 günde <b style="color:#1f8a52;">%42 fazla</b> görüntülendi</div>
+                <div class="mono" style="font-size:10px;color:var(--ink-faint);margin-top:3px;">fiyat optimizasyon fırsatı</div>
+              </div>
+            </div>
+            <div class="insight">
+              <div class="ico" style="background:rgba(30,155,138,.14);color:var(--teal);">↗</div>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;line-height:1.35;color:var(--ink);"><b>Çankaya Vadi</b> en çok paylaşılan proje · <b class="mono">38</b> paylaşım</div>
+                <div class="mono" style="font-size:10px;color:var(--ink-faint);margin-top:3px;">12 emlakçı tarafından</div>
+              </div>
+            </div>
+            <div class="insight" style="background:rgba(227,161,44,.06);border-color:rgba(227,161,44,.22);">
+              <div class="ico" style="background:rgba(227,161,44,.16);color:#b67e16;">!</div>
+              <div>
+                <div style="font-size:12.5px;font-weight:600;line-height:1.35;color:var(--ink);"><b class="mono">12 birim</b> 15 günden eski güncellemede</div>
+                <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                  <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#b67e16;font-weight:600;"><span class="freshdot f-2"></span>bayatlamak üzere</span>
+                  <button class="btn btn-ghost" style="min-height:26px;padding:0 9px;font-size:10.5px;">Tazele</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MUSTERI SORGULA -->
+        <div class="kart" style="padding:15px 14px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-3.5-3.5"/></svg>
+            <span class="font-display" style="font-size:14.5px;font-weight:700;">Müşteri Sorgula</span>
+          </div>
+          <p style="font-size:11.5px;color:var(--ink-soft);line-height:1.45;margin:0 0 11px;">TC / telefon ile bu müşteriye daha önce hangi emlakçı, hangi birimi göstermiş — <b>çift-satış kalkanı</b>.</p>
+          <div style="display:flex;gap:7px;">
+            <div style="flex:1;display:flex;align-items:center;gap:8px;background:var(--zemin);border:1px solid var(--cizgi);border-radius:11px;padding:0 11px;height:42px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <input placeholder="5xx xxx xx xx / TC" style="border:none;background:transparent;outline:none;font-size:12.5px;width:100%;color:var(--ink);" class="mono">
+            </div>
+            <button class="btn btn-navy" style="min-height:42px;padding:0 14px;">Sorgula</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:9px;font-size:10.5px;color:var(--ink-faint);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            KVKK uyumlu · yalnız tahsis çakışması döner
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <!-- ============ ALT KOMPAKT SERIT: PROJE KARTLARI ============ -->
+    <div style="margin:18px 0 11px;display:flex;align-items:center;gap:10px;">
+      <span class="font-display" style="font-size:14px;font-weight:700;color:var(--ink-soft);">Projeler</span>
+      <span style="flex:1;height:1px;background:var(--cizgi);"></span>
+      <span class="mono" style="font-size:11px;color:var(--ink-faint);">2 aktif · 160 birim</span>
+    </div>
+
+    <div class="bottom-strip" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+      <!-- PROJE A -->
+      <div class="kart kart-strip s-musait" style="padding:15px 16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="font-display" style="font-size:15px;font-weight:700;">Çankaya Vadi Konakları</span>
+              <span class="chip chip-belge" style="font-size:10px;padding:2px 7px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Belgeli</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--ink-faint);margin-top:3px;">Ankara · Çankaya · <span class="mono">teslim 2026 Ara</span></div>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#1f8a52;font-weight:600;white-space:nowrap;"><span class="freshdot f-0"></span>2 sa önce</span>
+        </div>
+
+        <div style="display:flex;align-items:baseline;gap:7px;margin:11px 0 9px;">
+          <span class="mono" style="font-size:17px;font-weight:600;">₺6.2M</span>
+          <span style="color:var(--ink-faint);font-size:12px;">–</span>
+          <span class="mono" style="font-size:17px;font-weight:600;">₺14.8M</span>
+          <span style="font-size:10.5px;color:var(--ink-faint);margin-left:auto;">fiyat aralığı</span>
+        </div>
+
+        <div class="stok-bar" style="margin-bottom:8px;">
+          <i style="width:93.3%;background:var(--musait);"></i>
+          <i style="width:0%;background:var(--opsiyon);"></i>
+          <i style="width:6.7%;background:var(--satildi);"></i>
+        </div>
+        <div style="display:flex;gap:14px;font-size:11.5px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--musait);"></span><span class="mono" style="font-weight:600;">84</span> müsait</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--opsiyon);"></span><span class="mono" style="font-weight:600;">0</span> opsiyon</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--satildi);"></span><span class="mono" style="font-weight:600;">6</span> satıldı</span>
+          <span style="margin-left:auto;color:var(--ink-faint);"><span class="mono" style="font-weight:600;color:var(--ink);">%62</span> doluluk</span>
+        </div>
+      </div>
+
+      <!-- PROJE B -->
+      <div class="kart kart-strip s-opsiyon" style="padding:15px 16px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="font-display" style="font-size:15px;font-weight:700;">Test Konakları</span>
+              <span class="chip chip-opsiyon" style="font-size:10px;padding:2px 7px;"><span style="width:6px;height:6px;border-radius:50%;background:var(--opsiyon);"></span>4 opsiyon</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--ink-faint);margin-top:3px;">Ankara · Yenimahalle · <span class="mono">teslim 2027 Haz</span></div>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:#b67e16;font-weight:600;white-space:nowrap;"><span class="freshdot f-2"></span>11 gün önce</span>
+        </div>
+
+        <div style="display:flex;align-items:baseline;gap:7px;margin:11px 0 9px;">
+          <span class="mono" style="font-size:17px;font-weight:600;">₺4.1M</span>
+          <span style="color:var(--ink-faint);font-size:12px;">–</span>
+          <span class="mono" style="font-size:17px;font-weight:600;">₺9.3M</span>
+          <span style="font-size:10.5px;color:var(--ink-faint);margin-left:auto;">fiyat aralığı</span>
+        </div>
+
+        <div class="stok-bar" style="margin-bottom:8px;">
+          <i style="width:92.9%;background:var(--musait);"></i>
+          <i style="width:5.7%;background:var(--opsiyon);"></i>
+          <i style="width:0%;background:var(--satildi);"></i>
+        </div>
+        <div style="display:flex;gap:14px;font-size:11.5px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--musait);"></span><span class="mono" style="font-weight:600;">65</span> müsait</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--opsiyon);"></span><span class="mono" style="font-weight:600;">4</span> opsiyon</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:3px;background:var(--satildi);"></span><span class="mono" style="font-weight:600;">0</span> satıldı</span>
+          <span style="margin-left:auto;color:var(--ink-faint);"><span class="mono" style="font-weight:600;color:var(--ink);">%28</span> doluluk</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:20px;font-size:10.5px;color:var(--ink-faint);">
+      <span class="mono">ProjePazar</span> · Canlı konut stoğu dağıtım ağı · Müteahhit kokpiti v2-C
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>

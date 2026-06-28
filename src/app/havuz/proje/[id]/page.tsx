@@ -93,17 +93,17 @@ export default async function HavuzProjeDetay({
       ) : null}
 
       {/* KAPAK HERO */}
-      <div className="relative mt-2 overflow-hidden rounded-2xl border border-white/10 bg-[#020617] shadow-card">
+      <div className="relative mt-2 overflow-hidden rounded-2xl border border-slate-200/85 bg-white shadow-card">
         <div className="aspect-[16/7] w-full relative">
           {kapak ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={kapak} alt={proje.ad} className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617]">
-              <span className="select-none font-display text-7xl font-extrabold text-teal/10">{(proje.ad ?? "P").charAt(0).toUpperCase()}</span>
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
+              <span className="select-none font-display text-7xl font-extrabold text-slate-300/40">{(proje.ad ?? "P").charAt(0).toUpperCase()}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         </div>
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 z-10">
           <div className="flex flex-wrap items-center gap-3">
@@ -121,14 +121,14 @@ export default async function HavuzProjeDetay({
       {/* İNŞAAT DURUMU */}
       <div className="mt-6 rounded-2xl glass-card p-6 shadow-card">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-white/90 text-sm">
+          <span className="font-semibold text-slate-800 text-sm">
             İnşaat Aşaması: <span className="text-teal font-bold">{ASAMA_ETIKET[proje.insaat_asamasi as InsaatAsama]}</span>
             {proje.etap ? ` · ${proje.etap}` : ""}
           </span>
-          <span className="font-mono text-sm font-bold text-teal shadow-text">%{proje.ilerleme_yuzde}</span>
+          <span className="font-mono text-sm font-bold text-teal">%{proje.ilerleme_yuzde}</span>
         </div>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/5">
-          <div className="h-full rounded-full bg-gradient-to-r from-teal to-green shadow-[0_0_8px_var(--color-teal)]" style={{ width: `${proje.ilerleme_yuzde}%` }} />
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full bg-gradient-to-r from-teal to-green shadow-sm" style={{ width: `${proje.ilerleme_yuzde}%` }} />
         </div>
         <div className="mt-5 grid grid-cols-3 gap-4 text-xs">
           {([
@@ -136,9 +136,9 @@ export default async function HavuzProjeDetay({
             ["Planlanan Teslim", proje.teslim_tarihi],
             ["İskân Durumu", proje.iskan_tarihi],
           ] as [string, string | null][]).map(([et, t]) => (
-            <div key={et} className="bg-white/[0.01] border border-white/5 rounded-xl p-3">
-              <p className="text-[10px] font-bold text-gray/50 uppercase font-mono tracking-wider">{et}</p>
-              <p className="font-mono font-bold text-white mt-1">{trTarih(t)}</p>
+            <div key={et} className="bg-slate-50 border border-slate-200/60 rounded-xl p-3">
+              <p className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider">{et}</p>
+              <p className="font-mono font-bold text-slate-800 mt-1">{trTarih(t)}</p>
             </div>
           ))}
         </div>
@@ -147,31 +147,31 @@ export default async function HavuzProjeDetay({
       {/* KÜNYE + DONATI */}
       {kunyeVar ? (
         <div className="mt-6 rounded-2xl glass-card p-6 shadow-card">
-          <h2 className="font-display text-sm font-bold text-white tracking-tight uppercase font-mono tracking-widest text-gray/50 border-b border-white/5 pb-3">Proje Künyesi</h2>
+          <h2 className="font-display text-sm font-bold text-slate-900 tracking-tight uppercase font-mono tracking-widest text-slate-400 border-b border-slate-100 pb-3">Proje Künyesi</h2>
           <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 text-xs sm:grid-cols-4">
             {kunyeSatir.map(([k, v]) => (
-              <div key={k} className="bg-white/[0.01] border border-white/5 rounded-xl p-3">
-                <p className="text-[10px] font-bold text-gray/50 uppercase font-mono tracking-wider">{k}</p>
-                <p className="font-semibold text-white mt-1">{v}</p>
+              <div key={k} className="bg-slate-50 border border-slate-200/60 rounded-xl p-3">
+                <p className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider">{k}</p>
+                <p className="font-bold text-slate-800 mt-1">{v}</p>
               </div>
             ))}
           </div>
           {donati.length > 0 ? (
             <div className="mt-5">
-              <p className="text-[10px] font-bold text-gray/50 uppercase font-mono tracking-wider mb-2">Sosyal Donatılar</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-2">Sosyal Donatılar</p>
               <div className="flex flex-wrap gap-2">
                 {donati.map((d) => (
-                  <span key={d} className="rounded-xl border border-white/5 bg-white/[0.02] px-3.5 py-1.5 text-xs text-white/80 font-semibold">{d}</span>
+                  <span key={d} className="rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs text-slate-700 font-bold">{d}</span>
                 ))}
               </div>
             </div>
           ) : null}
           {malzeme.length > 0 ? (
             <div className="mt-5">
-              <p className="text-[10px] font-bold text-gray/50 uppercase font-mono tracking-wider mb-2">Yapı Malzemeleri & Standartlar</p>
-              <ul className="grid gap-2 text-xs font-semibold text-white/80 sm:grid-cols-2">
+              <p className="text-[10px] font-bold text-slate-400 uppercase font-mono tracking-wider mb-2">Yapı Malzemeleri & Standartlar</p>
+              <ul className="grid gap-2 text-xs font-semibold text-slate-700 sm:grid-cols-2">
                 {malzeme.map((m) => (
-                  <li key={m} className="flex items-center gap-2 bg-white/[0.01] border border-white/5 rounded-xl px-3 py-2">
+                  <li key={m} className="flex items-center gap-2 bg-slate-50 border border-slate-200/60 rounded-xl px-3 py-2">
                     <span className="size-1.5 rounded-full bg-teal" />
                     <span>{m}</span>
                   </li>
@@ -185,11 +185,11 @@ export default async function HavuzProjeDetay({
       {/* TANITIM GALERİSİ */}
       {fotolar.length > 0 || videolar.length > 0 || brosurler.length > 0 ? (
         <div className="mt-6 rounded-2xl glass-card p-6 shadow-card">
-          <h2 className="font-display text-sm font-bold text-white tracking-tight uppercase font-mono tracking-widest text-gray/50 border-b border-white/5 pb-3">Görseller & Katalog</h2>
+          <h2 className="font-display text-sm font-bold text-slate-900 tracking-tight uppercase font-mono tracking-widest text-slate-400 border-b border-slate-100 pb-3">Görseller & Katalog</h2>
           {fotolar.length > 0 ? (
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5">
               {fotolar.map((f) => (
-                <a key={f.id} href={f.url!} target="_blank" rel="noopener noreferrer" className="overflow-hidden rounded-xl border border-white/5 bg-[#0f172a] block group aspect-square">
+                <a key={f.id} href={f.url!} target="_blank" rel="noopener noreferrer" className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 block group aspect-square">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={f.url!} alt={f.ad ?? "Foto"} className="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-103" />
                 </a>
@@ -199,12 +199,12 @@ export default async function HavuzProjeDetay({
           {videolar.length > 0 || brosurler.length > 0 ? (
             <div className="mt-4 flex flex-wrap gap-2.5">
               {videolar.map((v) => (
-                <a key={v.id} href={v.url!} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-xs font-bold text-teal transition-all duration-300 hover:bg-white/10 flex items-center gap-2">
+                <a key={v.id} href={v.url!} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-teal transition-all duration-300 hover:bg-slate-50 flex items-center gap-2 shadow-sm">
                   <span>▶</span> {v.ad || "Tanıtım Videosu"}
                 </a>
               ))}
               {brosurler.map((b) => (
-                <a key={b.id} href={b.url!} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-xs font-bold text-teal transition-all duration-300 hover:bg-white/10 flex items-center gap-2">
+                <a key={b.id} href={b.url!} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-teal transition-all duration-300 hover:bg-slate-50 flex items-center gap-2 shadow-sm">
                   <span>📄</span> Broşür: {b.ad || "E-Katalog PDF"}
                 </a>
               ))}
@@ -216,11 +216,11 @@ export default async function HavuzProjeDetay({
       {/* MAHAL LİSTESİ */}
       {mahaller.length > 0 ? (
         <div className="mt-6 rounded-2xl glass-card p-6 shadow-card">
-          <h2 className="font-display text-sm font-bold text-white tracking-tight uppercase font-mono tracking-widest text-gray/50 border-b border-white/5 pb-3">Mahal Listesi (Teslim Standardı)</h2>
+          <h2 className="font-display text-sm font-bold text-slate-900 tracking-tight uppercase font-mono tracking-widest text-slate-400 border-b border-slate-100 pb-3">Mahal Listesi (Teslim Standardı)</h2>
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[460px] text-xs font-semibold text-white/95">
+            <table className="w-full min-w-[460px] text-xs font-semibold text-slate-800">
               <thead>
-                <tr className="text-left text-[10px] uppercase tracking-widest text-gray/50 font-mono border-b border-white/5">
+                <tr className="text-left text-[10px] uppercase tracking-widest text-slate-400 font-mono border-b border-slate-100">
                   <th className="pb-3 pr-3 font-bold">Mahal</th>
                   <th className="pb-3 pr-3 font-bold">Zemin</th>
                   <th className="pb-3 pr-3 font-bold">Duvar</th>
@@ -229,11 +229,11 @@ export default async function HavuzProjeDetay({
               </thead>
               <tbody>
                 {mahaller.map((m) => (
-                  <tr key={m.id} className="border-t border-white/5 hover:bg-white/[0.01] transition-colors">
-                    <td className="py-3 pr-3 font-bold text-white">{m.mahal}</td>
-                    <td className="py-3 pr-3 text-gray/80 font-mono">{m.zemin ?? "—"}</td>
-                    <td className="py-3 pr-3 text-gray/80 font-mono">{m.duvar ?? "—"}</td>
-                    <td className="py-3 text-gray/80 font-mono">{m.tavan ?? "—"}</td>
+                  <tr key={m.id} className="border-t border-slate-100 hover:bg-slate-50/50 transition-colors">
+                    <td className="py-3 pr-3 font-bold text-slate-900">{m.mahal}</td>
+                    <td className="py-3 pr-3 text-slate-600 font-mono">{m.zemin ?? "—"}</td>
+                    <td className="py-3 pr-3 text-slate-600 font-mono">{m.duvar ?? "—"}</td>
+                    <td className="py-3 text-slate-600 font-mono">{m.tavan ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>

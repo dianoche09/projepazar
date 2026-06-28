@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Müteahhit Kokpiti — Demosaha İnşaat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+        },
+        colors: {
+          bg:      '#0a0e14',
+          panel:   '#0e141d',
+          panel2:  '#121a26',
+          line:    '#1c2735',
+          line2:   '#283648',
+          ink:     '#e6edf5',
+          muted:   '#8b9bb0',
+          dim:     '#5d6b80',
+          avail:   '#2FB36B',
+          option:  '#E3A12C',
+          sold:    '#D15A4E',
+          teal:    '#1E9B8A',
+          passive: '#98A2B3',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { background: #0a0e14; }
+  .tnum { font-variant-numeric: tabular-nums; }
+  /* CRT / terminal glow */
+  .glow-green { text-shadow: 0 0 8px rgba(47,179,107,.45); }
+  .glow-amber { text-shadow: 0 0 8px rgba(227,161,44,.45); }
+  .glow-teal  { text-shadow: 0 0 10px rgba(30,155,138,.5); }
+  /* subtle scanline texture over the whole app */
+  .scanlines::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none; z-index: 60;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0px, rgba(255,255,255,.012) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode: overlay;
+  }
+  /* live ticker */
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .ticker-track { display: inline-flex; white-space: nowrap; animation: ticker 48s linear infinite; }
+  .ticker-wrap:hover .ticker-track { animation-play-state: paused; }
+  @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:.25; } }
+  .blink { animation: blink 1.4s ease-in-out infinite; }
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(47,179,107,.5); }
+    70% { box-shadow: 0 0 0 6px rgba(47,179,107,0); }
+    100% { box-shadow: 0 0 0 0 rgba(47,179,107,0); }
+  }
+  .live-dot { animation: pulse-ring 2s infinite; }
+  /* custom scrollbar */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #0a0e14; }
+  ::-webkit-scrollbar-thumb { background: #283648; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a4d66; }
+  /* grid hairlines for panels */
+  .hair { border-color: #1c2735; }
+  .cell { transition: transform .12s ease, box-shadow .12s ease; }
+  .cell:hover { transform: translateY(-2px); }
+  .navlink:hover { background: #121a26; }
+  /* mono numerals everywhere they matter */
+  .kpi-num { letter-spacing: -0.02em; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+</style>
+</head>
+<body class="bg-bg text-ink font-sans antialiased scanlines">
+
+<!-- ============ LIVE TICKER ============ -->
+<div class="ticker-wrap fixed top-0 inset-x-0 z-50 h-9 bg-[#070a10] border-b border-line overflow-hidden flex items-center">
+  <div class="shrink-0 h-full px-3 flex items-center gap-2 bg-teal/10 border-r border-line">
+    <span class="w-1.5 h-1.5 rounded-full bg-avail live-dot"></span>
+    <span class="font-mono text-[11px] font-bold tracking-widest text-avail glow-green">CANLI</span>
+  </div>
+  <div class="ticker-track font-mono text-[12px] text-muted">
+    <!-- one set -->
+    <span class="inline-flex items-center gap-6 px-6">
+      <span><span class="text-dim">ÇVK</span> A-12 3+1 <span class="text-ink tnum">₺8.75M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">ÇVK</span> A-07 2+1 <span class="text-ink tnum">₺6.20M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">ÇVK</span> B-21 4+1 <span class="text-ink tnum">₺14.80M</span> <span class="text-sold">●SATILDI</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> C-05 3+1 <span class="text-ink tnum">₺7.10M</span> <span class="text-option">●OPSİYON</span> <span class="text-dim">22:14 bitiş</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> A-02 2+1 <span class="text-ink tnum">₺4.10M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-teal glow-teal">↗ TALEP</span> ÇVK 7.kat 3+1 <span class="text-ink tnum">+42%</span> 7g görüntülenme</span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> C-08 4+1 <span class="text-ink tnum">₺9.30M</span> <span class="text-option">●OPSİYON</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">PAYLAŞIM</span> ÇVK <span class="text-ink tnum">38</span> bu hafta <span class="text-teal">↑</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">FİYAT↑</span> ÇVK A-12 <span class="text-ink tnum">₺8.50M→₺8.75M</span> <span class="text-dim">2sa önce</span></span>
+      <span class="text-line2">│</span>
+    </span>
+    <!-- duplicate for seamless loop -->
+    <span class="inline-flex items-center gap-6 px-6" aria-hidden="true">
+      <span><span class="text-dim">ÇVK</span> A-12 3+1 <span class="text-ink tnum">₺8.75M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">ÇVK</span> A-07 2+1 <span class="text-ink tnum">₺6.20M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">ÇVK</span> B-21 4+1 <span class="text-ink tnum">₺14.80M</span> <span class="text-sold">●SATILDI</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> C-05 3+1 <span class="text-ink tnum">₺7.10M</span> <span class="text-option">●OPSİYON</span> <span class="text-dim">22:14 bitiş</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> A-02 2+1 <span class="text-ink tnum">₺4.10M</span> <span class="text-avail">●MÜSAİT</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-teal glow-teal">↗ TALEP</span> ÇVK 7.kat 3+1 <span class="text-ink tnum">+42%</span> 7g görüntülenme</span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">TK</span> C-08 4+1 <span class="text-ink tnum">₺9.30M</span> <span class="text-option">●OPSİYON</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">PAYLAŞIM</span> ÇVK <span class="text-ink tnum">38</span> bu hafta <span class="text-teal">↑</span></span>
+      <span class="text-line2">│</span>
+      <span><span class="text-dim">FİYAT↑</span> ÇVK A-12 <span class="text-ink tnum">₺8.50M→₺8.75M</span> <span class="text-dim">2sa önce</span></span>
+      <span class="text-line2">│</span>
+    </span>
+  </div>
+</div>
+
+<div class="pt-9 flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="hidden lg:flex w-60 shrink-0 flex-col border-r border-line bg-panel sticky top-9 self-start h-[calc(100vh-2.25rem)]">
+    <!-- brand -->
+    <div class="px-4 h-14 flex items-center gap-2.5 border-b border-line">
+      <div class="grid grid-cols-3 grid-rows-3 gap-[2px] w-6 h-6">
+        <span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span>
+        <span class="bg-line2 rounded-[1px]"></span><span class="bg-avail rounded-[1px] glow-green"></span><span class="bg-line2 rounded-[1px]"></span>
+        <span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span>
+      </div>
+      <div class="leading-none">
+        <div class="font-extrabold text-[15px] tracking-tight">ProjePazar</div>
+        <div class="font-mono text-[9px] text-dim tracking-[0.2em] mt-0.5">TERMINAL v1</div>
+      </div>
+    </div>
+
+    <!-- nav -->
+    <nav class="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+      <a href="#" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-semibold bg-teal/10 text-ink border-l-2 border-teal -ml-[2px]">
+        <span class="text-teal">▣</span> Kokpit
+      </a>
+      <a href="#projeler" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">▤</span> Projeler <span class="ml-auto font-mono text-[10px] text-dim">2</span>
+      </a>
+      <a href="#stok" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">▦</span> Stok <span class="ml-auto font-mono text-[10px] text-dim">160</span>
+      </a>
+      <a href="#" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">⤸</span> Tahsis
+      </a>
+      <a href="#" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">◷</span> Opsiyonlar <span class="ml-auto font-mono text-[10px] text-option">4</span>
+      </a>
+      <a href="#radar" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">◎</span> Talep Radarı
+      </a>
+      <a href="#sorgu" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">⌕</span> Müşteri Sorgula
+      </a>
+      <a href="#" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">▥</span> Raporlar
+      </a>
+      <a href="#" class="navlink flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-muted">
+        <span class="text-dim">⚙</span> Ayarlar
+      </a>
+    </nav>
+
+    <!-- user -->
+    <div class="border-t border-line p-3">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-teal to-avail flex items-center justify-center font-bold text-[12px] text-bg shrink-0">Dİ</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-[12px] font-semibold truncate">Demosaha İnşaat</div>
+          <div class="font-mono text-[10px] text-dim truncate">üretici · admin</div>
+        </div>
+      </div>
+      <button class="mt-2.5 w-full text-left px-3 py-1.5 rounded-md text-[12px] text-dim hover:text-sold hover:bg-panel2 transition flex items-center gap-2">
+        <span>⏻</span> Çıkış
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="flex-1 min-w-0">
+
+    <!-- command header -->
+    <header class="sticky top-9 z-40 bg-bg/90 backdrop-blur border-b border-line">
+      <div class="px-4 sm:px-6 h-14 flex items-center gap-3">
+        <!-- mobile brand -->
+        <div class="lg:hidden grid grid-cols-3 grid-rows-3 gap-[2px] w-5 h-5">
+          <span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span>
+          <span class="bg-line2 rounded-[1px]"></span><span class="bg-avail rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span>
+          <span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span><span class="bg-line2 rounded-[1px]"></span>
+        </div>
+        <h1 class="font-extrabold text-[19px] tracking-tight">Kokpit</h1>
+        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-avail/10 border border-avail/25">
+          <span class="w-1.5 h-1.5 rounded-full bg-avail blink"></span>
+          <span class="font-mono text-[10px] font-bold text-avail tracking-wide">CANLI</span>
+        </span>
+        <span class="hidden sm:inline font-mono text-[11px] text-dim">son senkron <span class="text-muted">2 sa önce</span></span>
+
+        <div class="ml-auto flex items-center gap-2">
+          <div class="hidden md:flex items-center gap-2 px-3 h-9 rounded-md bg-panel border border-line text-dim">
+            <span class="text-[13px]">⌕</span>
+            <input placeholder="Birim / blok / müşteri ara…" class="bg-transparent outline-none text-[12px] font-mono placeholder:text-dim w-44 text-ink" />
+            <kbd class="font-mono text-[9px] text-dim border border-line rounded px-1">⌘K</kbd>
+          </div>
+          <button class="h-9 px-3.5 rounded-md bg-teal text-bg font-bold text-[12.5px] flex items-center gap-1.5 hover:brightness-110 transition shadow-[0_0_18px_rgba(30,155,138,.35)]">
+            <span class="text-[15px] leading-none">+</span> Yeni proje
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="px-4 sm:px-6 py-5 space-y-5 max-w-[1500px] mx-auto">
+
+      <!-- ============ KPI STRIP ============ -->
+      <section aria-label="Özet göstergeler" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <!-- toplam -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-line2"></div>
+          <div class="font-mono text-[10px] text-dim tracking-widest uppercase">Toplam Birim</div>
+          <div class="font-mono kpi-num text-[30px] font-extrabold text-ink tnum mt-1.5">160</div>
+          <div class="font-mono text-[10px] text-dim mt-1">2 proje · 160 kayıt</div>
+        </div>
+        <!-- musait -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-avail"></div>
+          <div class="font-mono text-[10px] text-avail tracking-widest uppercase">● Müsait</div>
+          <div class="font-mono kpi-num text-[30px] font-extrabold text-avail glow-green tnum mt-1.5">149</div>
+          <div class="font-mono text-[10px] text-dim mt-1">%93.1 stok açık</div>
+        </div>
+        <!-- opsiyon -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-option"></div>
+          <div class="font-mono text-[10px] text-option tracking-widest uppercase">● Opsiyon</div>
+          <div class="font-mono kpi-num text-[30px] font-extrabold text-option glow-amber tnum mt-1.5">4</div>
+          <div class="font-mono text-[10px] text-dim mt-1">aktif rezervasyon</div>
+        </div>
+        <!-- satildi -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-sold"></div>
+          <div class="font-mono text-[10px] text-sold tracking-widest uppercase">● Satıldı</div>
+          <div class="font-mono kpi-num text-[30px] font-extrabold text-sold tnum mt-1.5">6</div>
+          <div class="font-mono text-[10px] text-dim mt-1">kapanan satış</div>
+        </div>
+        <!-- satis orani -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-teal"></div>
+          <div class="font-mono text-[10px] text-teal tracking-widest uppercase">Satış Oranı</div>
+          <div class="font-mono kpi-num text-[30px] font-extrabold text-ink tnum mt-1.5">%4<span class="text-[16px] text-dim">.0</span></div>
+          <div class="font-mono text-[10px] text-teal mt-1">▲ ilk satışlar açıldı</div>
+        </div>
+        <!-- portfoy degeri -->
+        <div class="rounded-lg bg-panel border border-line p-3.5 relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-[2px] bg-line2"></div>
+          <div class="font-mono text-[10px] text-dim tracking-widest uppercase">Açık Stok Değeri</div>
+          <div class="font-mono kpi-num text-[26px] font-extrabold text-ink tnum mt-2">₺1.34<span class="text-[15px] text-dim">Mr</span></div>
+          <div class="font-mono text-[10px] text-dim mt-1">149 birim · ortalama ₺9.0M</div>
+        </div>
+      </section>
+
+      <!-- ============ ROW: dağılım + radar üst ============ -->
+      <section class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+
+        <!-- STOK DAĞILIMI (donut) -->
+        <div class="rounded-lg bg-panel border border-line p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="font-bold text-[14px]">Stok Dağılımı</h2>
+            <span class="font-mono text-[10px] text-dim">160 birim</span>
+          </div>
+          <div class="flex items-center gap-5">
+            <!-- donut via conic-gradient -->
+            <div class="relative w-32 h-32 shrink-0">
+              <div class="w-full h-full rounded-full"
+                   style="background: conic-gradient(#2FB36B 0% 93.1%, #E3A12C 93.1% 95.6%, #D15A4E 95.6% 100%);">
+              </div>
+              <div class="absolute inset-[14px] rounded-full bg-panel border border-line flex flex-col items-center justify-center">
+                <span class="font-mono text-[22px] font-extrabold text-ink tnum leading-none">149</span>
+                <span class="font-mono text-[9px] text-dim mt-0.5">MÜSAİT</span>
+              </div>
+            </div>
+            <!-- legend + stacked bar -->
+            <div class="flex-1 min-w-0 space-y-2.5">
+              <div class="flex items-center gap-2 text-[12px]">
+                <span class="w-2.5 h-2.5 rounded-sm bg-avail"></span>
+                <span class="text-muted">Müsait</span>
+                <span class="ml-auto font-mono text-ink tnum">149</span>
+                <span class="font-mono text-dim text-[10px] w-12 text-right">%93.1</span>
+              </div>
+              <div class="flex items-center gap-2 text-[12px]">
+                <span class="w-2.5 h-2.5 rounded-sm bg-option"></span>
+                <span class="text-muted">Opsiyon</span>
+                <span class="ml-auto font-mono text-ink tnum">4</span>
+                <span class="font-mono text-dim text-[10px] w-12 text-right">%2.5</span>
+              </div>
+              <div class="flex items-center gap-2 text-[12px]">
+                <span class="w-2.5 h-2.5 rounded-sm bg-sold"></span>
+                <span class="text-muted">Satıldı</span>
+                <span class="ml-auto font-mono text-ink tnum">6</span>
+                <span class="font-mono text-dim text-[10px] w-12 text-right">%3.8</span>
+              </div>
+              <!-- stacked bar -->
+              <div class="h-2.5 w-full rounded-full overflow-hidden flex bg-panel2 mt-1">
+                <div class="bg-avail h-full" style="width:93.1%"></div>
+                <div class="bg-option h-full" style="width:2.5%"></div>
+                <div class="bg-sold h-full" style="width:3.8%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TALEP RADARI insight kartları (2/3 genişlik) -->
+        <div id="radar" class="xl:col-span-2 rounded-lg bg-panel border border-line p-4 scroll-mt-24">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <h2 class="font-bold text-[14px]">Talep Radarı</h2>
+              <span class="font-mono text-[10px] text-teal glow-teal">◎ satış zekâsı</span>
+            </div>
+            <span class="font-mono text-[10px] text-dim">son 7 gün</span>
+          </div>
+          <div class="grid sm:grid-cols-3 gap-3">
+            <!-- insight 1 -->
+            <div class="rounded-md bg-panel2 border border-line p-3 relative overflow-hidden">
+              <div class="absolute left-0 inset-y-0 w-[2px] bg-teal"></div>
+              <div class="font-mono text-[10px] text-teal tracking-wide mb-2">↗ YÜKSELEN TALEP</div>
+              <p class="text-[12.5px] leading-snug text-ink">
+                <span class="font-semibold">A Blok 7. kat 3+1</span> daireler son 7 günde
+                <span class="font-mono text-teal font-bold tnum">+42%</span> daha fazla görüntülendi.
+              </p>
+              <div class="mt-2.5 font-mono text-[10px] text-dim">öneri → fiyat sabit tut, baskı var</div>
+            </div>
+            <!-- insight 2 -->
+            <div class="rounded-md bg-panel2 border border-line p-3 relative overflow-hidden">
+              <div class="absolute left-0 inset-y-0 w-[2px] bg-avail"></div>
+              <div class="font-mono text-[10px] text-avail tracking-wide mb-2">★ EN ÇOK PAYLAŞILAN</div>
+              <p class="text-[12.5px] leading-snug text-ink">
+                <span class="font-semibold">Çankaya Vadi Konakları</span> ağdaki en çok paylaşılan proje —
+                <span class="font-mono text-avail font-bold tnum">38</span> paylaşım.
+              </p>
+              <div class="mt-2.5 font-mono text-[10px] text-dim">12 emlakçı aktif paylaşıyor</div>
+            </div>
+            <!-- insight 3 -->
+            <div class="rounded-md bg-panel2 border border-line p-3 relative overflow-hidden">
+              <div class="absolute left-0 inset-y-0 w-[2px] bg-option"></div>
+              <div class="font-mono text-[10px] text-option tracking-wide mb-2">⚠ TAZELİK DÜŞÜYOR</div>
+              <p class="text-[12.5px] leading-snug text-ink">
+                <span class="font-mono text-option font-bold tnum">12</span> birim
+                <span class="font-semibold">15 günden eski</span> — bayatlama riski, fiyat/foto tazele.
+              </p>
+              <div class="mt-2.5 font-mono text-[10px] text-dim">hepsi Test Konakları'nda</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PROJELER ============ -->
+      <section id="projeler" class="scroll-mt-24">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-bold text-[15px] flex items-center gap-2">Projeler <span class="font-mono text-[11px] text-dim">/ 2 aktif</span></h2>
+          <a href="#stok" class="font-mono text-[11px] text-teal hover:underline">stok tablosuna in ↓</a>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+
+          <!-- PROJE A -->
+          <article class="rounded-lg bg-panel border border-line overflow-hidden cell">
+            <div class="h-[3px] bg-avail"></div>
+            <div class="p-4">
+              <!-- header -->
+              <div class="flex items-start gap-3">
+                <!-- gradient placeholder thumb -->
+                <div class="w-14 h-14 rounded-md shrink-0 border border-line2"
+                     style="background: linear-gradient(135deg,#13314B 0%, #1E9B8A 120%);"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-[15px] truncate">Çankaya Vadi Konakları</h3>
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-avail/10 border border-avail/25 shrink-0">
+                      <span class="text-avail text-[10px]">✓</span>
+                      <span class="font-mono text-[9px] font-bold text-avail">BELGELİ</span>
+                    </span>
+                  </div>
+                  <div class="font-mono text-[11px] text-dim mt-0.5">Ankara · Çankaya</div>
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 font-mono text-[10px] text-avail">
+                      <span class="w-1.5 h-1.5 rounded-full bg-avail"></span> güncelleme 2 sa önce
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="font-mono text-[10px] text-dim">satış</div>
+                  <div class="font-mono text-[16px] font-extrabold text-ink tnum">%6.7</div>
+                </div>
+              </div>
+
+              <!-- stat row -->
+              <div class="grid grid-cols-4 gap-2 mt-3.5 text-center">
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-ink tnum">90</div>
+                  <div class="font-mono text-[9px] text-dim">TOPLAM</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-avail tnum">84</div>
+                  <div class="font-mono text-[9px] text-dim">MÜSAİT</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-option tnum">0</div>
+                  <div class="font-mono text-[9px] text-dim">OPSİYON</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-sold tnum">6</div>
+                  <div class="font-mono text-[9px] text-dim">SATILDI</div>
+                </div>
+              </div>
+
+              <!-- stok bar -->
+              <div class="h-2 w-full rounded-full overflow-hidden flex bg-panel2 mt-3">
+                <div class="bg-avail h-full" style="width:93.3%"></div>
+                <div class="bg-option h-full" style="width:0%"></div>
+                <div class="bg-sold h-full" style="width:6.7%"></div>
+              </div>
+
+              <!-- footer meta -->
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-line">
+                <div>
+                  <div class="font-mono text-[9px] text-dim">FİYAT ARALIĞI</div>
+                  <div class="font-mono text-[13px] font-bold text-ink tnum">₺6.2M – ₺14.8M</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-mono text-[9px] text-dim">İNŞAAT · TESLİM</div>
+                  <div class="font-mono text-[13px] font-bold text-ink tnum">%62 · 2026 Ara</div>
+                </div>
+              </div>
+              <!-- progress inşaat -->
+              <div class="mt-2 flex items-center gap-2">
+                <div class="h-1.5 flex-1 rounded-full bg-panel2 overflow-hidden">
+                  <div class="h-full bg-teal rounded-full" style="width:62%"></div>
+                </div>
+                <span class="font-mono text-[10px] text-teal tnum">%62</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROJE B -->
+          <article class="rounded-lg bg-panel border border-line overflow-hidden cell">
+            <div class="h-[3px] bg-option"></div>
+            <div class="p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-14 h-14 rounded-md shrink-0 border border-line2"
+                     style="background: linear-gradient(135deg,#13314B 0%, #5d6b80 120%);"></div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-[15px] truncate">Test Konakları</h3>
+                    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-panel2 border border-line shrink-0">
+                      <span class="font-mono text-[9px] font-bold text-dim">DOĞRULANMADI</span>
+                    </span>
+                  </div>
+                  <div class="font-mono text-[11px] text-dim mt-0.5">Ankara · Yenimahalle</div>
+                  <div class="mt-1">
+                    <span class="inline-flex items-center gap-1.5 font-mono text-[10px] text-option">
+                      <span class="w-1.5 h-1.5 rounded-full bg-option"></span> güncelleme 11 gün önce
+                    </span>
+                  </div>
+                </div>
+                <div class="text-right shrink-0">
+                  <div class="font-mono text-[10px] text-dim">satış</div>
+                  <div class="font-mono text-[16px] font-extrabold text-ink tnum">%0</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-4 gap-2 mt-3.5 text-center">
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-ink tnum">70</div>
+                  <div class="font-mono text-[9px] text-dim">TOPLAM</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-avail tnum">65</div>
+                  <div class="font-mono text-[9px] text-dim">MÜSAİT</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-option tnum">4</div>
+                  <div class="font-mono text-[9px] text-dim">OPSİYON</div>
+                </div>
+                <div class="rounded bg-panel2 border border-line py-1.5">
+                  <div class="font-mono text-[15px] font-bold text-sold tnum">0</div>
+                  <div class="font-mono text-[9px] text-dim">SATILDI</div>
+                </div>
+              </div>
+
+              <div class="h-2 w-full rounded-full overflow-hidden flex bg-panel2 mt-3">
+                <div class="bg-avail h-full" style="width:92.9%"></div>
+                <div class="bg-option h-full" style="width:5.7%"></div>
+                <div class="bg-sold h-full" style="width:0%"></div>
+              </div>
+
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-line">
+                <div>
+                  <div class="font-mono text-[9px] text-dim">FİYAT ARALIĞI</div>
+                  <div class="font-mono text-[13px] font-bold text-ink tnum">₺4.1M – ₺9.3M</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-mono text-[9px] text-dim">İNŞAAT · TESLİM</div>
+                  <div class="font-mono text-[13px] font-bold text-ink tnum">%28 · 2027 Haz</div>
+                </div>
+              </div>
+              <div class="mt-2 flex items-center gap-2">
+                <div class="h-1.5 flex-1 rounded-full bg-panel2 overflow-hidden">
+                  <div class="h-full bg-teal rounded-full" style="width:28%"></div>
+                </div>
+                <span class="font-mono text-[10px] text-teal tnum">%28</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ============ BİNA KESİTİ ============ -->
+      <section class="rounded-lg bg-panel border border-line overflow-hidden">
+        <div class="h-[3px] bg-teal"></div>
+        <div class="p-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <div class="flex items-center gap-2">
+              <h2 class="font-bold text-[15px]">Bina Kesiti</h2>
+              <span class="font-mono text-[11px] text-dim">/ Çankaya Vadi Konakları · A Blok</span>
+            </div>
+            <div class="flex items-center gap-3 font-mono text-[10px]">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-avail"></span><span class="text-muted">müsait</span></span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-option"></span><span class="text-muted">opsiyon</span></span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-sold"></span><span class="text-muted">satıldı</span></span>
+            </div>
+          </div>
+
+          <!-- floors -->
+          <div class="space-y-1.5">
+            <!-- KAT 8 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K8</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell group relative rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-31 · 4+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺13.20M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-32 · 4+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺13.20M</div>
+                </div>
+                <div class="cell rounded bg-sold/12 border border-sold/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-sold">A-33 · 4+1</div>
+                  <div class="font-mono text-[10px] text-dim line-through tnum">₺14.80M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 7 (yüksek talep) -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex flex-col items-end justify-center pr-1 font-mono text-[11px] text-teal">K7<span class="text-[8px] text-teal glow-teal">↗talep</span></div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px] ring-1 ring-teal/40">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-27 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺9.40M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px] ring-1 ring-teal/40">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-28 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺9.40M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-29 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.80M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-30 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.80M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 6 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K6</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-23 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺9.10M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-24 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺9.10M</div>
+                </div>
+                <div class="cell rounded bg-sold/12 border border-sold/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-sold">A-25 · 2+1</div>
+                  <div class="font-mono text-[10px] text-dim line-through tnum">₺6.50M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-26 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.50M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 5 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K5</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-19 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺8.90M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-20 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺8.90M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-21 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.30M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-22 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.30M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 4 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K4</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-15 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺8.75M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-16 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺8.75M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-17 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.20M</div>
+                </div>
+                <div class="cell rounded bg-sold/12 border border-sold/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-sold">A-18 · 2+1</div>
+                  <div class="font-mono text-[10px] text-dim line-through tnum">₺6.20M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 3 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K3</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell relative rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px] ring-2 ring-teal shadow-[0_0_14px_rgba(30,155,138,.4)]">
+                  <div class="absolute -top-2 -right-1.5 font-mono text-[8px] font-bold text-bg bg-teal px-1 rounded">SEÇİLİ</div>
+                  <div class="font-mono text-[11px] font-bold text-avail">A-12 · 3+1</div>
+                  <div class="font-mono text-[10px] text-ink tnum">₺8.75M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-11 · 3+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺8.60M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-10 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.10M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-09 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.10M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 2 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K2</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-07 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.20M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-08 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.20M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-06 · 1+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺4.40M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-05 · 1+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺4.40M</div>
+                </div>
+              </div>
+            </div>
+            <!-- KAT 1 -->
+            <div class="flex items-stretch gap-2">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">K1</div>
+              <div class="flex gap-1.5 flex-1 flex-wrap">
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-03 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.00M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-04 · 2+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺6.00M</div>
+                </div>
+                <div class="cell rounded bg-sold/12 border border-sold/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-sold">A-02 · 1+1</div>
+                  <div class="font-mono text-[10px] text-dim line-through tnum">₺4.20M</div>
+                </div>
+                <div class="cell rounded bg-avail/12 border border-avail/40 px-2.5 py-1.5 min-w-[118px]">
+                  <div class="font-mono text-[11px] font-bold text-avail">A-01 · 1+1</div>
+                  <div class="font-mono text-[10px] text-muted tnum">₺4.20M</div>
+                </div>
+              </div>
+            </div>
+            <!-- ZEMİN -->
+            <div class="flex items-stretch gap-2 pt-1">
+              <div class="w-12 shrink-0 flex items-center justify-end pr-1 font-mono text-[11px] text-dim">Z</div>
+              <div class="flex-1 rounded bg-panel2 border border-dashed border-line2 px-3 py-2 flex items-center gap-2">
+                <span class="font-mono text-[10px] text-dim tracking-widest">▣ ZEMİN GİRİŞ</span>
+                <span class="font-mono text-[10px] text-dim ml-auto">lobi · ticari ünite · otopark</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ STOK TABLOSU ============ -->
+      <section id="stok" class="rounded-lg bg-panel border border-line overflow-hidden scroll-mt-24">
+        <div class="flex flex-wrap items-center justify-between gap-2 p-4 border-b border-line">
+          <div class="flex items-center gap-2">
+            <h2 class="font-bold text-[15px]">Stok Tablosu</h2>
+            <span class="font-mono text-[11px] text-dim">/ tüm birimler · canlı</span>
+          </div>
+          <div class="flex items-center gap-1.5 font-mono text-[11px]">
+            <button class="px-2.5 py-1 rounded bg-teal/15 border border-teal/30 text-teal">Tümü</button>
+            <button class="px-2.5 py-1 rounded bg-panel2 border border-line text-muted hover:text-avail">● Müsait</button>
+            <button class="px-2.5 py-1 rounded bg-panel2 border border-line text-muted hover:text-option">● Opsiyon</button>
+            <button class="px-2.5 py-1 rounded bg-panel2 border border-line text-muted hover:text-sold">● Satıldı</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[900px]">
+            <thead>
+              <tr class="font-mono text-[10px] text-dim uppercase tracking-wider bg-panel2/60">
+                <th class="font-medium px-4 py-2.5 border-b border-line">Blok</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line">Kat</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line">No</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line">Tip</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line text-right">Net m²</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line text-right">Fiyat</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line">Durum</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line">Son Güncelleme</th>
+                <th class="font-medium px-4 py-2.5 border-b border-line text-right">Aksiyon</th>
+              </tr>
+            </thead>
+            <tbody class="font-mono text-[12px] tnum">
+              <!-- row: seçili A-12 -->
+              <tr class="border-b border-line/70 hover:bg-panel2/50 bg-teal/[0.04]">
+                <td class="px-4 py-2.5 text-muted">A</td>
+                <td class="px-4 py-2.5 text-muted">3</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-12</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">142</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺8.75M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-avail">● 2 sa önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Paylaş ↗</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">A</td>
+                <td class="px-4 py-2.5 text-muted">7</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-27</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">146</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺9.40M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-avail">● 2 sa önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Paylaş ↗</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">A</td>
+                <td class="px-4 py-2.5 text-muted">8</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-33</td>
+                <td class="px-4 py-2.5 text-ink">4+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">198</td>
+                <td class="px-4 py-2.5 text-right font-bold text-dim line-through">₺14.80M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-sold"><span class="w-1.5 h-1.5 rounded-full bg-sold"></span>Satıldı</span></td>
+                <td class="px-4 py-2.5"><span class="text-teal">● 1 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-dim">—</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">A</td>
+                <td class="px-4 py-2.5 text-muted">1</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-02</td>
+                <td class="px-4 py-2.5 text-ink">1+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">68</td>
+                <td class="px-4 py-2.5 text-right font-bold text-dim line-through">₺4.20M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-sold"><span class="w-1.5 h-1.5 rounded-full bg-sold"></span>Satıldı</span></td>
+                <td class="px-4 py-2.5"><span class="text-teal">● 3 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-dim">—</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">A</td>
+                <td class="px-4 py-2.5 text-muted">4</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-15</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">142</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺8.75M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-avail">● 2 sa önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Paylaş ↗</span></td>
+              </tr>
+              <!-- Test Konakları rows -->
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">C <span class="text-[9px] text-dim">·TK</span></td>
+                <td class="px-4 py-2.5 text-muted">2</td>
+                <td class="px-4 py-2.5 font-bold text-ink">C-05</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">138</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺7.10M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-option"><span class="w-1.5 h-1.5 rounded-full bg-option"></span>Opsiyon</span></td>
+                <td class="px-4 py-2.5"><span class="text-option">● 11 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-dim cursor-pointer hover:text-muted">Kilit</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">C <span class="text-[9px] text-dim">·TK</span></td>
+                <td class="px-4 py-2.5 text-muted">3</td>
+                <td class="px-4 py-2.5 font-bold text-ink">C-08</td>
+                <td class="px-4 py-2.5 text-ink">4+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">186</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺9.30M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-option"><span class="w-1.5 h-1.5 rounded-full bg-option"></span>Opsiyon</span></td>
+                <td class="px-4 py-2.5"><span class="text-option">● 11 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-dim cursor-pointer hover:text-muted">Kilit</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">A <span class="text-[9px] text-dim">·TK</span></td>
+                <td class="px-4 py-2.5 text-muted">1</td>
+                <td class="px-4 py-2.5 font-bold text-ink">A-02</td>
+                <td class="px-4 py-2.5 text-ink">2+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">96</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺4.10M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-option">● 11 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Paylaş ↗</span></td>
+              </tr>
+              <tr class="border-b border-line/70 hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">B <span class="text-[9px] text-dim">·TK</span></td>
+                <td class="px-4 py-2.5 text-muted">5</td>
+                <td class="px-4 py-2.5 font-bold text-ink">B-14</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">134</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺7.50M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-passive">● 16 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Tazele</span></td>
+              </tr>
+              <tr class="hover:bg-panel2/50">
+                <td class="px-4 py-2.5 text-muted">B <span class="text-[9px] text-dim">·TK</span></td>
+                <td class="px-4 py-2.5 text-muted">5</td>
+                <td class="px-4 py-2.5 font-bold text-ink">B-15</td>
+                <td class="px-4 py-2.5 text-ink">3+1</td>
+                <td class="px-4 py-2.5 text-right text-muted">134</td>
+                <td class="px-4 py-2.5 text-right font-bold text-ink">₺7.50M</td>
+                <td class="px-4 py-2.5"><span class="inline-flex items-center gap-1.5 text-avail"><span class="w-1.5 h-1.5 rounded-full bg-avail"></span>Müsait</span></td>
+                <td class="px-4 py-2.5"><span class="text-passive">● 16 gün önce</span></td>
+                <td class="px-4 py-2.5 text-right"><span class="text-teal hover:underline cursor-pointer">Tazele</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="px-4 py-2.5 border-t border-line flex items-center justify-between font-mono text-[10px] text-dim">
+          <span>10 / 160 birim gösteriliyor</span>
+          <span class="flex items-center gap-3">
+            <span class="text-avail">● 149 müsait</span>
+            <span class="text-option">● 4 opsiyon</span>
+            <span class="text-sold">● 6 satıldı</span>
+          </span>
+        </div>
+      </section>
+
+      <!-- ============ MÜŞTERİ SORGULA ============ -->
+      <section id="sorgu" class="rounded-lg bg-panel border border-line overflow-hidden scroll-mt-24">
+        <div class="h-[3px] bg-line2"></div>
+        <div class="p-4">
+          <div class="flex items-center gap-2 mb-1">
+            <h2 class="font-bold text-[15px]">Müşteri Sorgula</h2>
+            <span class="font-mono text-[10px] text-dim">/ çift-satış kalkanı</span>
+          </div>
+          <p class="text-[12px] text-muted mb-3.5">Ad veya telefonla sorgula: <span class="text-ink">bu kişi ağda ilk kimin lead'i?</span> Aynı müşteriyi iki danışmanın çalışmasını önler.</p>
+
+          <div class="flex flex-col sm:flex-row gap-2">
+            <div class="flex-1 flex items-center gap-2 px-3 h-11 rounded-md bg-panel2 border border-line focus-within:border-teal/50 transition">
+              <span class="text-dim text-[14px]">⌕</span>
+              <input value="0532 4** ** 18" class="bg-transparent outline-none text-[13px] font-mono text-ink placeholder:text-dim w-full" placeholder="Ad Soyad veya 05XX XXX XX XX" />
+            </div>
+            <button class="h-11 px-5 rounded-md bg-teal text-bg font-bold text-[13px] hover:brightness-110 transition shadow-[0_0_18px_rgba(30,155,138,.3)] shrink-0">Sorgula</button>
+          </div>
+
+          <!-- result -->
+          <div class="mt-3 rounded-md bg-panel2 border border-option/30 p-3.5 relative overflow-hidden">
+            <div class="absolute left-0 inset-y-0 w-[2px] bg-option"></div>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <span class="inline-flex items-center gap-1.5 font-mono text-[10px] font-bold text-option">
+                <span class="w-1.5 h-1.5 rounded-full bg-option"></span> KAYITLI LEAD
+              </span>
+              <div class="font-mono text-[12px] text-ink">
+                <span class="text-dim">eşleşme:</span> <span class="font-bold">M. Yıldız</span> · <span class="text-dim">tel</span> 0532 4** ** 18
+              </div>
+              <div class="font-mono text-[12px] text-ink">
+                <span class="text-dim">ilk danışman:</span> <span class="font-bold text-teal">Emre K. (Yıldız Emlak)</span>
+              </div>
+              <div class="font-mono text-[12px] text-ink">
+                <span class="text-dim">ilk temas:</span> <span class="tnum">14 gün önce</span> · ÇVK A-12
+              </div>
+              <span class="ml-auto inline-flex items-center gap-1.5 px-2 py-1 rounded bg-sold/10 border border-sold/30 font-mono text-[10px] font-bold text-sold">
+                ⛔ ÇİFT ÇALIŞMA RİSKİ
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- footer strip -->
+      <footer class="flex flex-wrap items-center justify-between gap-2 pt-1 pb-4 font-mono text-[10px] text-dim">
+        <span>ProjePazar Terminal · Demosaha İnşaat · üretici paneli</span>
+        <span class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-avail blink"></span>
+          canlı stok · tek doğru kaynak · son senkron 2 sa önce
+        </span>
+      </footer>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

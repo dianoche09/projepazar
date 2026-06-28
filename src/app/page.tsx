@@ -45,22 +45,22 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex flex-1 flex-col bg-paper min-h-screen relative">
+    <main className="flex flex-1 flex-col bg-paper min-h-screen relative text-slate-900">
       {/* Background blueprint grid */}
-      <div className="izgara-doku absolute inset-0 opacity-[0.03] pointer-events-none" aria-hidden />
+      <div className="izgara-doku absolute inset-0 opacity-[0.05] pointer-events-none" aria-hidden />
 
       {/* Hero section with aurora and glowing effects */}
-      <section className="aurora relative flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#030712] via-[#090d16] to-[#020617] px-6 py-24 text-center sm:py-32 border-b border-white/5">
+      <section className="aurora relative flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-white via-slate-50/50 to-[#f4f4f5] px-6 py-24 text-center sm:py-32 border-b border-slate-200/60">
         {/* Glow dots on backgrounds */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-teal/10 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[250px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
         
-        <div className="belir relative z-10 flex items-center gap-3 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-md shadow-card">
+        <div className="belir relative z-10 flex items-center gap-3 bg-slate-100 border border-slate-200 rounded-full px-4 py-1.5 shadow-sm">
           <span className="grid grid-cols-3 gap-1" aria-hidden>
             {Array.from({ length: 9 }).map((_, i) => (
-              <span key={i} className={`size-2 rounded-[2px] ${i === 4 ? "bg-green nabiz shadow-[0_0_10px_var(--color-green)]" : "bg-white/20"}`} />
+              <span key={i} className={`size-2 rounded-[2px] ${i === 4 ? "bg-green nabiz shadow-[0_0_8px_var(--color-green)]" : "bg-slate-300"}`} />
             ))}
           </span>
-          <span className="font-display text-sm font-semibold tracking-wide text-white/90">PROJEPAZAR PLATFORMU</span>
+          <span className="font-display text-xs font-bold tracking-wide text-slate-700">PROJEPAZAR PLATFORMU</span>
         </div>
 
         <h1 className="belir belir-1 relative z-10 mt-10 max-w-4xl text-balance font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-gradient sm:text-6xl">
@@ -68,7 +68,7 @@ export default async function Home() {
           <span className="text-gradient-cyan">konut stoğu dağıtım ağı</span>
         </h1>
 
-        <p className="belir belir-2 relative z-10 mt-6 max-w-2xl text-pretty text-base leading-relaxed text-gray/80 sm:text-lg">
+        <p className="belir belir-2 relative z-10 mt-6 max-w-2xl text-pretty text-base leading-relaxed text-slate-600 sm:text-lg">
           İlan portalı değiliz — müteahhidin canlı stok kontrol merkezi ve danışman ağına güvenilir
           dağıtım altyapısı. Komisyona dokunmayız; danışman ve ofis için ücretsiz.
         </p>
@@ -84,7 +84,7 @@ export default async function Home() {
           ).map(([renk, etiket]) => (
             <span
               key={etiket}
-              className="inline-flex items-center gap-2.5 rounded-full border border-white/5 bg-white/[0.03] px-3.5 py-1.5 text-white/70"
+              className="inline-flex items-center gap-2.5 rounded-full border border-slate-200/60 bg-white px-3.5 py-1.5 text-slate-600 shadow-sm"
             >
               <span className={`size-2 rounded-full ${renk}`} /> {etiket}
             </span>
@@ -95,13 +95,13 @@ export default async function Home() {
         <div className="belir belir-4 relative z-10 mt-12 flex items-center gap-4">
           <Link
             href="/login"
-            className="btn rounded-xl bg-teal px-8 py-3.5 font-semibold text-navy transition-all duration-300 hover:bg-teal/90 shadow-[0_0_20px_rgba(6,182,212,0.25)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)]"
+            className="btn rounded-xl bg-teal px-8 py-3.5 font-bold text-white transition-all duration-300 hover:bg-teal-d shadow-[0_4px_12px_rgba(37,99,235,0.2)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.3)]"
           >
             Giriş yap
           </Link>
           <Link
             href="/kayit"
-            className="btn rounded-xl border border-white/10 bg-white/5 px-8 py-3.5 font-semibold text-white transition-all duration-300 hover:border-white/20 hover:bg-white/10"
+            className="btn rounded-xl border border-slate-200 bg-white px-8 py-3.5 font-bold text-slate-800 transition-all duration-300 hover:bg-slate-50 hover:border-slate-300"
           >
             Kayıt ol
           </Link>
@@ -110,13 +110,13 @@ export default async function Home() {
 
       {/* DEĞİŞMEZLER — güven protokolü */}
       <section className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-28 relative">
-        <div className="absolute top-1/2 right-1/4 w-[350px] h-[350px] bg-green/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 right-1/4 w-[350px] h-[350px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
         
-        <h2 className="text-center font-display text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
           Gayrimenkulün güven protokolü
         </h2>
-        <p className="mx-auto mt-3 max-w-xl text-pretty text-center text-sm leading-relaxed text-gray/80">
-          Dört değişmez ilke ProjePazar&apos;ı tekil bir CRM, portal ya da broker değil — saf,
+        <p className="mx-auto mt-3 max-w-xl text-pretty text-center text-sm leading-relaxed text-slate-500 font-medium">
+          Döt değişmez ilke ProjePazar&apos;ı tekil bir CRM, portal ya da broker değil — saf,
           tarafsız dağıtım altyapısı yapar.
         </p>
 
@@ -129,28 +129,28 @@ export default async function Home() {
               className="belir glass-card glass-card-hover relative overflow-hidden rounded-2xl p-6 transition-all duration-300"
             >
               <span className={`absolute inset-x-0 top-0 h-[2px] ${o.sinyal}`} aria-hidden />
-              <h3 className="font-display text-base font-semibold text-white tracking-wide mt-2">{o.baslik}</h3>
-              <p className="mt-3 text-xs leading-relaxed text-gray/70">{o.metin}</p>
+              <h3 className="font-display text-base font-bold text-slate-900 tracking-tight mt-2">{o.baslik}</h3>
+              <p className="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{o.metin}</p>
             </div>
           ))}
         </div>
 
         {/* Bottom invitation layout */}
-        <div className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-md px-6 py-10 text-center max-w-3xl mx-auto shadow-card">
-          <p className="max-w-xl text-pretty text-sm leading-relaxed text-gray/80">
+        <div className="mt-16 flex flex-col items-center gap-5 rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-6 py-10 text-center max-w-3xl mx-auto shadow-card">
+          <p className="max-w-xl text-pretty text-sm leading-relaxed text-slate-600 font-medium">
             Müteahhitseniz stoğunuzu tek noktadan yönetin; danışmansanız yalnız size tahsisli
             projeleri canlı havuzdan paylaşın. Kapalı devre, davetli B2B ağ.
           </p>
           <div className="flex items-center gap-4 mt-2">
             <Link
               href="/kayit"
-              className="btn rounded-xl bg-teal px-6 py-2.5 text-sm font-semibold text-navy transition-all duration-300 hover:bg-teal/90"
+              className="btn rounded-xl bg-teal px-6 py-2.5 text-sm font-bold text-white transition-all duration-300 hover:bg-teal-d"
             >
               Hesap oluştur
             </Link>
             <Link
               href="/login"
-              className="btn rounded-xl border border-white/10 bg-white/5 px-6 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:border-white/20 hover:bg-white/10"
+              className="btn rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-bold text-slate-800 transition-all duration-300 hover:bg-slate-50"
             >
               Giriş yap
             </Link>
@@ -159,17 +159,17 @@ export default async function Home() {
       </section>
 
       {/* Redesigned Footer */}
-      <footer className="mt-auto border-t border-white/5 bg-[#020617]/50 backdrop-blur-md flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-6 py-10 text-xs text-gray/50">
-        <Link href="/kullanim-kosullari" className="transition-colors hover:text-white/80 hover:underline">
+      <footer className="mt-auto border-t border-slate-200/80 bg-white/55 backdrop-blur-md flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-6 py-10 text-xs text-slate-500 font-medium">
+        <Link href="/kullanim-kosullari" className="transition-colors hover:text-slate-900 hover:underline">
           Kullanım Koşulları
         </Link>
-        <Link href="/gizlilik" className="transition-colors hover:text-white/80 hover:underline">
+        <Link href="/gizlilik" className="transition-colors hover:text-slate-900 hover:underline">
           Gizlilik
         </Link>
-        <Link href="/kvkk-aydinlatma" className="transition-colors hover:text-white/80 hover:underline">
+        <Link href="/kvkk-aydinlatma" className="transition-colors hover:text-slate-900 hover:underline">
           KVKK Aydınlatma
         </Link>
-        <span className="ml-auto text-gray/40">© 2026 ProjePazar • Tüm Hakları Saklıdır.</span>
+        <span className="ml-auto text-slate-400">© 2026 ProjePazar • Tüm Hakları Saklıdır.</span>
       </footer>
     </main>
   );

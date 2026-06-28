@@ -36,7 +36,7 @@ export function Donut({
   return (
     <div className="relative inline-grid place-items-center" style={{ width: boyut, height: boyut }}>
       <svg width={boyut} height={boyut} viewBox={`0 0 ${boyut} ${boyut}`} className="-rotate-90">
-        <circle cx={merkez} cy={merkez} r={r} fill="none" stroke="#E6EBEF" strokeWidth={kalin} />
+        <circle cx={merkez} cy={merkez} r={r} fill="none" stroke="#f1f5f9" strokeWidth={kalin} />
         {toplam > 0
           ? dilimler.map((d) => (
               <circle
@@ -55,8 +55,8 @@ export function Donut({
           : null}
       </svg>
       <div className="absolute flex flex-col items-center leading-none">
-        {ortaUst ? <span className="font-mono text-2xl font-semibold tabular-nums text-ink">{ortaUst}</span> : null}
-        {ortaAlt ? <span className="mt-1 text-[11px] uppercase tracking-wide text-gray">{ortaAlt}</span> : null}
+        {ortaUst ? <span className="font-mono text-2xl font-extrabold tabular-nums text-slate-800">{ortaUst}</span> : null}
+        {ortaAlt ? <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">{ortaAlt}</span> : null}
       </div>
     </div>
   );
@@ -89,12 +89,12 @@ export function YiginBar({ parcalar, yukseklik = 8 }: { parcalar: Parca[]; yukse
 /** Grafik lejantı — renk noktası + etiket + sayı. */
 export function Lejant({ parcalar }: { parcalar: Parca[] }) {
   return (
-    <ul className="space-y-2">
+    <ul className="space-y-2 font-bold">
       {parcalar.map((p) => (
-        <li key={p.etiket} className="flex items-center gap-2 text-sm">
-          <span className="size-2.5 shrink-0 rounded-full" style={{ background: p.renk }} />
-          <span className="text-gray">{p.etiket}</span>
-          <span className="ml-auto font-mono font-semibold tabular-nums text-ink">{p.deger}</span>
+        <li key={p.etiket} className="flex items-center gap-2 text-xs">
+          <span className="size-2 shrink-0 rounded-full" style={{ background: p.renk }} />
+          <span className="text-slate-500 font-semibold">{p.etiket}</span>
+          <span className="ml-auto font-mono font-extrabold tabular-nums text-slate-800">{p.deger}</span>
         </li>
       ))}
     </ul>

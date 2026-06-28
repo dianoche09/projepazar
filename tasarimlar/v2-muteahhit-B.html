@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Müteahhit Kokpiti — Demosaha İnşaat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --zemin:#eef1f6;
+    --zemin-2:#e7ebf2;
+    --ink:#10243a;
+    --ink-soft:#46586b;
+    --ink-faint:#7d8da0;
+    --navy:#13314b;
+    --teal:#1e9b8a;
+    --musait:#2fb36b;
+    --opsiyon:#e3a12c;
+    --satildi:#d15a4e;
+    --pasif:#98a2b3;
+    --kart:#ffffff;
+    --cizgi:rgba(16,36,58,.08);
+    --cizgi-2:rgba(16,36,58,.12);
+    --golge-1:0 1px 2px rgba(16,36,58,.04),0 2px 6px rgba(16,36,58,.05);
+    --golge-2:0 2px 6px rgba(16,36,58,.05),0 12px 28px rgba(16,36,58,.08);
+    --golge-3:0 4px 14px rgba(16,36,58,.08),0 24px 56px rgba(16,36,58,.12);
+  }
+  *{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; box-sizing:border-box; }
+  html,body{ background:var(--zemin); }
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    color:var(--ink);
+    margin:0;
+    background:
+      radial-gradient(1200px 700px at 78% -8%, rgba(30,155,138,.10), transparent 60%),
+      radial-gradient(1000px 600px at -6% 8%, rgba(19,49,75,.07), transparent 55%),
+      linear-gradient(180deg,#eef1f6 0%, #e9edf4 100%);
+    background-attachment:fixed;
+    min-height:100vh;
+  }
+  .font-display{ font-family:'Outfit',sans-serif; }
+  .mono{ font-family:'Geist Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; }
+
+  /* ---- kart ---- */
+  .kart{
+    background:var(--kart);
+    border:1px solid var(--cizgi);
+    border-radius:20px;
+    box-shadow:var(--golge-2);
+    position:relative;
+  }
+  .kart-serit::before{
+    content:"";
+    position:absolute; left:0; right:0; top:0; height:4px;
+    border-radius:20px 20px 0 0;
+  }
+  .serit-musait::before{ background:var(--musait); }
+  .serit-opsiyon::before{ background:var(--opsiyon); }
+  .serit-teal::before{ background:var(--teal); }
+  .serit-navy::before{ background:linear-gradient(90deg,var(--navy),var(--teal)); }
+
+  /* ---- üst nav ---- */
+  .topnav{
+    background:rgba(255,255,255,.78);
+    backdrop-filter:blur(20px) saturate(160%);
+    -webkit-backdrop-filter:blur(20px) saturate(160%);
+    border-bottom:1px solid var(--cizgi);
+  }
+  .nav-link{
+    font-size:13.5px; font-weight:500; color:var(--ink-soft);
+    padding:7px 12px; border-radius:9px; white-space:nowrap;
+    transition:all .15s ease; cursor:pointer; letter-spacing:-.01em;
+  }
+  .nav-link:hover{ background:rgba(16,36,58,.05); color:var(--ink); }
+  .nav-link.aktif{
+    background:var(--navy); color:#fff; box-shadow:0 2px 8px rgba(19,49,75,.22);
+  }
+
+  /* ---- logo 3x3 ---- */
+  .logo-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:2.5px;
+    width:26px; height:26px;
+  }
+  .logo-grid i{ border-radius:2px; background:var(--ink-faint); }
+  .logo-grid i.on{ background:var(--teal); }
+  .logo-grid i.on2{ background:var(--navy); }
+
+  /* ---- canlı nokta ---- */
+  .canli-nokta{ width:8px; height:8px; border-radius:50%; background:var(--musait); position:relative; }
+  .canli-nokta::after{
+    content:""; position:absolute; inset:-4px; border-radius:50%;
+    background:var(--musait); opacity:.35; animation:puls 2s ease-out infinite;
+  }
+  @keyframes puls{ 0%{ transform:scale(.6); opacity:.5;} 100%{ transform:scale(2.2); opacity:0;} }
+
+  /* ---- tazelik ---- */
+  .taze{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; }
+  .taze .pt{ width:7px; height:7px; border-radius:50%; }
+  .t-yesil{ color:var(--musait); } .t-yesil .pt{ background:var(--musait); }
+  .t-teal{ color:var(--teal); } .t-teal .pt{ background:var(--teal); }
+  .t-amber{ color:var(--opsiyon); } .t-amber .pt{ background:var(--opsiyon); }
+  .t-gri{ color:var(--pasif); } .t-gri .pt{ background:var(--pasif); }
+
+  /* ---- rozet ---- */
+  .rozet{
+    display:inline-flex; align-items:center; gap:4px;
+    font-size:11px; font-weight:600; padding:3px 8px; border-radius:7px; letter-spacing:.01em;
+  }
+  .r-belgeli{ background:rgba(30,155,138,.12); color:var(--teal); }
+  .r-yuksek{ background:rgba(227,161,44,.14); color:#b07e1d; }
+  .r-bayat{ background:rgba(152,162,179,.16); color:#69788b; }
+
+  /* ---- bina kesiti hücre ---- */
+  .hucre{
+    border-radius:9px; padding:7px 8px; min-height:46px;
+    display:flex; flex-direction:column; justify-content:center; gap:2px;
+    border:1px solid rgba(16,36,58,.05); cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .hucre:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(16,36,58,.14); z-index:2; }
+  .h-musait{ background:linear-gradient(150deg,#e6f6ee,#d4efe0); }
+  .h-musait .kod{ color:#1d8a52; }
+  .h-opsiyon{ background:linear-gradient(150deg,#fcf2dd,#f8e8c4); }
+  .h-opsiyon .kod{ color:#a9771a; }
+  .h-satildi{ background:linear-gradient(150deg,#f7e0dc,#f0cdc6); }
+  .h-satildi .kod{ color:#b1463b; }
+  .h-bos{ background:repeating-linear-gradient(135deg,#eef1f6,#eef1f6 6px,#e7ebf2 6px,#e7ebf2 12px); border-style:dashed; }
+  .kod{ font-size:11px; font-weight:600; }
+  .alt{ font-size:9.5px; }
+
+  /* ---- KPI ---- */
+  .kpi-deger{ font-size:30px; font-weight:700; line-height:1; letter-spacing:-.02em; }
+  .kpi-etiket{ font-size:11.5px; font-weight:600; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+  /* ---- donut ---- */
+  .donut{ width:148px; height:148px; border-radius:50%; position:relative;
+    background:conic-gradient(
+      var(--musait) 0 var(--p1),
+      var(--opsiyon) var(--p1) var(--p2),
+      var(--satildi) var(--p2) 100%);
+  }
+  .donut::after{ content:""; position:absolute; inset:22px; border-radius:50%; background:#fff; box-shadow:inset 0 1px 4px rgba(16,36,58,.06); }
+
+  /* ---- stok bar ---- */
+  .stokbar{ height:8px; border-radius:99px; overflow:hidden; display:flex; background:var(--zemin-2); }
+
+  /* ---- buton ---- */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px;
+    font-size:13.5px; font-weight:600; border-radius:11px; padding:9px 16px;
+    cursor:pointer; transition:all .15s ease; border:1px solid transparent; }
+  .btn-navy{ background:var(--navy); color:#fff; box-shadow:0 2px 8px rgba(19,49,75,.2); }
+  .btn-navy:hover{ filter:brightness(1.12); }
+  .btn-teal{ background:var(--teal); color:#fff; }
+  .btn-sec{ background:#fff; color:var(--ink); border-color:var(--cizgi-2); }
+  .btn-sec:hover{ background:var(--zemin); }
+
+  /* ---- insight ---- */
+  .insight{ display:flex; gap:11px; padding:13px; border-radius:13px; background:var(--zemin); border:1px solid var(--cizgi); }
+  .insight-ikon{ width:34px; height:34px; border-radius:10px; flex:none; display:flex; align-items:center; justify-content:center; font-size:16px; }
+
+  /* arama input */
+  .arama{ background:var(--zemin); border:1px solid var(--cizgi-2); border-radius:11px; padding:10px 14px; font-size:14px; width:100%; color:var(--ink); }
+  .arama:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(30,155,138,.12); background:#fff; }
+  .arama::placeholder{ color:var(--ink-faint); }
+
+  ::-webkit-scrollbar{ height:7px; width:7px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(16,36,58,.18); border-radius:99px; }
+
+  @media (max-width:1180px){ .grid-3kol{ grid-template-columns:1fr !important; } }
+  @media (max-width:900px){ .nav-orta{ display:none !important; } .grid-2proje{ grid-template-columns:1fr !important; } .kpi-serit{ grid-template-columns:repeat(2,1fr) !important; } }
+</style>
+</head>
+<body>
+
+<!-- ===================== ÜST NAV ===================== -->
+<header class="topnav sticky top-0 z-50">
+  <div class="max-w-[1340px] mx-auto px-5 h-[62px] flex items-center gap-4">
+    <!-- logo -->
+    <div class="flex items-center gap-2.5 flex-none">
+      <div class="logo-grid">
+        <i class="on"></i><i></i><i class="on2"></i>
+        <i></i><i class="on2"></i><i></i>
+        <i class="on2"></i><i></i><i class="on"></i>
+      </div>
+      <span class="font-display font-bold text-[17px] tracking-tight" style="color:var(--ink)">ProjePazar</span>
+    </div>
+
+    <!-- orta menü -->
+    <nav class="nav-orta flex items-center gap-0.5 mx-auto">
+      <span class="nav-link aktif">Kokpit</span>
+      <span class="nav-link">Projeler</span>
+      <span class="nav-link">Stok</span>
+      <span class="nav-link">Tahsis</span>
+      <span class="nav-link">Opsiyonlar</span>
+      <span class="nav-link">Talep Radarı</span>
+      <span class="nav-link">Müşteri Sorgula</span>
+      <span class="nav-link">Raporlar</span>
+      <span class="nav-link">Ayarlar</span>
+    </nav>
+
+    <!-- sağ kullanıcı -->
+    <div class="flex items-center gap-2.5 flex-none">
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-[11px]" style="background:var(--zemin);border:1px solid var(--cizgi)">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center font-display font-bold text-[12px]" style="background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff">Dİ</div>
+        <div class="leading-tight">
+          <div class="text-[12.5px] font-semibold" style="color:var(--ink)">Demosaha İnşaat</div>
+          <div class="text-[10.5px]" style="color:var(--ink-faint)">Üretici · Müteahhit</div>
+        </div>
+      </div>
+      <button class="btn btn-sec !px-3 !py-2 text-[12.5px]">Çıkış</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-[1340px] mx-auto px-5 py-6">
+
+  <!-- ===================== BAŞLIK ===================== -->
+  <div class="flex flex-wrap items-end justify-between gap-3 mb-5">
+    <div>
+      <div class="flex items-center gap-3">
+        <h1 class="font-display font-bold text-[30px] tracking-tight" style="color:var(--ink)">Kokpit</h1>
+        <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold" style="background:rgba(47,179,107,.12);color:var(--musait)">
+          <span class="canli-nokta"></span> Canlı
+        </span>
+      </div>
+      <div class="flex items-center gap-2 mt-1.5 text-[13px]" style="color:var(--ink-soft)">
+        <span class="taze t-yesil"><span class="pt"></span>son senkron 2 sa önce</span>
+        <span style="color:var(--cizgi-2)">·</span>
+        <span>2 aktif proje · 160 birim</span>
+      </div>
+    </div>
+    <button class="btn btn-navy">
+      <span class="text-[16px] leading-none">+</span> Yeni proje
+    </button>
+  </div>
+
+  <!-- ===================== KPI ŞERİDİ ===================== -->
+  <section class="kpi-serit grid grid-cols-5 gap-3 mb-5">
+    <div class="kart kart-serit serit-navy p-4">
+      <div class="kpi-etiket">Toplam birim</div>
+      <div class="kpi-deger mono mt-2" style="color:var(--ink)">160</div>
+      <div class="text-[11.5px] mt-1.5" style="color:var(--ink-faint)">2 projede</div>
+    </div>
+    <div class="kart kart-serit serit-musait p-4">
+      <div class="kpi-etiket">Müsait</div>
+      <div class="kpi-deger mono mt-2" style="color:var(--musait)">149</div>
+      <div class="text-[11.5px] mt-1.5" style="color:var(--ink-faint)">%93 hazır stok</div>
+    </div>
+    <div class="kart kart-serit serit-opsiyon p-4">
+      <div class="kpi-etiket">Opsiyonlu</div>
+      <div class="kpi-deger mono mt-2" style="color:var(--opsiyon)">4</div>
+      <div class="text-[11.5px] mt-1.5" style="color:var(--ink-faint)">teyit bekliyor</div>
+    </div>
+    <div class="kart p-4">
+      <div class="kpi-etiket">Satıldı</div>
+      <div class="kpi-deger mono mt-2" style="color:var(--satildi)">6</div>
+      <div class="text-[11.5px] mt-1.5" style="color:var(--ink-faint)">kümülatif</div>
+    </div>
+    <div class="kart kart-serit serit-teal p-4">
+      <div class="kpi-etiket">Satış oranı</div>
+      <div class="kpi-deger mono mt-2" style="color:var(--ink)">%4</div>
+      <div class="text-[11.5px] mt-1.5" style="color:var(--ink-faint)">6 / 160</div>
+    </div>
+  </section>
+
+  <!-- ===================== 3 KOLON IZGARA ===================== -->
+  <section class="grid-3kol grid mb-5" style="grid-template-columns:330px 1fr 360px; gap:14px;">
+
+    <!-- KOLON 1: STOK DONUT -->
+    <div class="kart kart-serit serit-navy p-5">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="font-display font-semibold text-[15px]" style="color:var(--ink)">Stok dağılımı</h2>
+        <span class="taze t-yesil"><span class="pt"></span>canlı</span>
+      </div>
+      <p class="text-[12px] mb-4" style="color:var(--ink-faint)">160 birim · tek havuz</p>
+
+      <div class="flex justify-center my-4">
+        <div class="donut" style="--p1:93.1%; --p2:95.6%;">
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <div class="mono font-bold text-[26px]" style="color:var(--ink)">160</div>
+            <div class="text-[10.5px] font-semibold uppercase tracking-wider" style="color:var(--ink-faint)">birim</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- lejant -->
+      <div class="space-y-2.5 mt-5">
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-[13px]" style="color:var(--ink-soft)"><span class="w-2.5 h-2.5 rounded" style="background:var(--musait)"></span>Müsait</span>
+          <span class="mono font-semibold text-[13px]" style="color:var(--ink)">149 <span style="color:var(--ink-faint)">· %93</span></span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-[13px]" style="color:var(--ink-soft)"><span class="w-2.5 h-2.5 rounded" style="background:var(--opsiyon)"></span>Opsiyonlu</span>
+          <span class="mono font-semibold text-[13px]" style="color:var(--ink)">4 <span style="color:var(--ink-faint)">· %3</span></span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-[13px]" style="color:var(--ink-soft)"><span class="w-2.5 h-2.5 rounded" style="background:var(--satildi)"></span>Satıldı</span>
+          <span class="mono font-semibold text-[13px]" style="color:var(--ink)">6 <span style="color:var(--ink-faint)">· %4</span></span>
+        </div>
+      </div>
+
+      <div class="stokbar mt-5">
+        <div style="width:93.1%;background:var(--musait)"></div>
+        <div style="width:2.5%;background:var(--opsiyon)"></div>
+        <div style="width:3.75%;background:var(--satildi)"></div>
+      </div>
+    </div>
+
+    <!-- KOLON 2: BİNA KESİTİ -->
+    <div class="kart kart-serit serit-musait p-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+        <div class="flex items-center gap-2">
+          <h2 class="font-display font-semibold text-[15px]" style="color:var(--ink)">Bina kesiti — Çankaya Vadi Konakları</h2>
+          <span class="rozet r-belgeli">✓ Belgeli</span>
+        </div>
+        <div class="flex items-center gap-3 text-[11px]" style="color:var(--ink-soft)">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded" style="background:var(--musait)"></span>Müsait</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded" style="background:var(--opsiyon)"></span>Opsiyon</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded" style="background:var(--satildi)"></span>Satıldı</span>
+        </div>
+      </div>
+      <p class="text-[12px] mb-4" style="color:var(--ink-faint)">A Blok · 6 kat · daire bazında canlı durum — hücreye dokun: net/brüt/cephe</p>
+
+      <!-- kat satırları: 4 sütun (kat etiketi + 4 daire = 5 hücre) -->
+      <div class="space-y-2">
+        <!-- KAT 8 -->
+        <div class="grid items-stretch gap-2" style="grid-template-columns:34px repeat(4,1fr)">
+          <div class="flex items-center justify-center mono text-[11px] font-semibold rounded-md" style="background:var(--zemin-2);color:var(--ink-faint)">K8</div>
+          <div class="hucre h-musait"><span class="kod">A-31</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺14.8M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-32</span><span class="alt mono" style="color:#1d8a52">4+1 · ₺13.2M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-33</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺12.9M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-34</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺12.4M</span></div>
+        </div>
+        <!-- KAT 7 -->
+        <div class="grid items-stretch gap-2" style="grid-template-columns:34px repeat(4,1fr)">
+          <div class="flex items-center justify-center mono text-[11px] font-semibold rounded-md" style="background:var(--zemin-2);color:var(--ink-faint)">K7</div>
+          <div class="hucre h-musait"><span class="kod">A-27</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺11.6M</span></div>
+          <div class="hucre h-satildi"><span class="kod">A-28</span><span class="alt mono" style="color:#b1463b">3+1 · satıldı</span></div>
+          <div class="hucre h-musait"><span class="kod">A-29</span><span class="alt mono" style="color:#1d8a52">2+1 · ₺9.40M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-30</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺11.2M</span></div>
+        </div>
+        <!-- KAT 4 (vurgu) -->
+        <div class="grid items-stretch gap-2" style="grid-template-columns:34px repeat(4,1fr)">
+          <div class="flex items-center justify-center mono text-[11px] font-semibold rounded-md" style="background:var(--zemin-2);color:var(--ink-faint)">K4</div>
+          <div class="hucre h-musait"><span class="kod">A-15</span><span class="alt mono" style="color:#1d8a52">2+1 · ₺8.90M</span></div>
+          <div class="hucre h-satildi"><span class="kod">A-16</span><span class="alt mono" style="color:#b1463b">3+1 · satıldı</span></div>
+          <div class="hucre h-musait"><span class="kod">A-17</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺10.1M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-18</span><span class="alt mono" style="color:#1d8a52">2+1 · ₺8.10M</span></div>
+        </div>
+        <!-- KAT 3 -->
+        <div class="grid items-stretch gap-2" style="grid-template-columns:34px repeat(4,1fr)">
+          <div class="flex items-center justify-center mono text-[11px] font-semibold rounded-md" style="background:var(--zemin-2);color:var(--ink-faint)">K3</div>
+          <div class="hucre h-musait" style="box-shadow:0 0 0 2px rgba(30,155,138,.35)"><span class="kod">A-12</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺8.75M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-13</span><span class="alt mono" style="color:#1d8a52">2+1 · ₺7.60M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-14</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺9.10M</span></div>
+          <div class="hucre h-satildi"><span class="kod">A-11</span><span class="alt mono" style="color:#b1463b">2+1 · satıldı</span></div>
+        </div>
+        <!-- KAT 1 -->
+        <div class="grid items-stretch gap-2" style="grid-template-columns:34px repeat(4,1fr)">
+          <div class="flex items-center justify-center mono text-[11px] font-semibold rounded-md" style="background:var(--zemin-2);color:var(--ink-faint)">K1</div>
+          <div class="hucre h-musait"><span class="kod">A-03</span><span class="alt mono" style="color:#1d8a52">2+1 · ₺6.80M</span></div>
+          <div class="hucre h-musait"><span class="kod">A-04</span><span class="alt mono" style="color:#1d8a52">1+1 · ₺6.20M</span></div>
+          <div class="hucre h-satildi"><span class="kod">A-05</span><span class="alt mono" style="color:#b1463b">2+1 · satıldı</span></div>
+          <div class="hucre h-musait"><span class="kod">A-06</span><span class="alt mono" style="color:#1d8a52">3+1 · ₺7.95M</span></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid var(--cizgi)">
+        <span class="text-[12px]" style="color:var(--ink-faint)">Fiyat aralığı: <span class="mono font-semibold" style="color:var(--ink)">₺6.2M – ₺14.8M</span></span>
+        <span class="taze t-yesil"><span class="pt"></span>2 sa önce güncellendi</span>
+      </div>
+    </div>
+
+    <!-- KOLON 3: TALEP RADARI -->
+    <div class="kart kart-serit serit-teal p-5">
+      <div class="flex items-center justify-between mb-1">
+        <h2 class="font-display font-semibold text-[15px]" style="color:var(--ink)">Talep Radarı</h2>
+        <span class="text-[11px] font-semibold px-2 py-1 rounded-md" style="background:rgba(30,155,138,.1);color:var(--teal)">son 7 gün</span>
+      </div>
+      <p class="text-[12px] mb-4" style="color:var(--ink-faint)">Stok hareketinden damıtılmış satış zekâsı</p>
+
+      <div class="space-y-3">
+        <div class="insight">
+          <div class="insight-ikon" style="background:rgba(30,155,138,.14);color:var(--teal)">↗</div>
+          <div>
+            <p class="text-[13px] leading-snug" style="color:var(--ink)"><b>A Blok 7. kat 3+1</b> daireler son 7 günde diğer tiplere göre <b style="color:var(--teal)">%42 daha fazla</b> görüntülendi.</p>
+            <span class="text-[11px]" style="color:var(--ink-faint)">Fiyat/teslim teyidini gözden geçir</span>
+          </div>
+        </div>
+        <div class="insight">
+          <div class="insight-ikon" style="background:rgba(19,49,75,.1);color:var(--navy)">⇪</div>
+          <div>
+            <p class="text-[13px] leading-snug" style="color:var(--ink)"><b>Çankaya Vadi Konakları</b> en çok paylaşılan proje — <b style="color:var(--navy)">38 paylaşım</b>.</p>
+            <span class="text-[11px]" style="color:var(--ink-faint)">14 emlakçı tarafından dağıtıldı</span>
+          </div>
+        </div>
+        <div class="insight" style="border-color:rgba(227,161,44,.3);background:rgba(227,161,44,.06)">
+          <div class="insight-ikon" style="background:rgba(227,161,44,.16);color:#b07e1d">⏱</div>
+          <div>
+            <p class="text-[13px] leading-snug" style="color:var(--ink)"><b style="color:#b07e1d">12 birim</b> 15 günden eski — fiyat tazeliği bayatladı.</p>
+            <span class="rozet r-bayat mt-1">● bayat stok</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-sec w-full mt-4 !text-[13px]">Tüm radar içgörüleri →</button>
+    </div>
+  </section>
+
+  <!-- ===================== 2 PROJE KARTI ===================== -->
+  <section class="grid-2proje grid grid-cols-2 gap-4 mb-5">
+
+    <!-- PROJE A -->
+    <div class="kart kart-serit serit-musait p-5">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-bold text-[18px] tracking-tight" style="color:var(--ink)">Çankaya Vadi Konakları</h3>
+            <span class="rozet r-belgeli">✓ Belgeli</span>
+          </div>
+          <p class="text-[12.5px] mt-0.5" style="color:var(--ink-soft)">Ankara · Çankaya · teslim 2026 Ara</p>
+        </div>
+        <span class="taze t-yesil flex-none"><span class="pt"></span>2 sa önce</span>
+      </div>
+
+      <!-- mini KPI -->
+      <div class="grid grid-cols-4 gap-2 mb-3">
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:var(--zemin)">
+          <div class="mono font-bold text-[19px]" style="color:var(--ink)">90</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Birim</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:rgba(47,179,107,.1)">
+          <div class="mono font-bold text-[19px]" style="color:var(--musait)">84</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Müsait</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:var(--zemin)">
+          <div class="mono font-bold text-[19px]" style="color:var(--ink-faint)">0</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Opsiyon</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:rgba(209,90,78,.08)">
+          <div class="mono font-bold text-[19px]" style="color:var(--satildi)">6</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Satıldı</div>
+        </div>
+      </div>
+
+      <!-- stok bar + doluluk -->
+      <div class="flex items-center justify-between text-[12px] mb-1.5">
+        <span style="color:var(--ink-soft)">Stok doluluğu</span>
+        <span class="mono font-semibold" style="color:var(--teal)">%62 dolu</span>
+      </div>
+      <div class="stokbar mb-3">
+        <div style="width:93.3%;background:var(--musait)"></div>
+        <div style="width:6.7%;background:var(--satildi)"></div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3" style="border-top:1px solid var(--cizgi)">
+        <span class="text-[12.5px]" style="color:var(--ink-faint)">Fiyat aralığı</span>
+        <span class="mono font-semibold text-[14px]" style="color:var(--ink)">₺6.2M – ₺14.8M</span>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-navy flex-1 !py-2.5 !text-[13px]">Stoğu yönet</button>
+        <button class="btn btn-sec flex-1 !py-2.5 !text-[13px]">Bina kesiti</button>
+      </div>
+    </div>
+
+    <!-- PROJE B -->
+    <div class="kart kart-serit serit-opsiyon p-5">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-bold text-[18px] tracking-tight" style="color:var(--ink)">Test Konakları</h3>
+            <span class="rozet r-yuksek">⚡ Yeni faz</span>
+          </div>
+          <p class="text-[12.5px] mt-0.5" style="color:var(--ink-soft)">Ankara · Yenimahalle · teslim 2027 Haz</p>
+        </div>
+        <span class="taze t-amber flex-none"><span class="pt"></span>11 gün önce</span>
+      </div>
+
+      <div class="grid grid-cols-4 gap-2 mb-3">
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:var(--zemin)">
+          <div class="mono font-bold text-[19px]" style="color:var(--ink)">70</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Birim</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:rgba(47,179,107,.1)">
+          <div class="mono font-bold text-[19px]" style="color:var(--musait)">65</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Müsait</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:rgba(227,161,44,.12)">
+          <div class="mono font-bold text-[19px]" style="color:var(--opsiyon)">4</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Opsiyon</div>
+        </div>
+        <div class="rounded-xl px-2.5 py-2.5 text-center" style="background:var(--zemin)">
+          <div class="mono font-bold text-[19px]" style="color:var(--ink-faint)">0</div>
+          <div class="text-[10px] font-semibold uppercase tracking-wide" style="color:var(--ink-faint)">Satıldı</div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between text-[12px] mb-1.5">
+        <span style="color:var(--ink-soft)">Stok doluluğu</span>
+        <span class="mono font-semibold" style="color:var(--opsiyon)">%28 dolu</span>
+      </div>
+      <div class="stokbar mb-3">
+        <div style="width:92.85%;background:var(--musait)"></div>
+        <div style="width:5.71%;background:var(--opsiyon)"></div>
+      </div>
+
+      <div class="flex items-center justify-between pt-3" style="border-top:1px solid var(--cizgi)">
+        <span class="text-[12.5px]" style="color:var(--ink-faint)">Fiyat aralığı</span>
+        <span class="mono font-semibold text-[14px]" style="color:var(--ink)">₺4.1M – ₺9.3M</span>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button class="btn btn-navy flex-1 !py-2.5 !text-[13px]">Stoğu yönet</button>
+        <button class="btn btn-sec flex-1 !py-2.5 !text-[13px]">Bina kesiti</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MÜŞTERİ SORGULA ===================== -->
+  <section class="kart kart-serit serit-navy p-5 mb-4">
+    <div class="flex flex-wrap items-center gap-4 justify-between">
+      <div class="flex items-start gap-3.5 flex-1 min-w-[260px]">
+        <div class="w-11 h-11 rounded-[13px] flex items-center justify-center text-[20px] flex-none" style="background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff">🛡</div>
+        <div>
+          <h2 class="font-display font-semibold text-[16px]" style="color:var(--ink)">Müşteri Sorgula <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ml-1" style="background:rgba(30,155,138,.12);color:var(--teal)">Güven Protokolü</span></h2>
+          <p class="text-[12.5px] mt-0.5 max-w-[460px]" style="color:var(--ink-soft)">Müşteri telefonunu sorgula — bu birim başka müteahhit/emlakçıda zaten opsiyonda mı, çift-satış riski var mı anında gör.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2.5 flex-1 min-w-[300px] max-w-[480px]">
+        <input class="arama mono" placeholder="0 5__ ___ __ __  ·  müşteri telefonu" />
+        <button class="btn btn-teal !px-5 flex-none">Sorgula</button>
+      </div>
+    </div>
+
+    <!-- örnek sonuç -->
+    <div class="flex flex-wrap items-center gap-3 mt-4 pt-4" style="border-top:1px solid var(--cizgi)">
+      <span class="rozet" style="background:rgba(47,179,107,.12);color:var(--musait)">● Çift-satış riski yok</span>
+      <span class="text-[12.5px]" style="color:var(--ink-soft)">Son 30 günde bu numara için aktif opsiyon/teyit bulunamadı.</span>
+      <span class="taze t-teal ml-auto"><span class="pt"></span>anlık DB taraması</span>
+    </div>
+  </section>
+
+  <div class="text-center text-[11.5px] py-3" style="color:var(--ink-faint)">
+    ProjePazar · canlı konut stoğu dağıtım ağı · Demosaha İnşaat kokpiti — veri canlı, satış buradan yönetilir.
+  </div>
+
+</main>
+</body>
+</html>

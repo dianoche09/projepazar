@@ -16,21 +16,21 @@ export function AuthKabuk({ children }: { children: React.ReactNode }) {
     <main className="flex flex-1 items-stretch bg-paper min-h-screen">
       <div className="grid w-full lg:grid-cols-[1.05fr_1fr]">
         {/* SOL — marka komuta paneli (yalnız desktop) */}
-        <aside className="aurora relative hidden overflow-hidden bg-gradient-to-br from-[#020617] via-[#090d16] to-[#0f172a] border-r border-white/5 lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
-          <div className="izgara-doku pointer-events-none absolute inset-0 opacity-[0.03]" aria-hidden />
+        <aside className="aurora relative hidden overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100 border-r border-slate-200/80 lg:flex lg:flex-col lg:justify-between lg:p-12 xl:p-16">
+          <div className="izgara-doku pointer-events-none absolute inset-0 opacity-[0.06]" aria-hidden />
 
           {/* Glow circle overlay */}
-          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-teal/5 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
 
           <Link
             href="/"
-            className="relative z-10 inline-flex items-center gap-3 font-display text-2xl font-semibold text-white tracking-tight"
+            className="relative z-10 inline-flex items-center gap-3 font-display text-2xl font-bold text-slate-900 tracking-tight"
           >
             <span className="grid grid-cols-3 gap-1" aria-hidden>
               {Array.from({ length: 9 }).map((_, i) => (
                 <span
                   key={i}
-                  className={`size-2.5 rounded-[3px] ${i === 4 ? "bg-green nabiz shadow-[0_0_10px_var(--color-green)]" : "bg-white/20"}`}
+                  className={`size-2.5 rounded-[3px] ${i === 4 ? "bg-teal shadow-[0_0_10px_rgba(37,99,235,0.4)]" : "bg-slate-300"}`}
                 />
               ))}
             </span>
@@ -38,11 +38,11 @@ export function AuthKabuk({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="belir relative z-10">
-            <h2 className="max-w-md font-display text-3xl font-extrabold leading-[1.15] text-gradient xl:text-4xl">
+            <h2 className="max-w-md font-display text-3xl font-extrabold leading-[1.15] text-slate-950 xl:text-4xl">
               Canlı konut stoğu, <br />
               <span className="text-gradient-cyan">tek komuta merkezinden.</span>
             </h2>
-            <p className="mt-4 max-w-md text-pretty text-sm leading-relaxed text-gray/80">
+            <p className="mt-4 max-w-md text-pretty text-sm leading-relaxed text-slate-500 font-medium">
               Üretici stoğu, fiyatı ve dağıtımı tek noktadan yönetir. Danışman yalnız kendisine
               tahsisli birimleri canlı havuzdan görür ve paylaşır.
             </p>
@@ -50,7 +50,7 @@ export function AuthKabuk({ children }: { children: React.ReactNode }) {
               {sinyaller.map(([renk, metin], i) => (
                 <li
                   key={metin}
-                  className={`belir belir-${i + 2} flex items-center gap-3.5 text-sm text-gray/90`}
+                  className={`belir belir-${i + 2} flex items-center gap-3.5 text-sm text-slate-700 font-medium`}
                 >
                   <span className={`size-2 shrink-0 rounded-full ${renk}`} aria-hidden />
                   {metin}
@@ -59,25 +59,25 @@ export function AuthKabuk({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
 
-          <p className="relative z-10 font-mono text-xs tracking-wider text-gray/40">
+          <p className="relative z-10 font-mono text-xs tracking-wider text-slate-400 font-bold">
             ● AĞ CANLI · GÜVEN PROTOKOLÜ AKTİF
           </p>
         </aside>
 
         {/* SAĞ — form alanı */}
-        <section className="flex items-center justify-center px-6 py-12 bg-[#090d16] sm:px-10 relative">
-          <div className="absolute inset-0 bg-radial-gradient from-teal/5 to-transparent pointer-events-none" />
+        <section className="flex items-center justify-center px-6 py-12 bg-white sm:px-10 relative">
+          <div className="absolute inset-0 bg-radial-gradient from-blue-500/5 to-transparent pointer-events-none" />
           <div className="belir w-full max-w-sm z-10">
             {/* mobil wordmark — desktop'ta sol panelde var */}
             <Link
               href="/"
-              className="mb-8 flex items-center justify-center gap-3 font-display text-xl font-semibold text-white lg:hidden"
+              className="mb-8 flex items-center justify-center gap-3 font-display text-xl font-bold text-slate-900 lg:hidden"
             >
               <span className="grid grid-cols-3 gap-0.5" aria-hidden>
                 {Array.from({ length: 9 }).map((_, i) => (
                   <span
                     key={i}
-                    className={`size-2 rounded-[2px] ${i === 4 ? "bg-green nabiz shadow-[0_0_8px_var(--color-green)]" : "bg-white/20"}`}
+                    className={`size-2 rounded-[2px] ${i === 4 ? "bg-teal shadow-[0_0_8px_rgba(37,99,235,0.4)]" : "bg-slate-300"}`}
                   />
                 ))}
               </span>

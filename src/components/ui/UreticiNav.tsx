@@ -55,10 +55,10 @@ export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
         <Link
           key={l.yol}
           href={l.yol}
-          className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+          className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-bold transition-all duration-200 ${
             aktif(l)
-              ? "bg-white/5 border border-white/10 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-              : "border border-transparent text-gray/70 hover:bg-white/5 hover:text-white"
+              ? "bg-blue-50/70 border border-blue-200/50 text-teal shadow-sm"
+              : "border border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800"
           }`}
         >
           <Ikon ad={l.yol} />
