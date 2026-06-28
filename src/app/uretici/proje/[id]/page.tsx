@@ -75,7 +75,7 @@ export default async function ProjeDetay({
   };
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="belir mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <ProjeKomutBari proje={proje} kapakUrl={kapak?.url ?? null} stats={stats} />
 
       {hata ? (
