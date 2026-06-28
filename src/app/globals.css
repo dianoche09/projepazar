@@ -139,3 +139,104 @@ a:focus-visible,
   outline: 2px solid var(--color-teal);
   outline-offset: 2px;
 }
+
+/* =========================================================
+   MARKA + HAREKET KATMANI — login · dashboard · mobil ortak
+   Albeni var ama dekoratif değil: "komut merkezi" dili.
+   Hepsi prefers-reduced-motion'da kapanır (erişilebilirlik).
+   ========================================================= */
+
+/* Giriş — bölüm/kart aşağıdan yumuşak belirir (+ kademeli stagger) */
+@keyframes belir {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.belir {
+  animation: belir 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.belir-1 {
+  animation-delay: 0.06s;
+}
+.belir-2 {
+  animation-delay: 0.13s;
+}
+.belir-3 {
+  animation-delay: 0.2s;
+}
+.belir-4 {
+  animation-delay: 0.27s;
+}
+.belir-5 {
+  animation-delay: 0.34s;
+}
+
+/* Komut-merkezi imzası: blueprint ızgara dokusu — navy zeminlerde */
+.izgara-doku {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* Marka ışıması (aurora) — navy komut panelinde teal/yeşil derinlik */
+.aurora::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(58% 48% at 16% 10%, rgba(30, 155, 138, 0.32), transparent 70%),
+    radial-gradient(46% 42% at 90% 92%, rgba(47, 179, 107, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+/* Hafif yüzme — dekoratif marka öğeleri (yavaş, dikkat dağıtmaz) */
+@keyframes yuzme {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.yuzme {
+  animation: yuzme 6s ease-in-out infinite;
+}
+
+/* Shimmer — yükleniyor iskeleti */
+@keyframes parilti {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.iskelet {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-hair);
+}
+.iskelet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: parilti 1.4s infinite;
+}
+
+/* Erişilebilirlik: "hareketi azalt" isteğine TAM saygı */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
