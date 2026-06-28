@@ -75,22 +75,22 @@ export default async function ProjeDetay({
   };
 
   return (
-    <div className="belir mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="belir mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       <ProjeKomutBari proje={proje} kapakUrl={kapak?.url ?? null} stats={stats} />
 
       {hata ? (
-        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">
+        <p role="alert" className="mt-4 rounded-xl border border-red/20 bg-red-soft px-4 py-2.5 text-sm font-medium text-red">
           {hata}
         </p>
       ) : null}
       {mesaj ? (
-        <p className="mt-4 rounded-lg border border-green/30 bg-green/10 px-3 py-2 text-sm text-ink">
+        <p className="mt-4 rounded-xl border border-green/20 bg-green-soft px-4 py-2.5 text-sm font-medium text-teal-d">
           {mesaj}
         </p>
       ) : null}
 
       {/* Künye · Parsel & İmar — salt-okunur özet (düzenleme: Proje Kurulumu) */}
-      <details className="mt-6 rounded-2xl border border-hair bg-card p-5">
+      <details className="kart mt-6 p-5">
         <summary className="flex cursor-pointer items-center justify-between gap-2">
           <span className="font-display text-base font-semibold text-ink">Künye · Parsel & İmar</span>
           <Link href={`/uretici/proje/${id}/kurulum`} className="text-xs font-medium text-teal-d hover:underline">
@@ -161,12 +161,12 @@ export default async function ProjeDetay({
               .map((bid) => blokMap.get(bid) ?? "?")
               .join(", ");
             return (
-              <div key={t.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-hair bg-card p-3">
-                <span className="rounded-full bg-teal/10 px-2.5 py-1 text-xs font-medium text-teal">
+              <div key={t.id} className="kart flex flex-wrap items-center gap-3 p-3.5">
+                <span className="rozet bg-teal-soft text-teal-d">
                   {t.hedef_tip === "herkes" ? "Herkese açık" : ofisMap.get(t.hedef_id) ?? "Ofis"}
                 </span>
-                <span className="text-sm text-gray">{bloklarKapsam || "tüm proje"}</span>
-                <span className="font-mono text-xs text-gray">
+                <span className="text-sm text-ink-soft">{bloklarKapsam || "tüm proje"}</span>
+                <span className="mono text-xs text-[var(--ink-faint)]">
                   {t.komisyon_tip === "yok"
                     ? "komisyon yok"
                     : t.komisyon_tip === "yuzde"
@@ -179,7 +179,7 @@ export default async function ProjeDetay({
                 <form action={tahsisSil} className="ml-auto">
                   <input type="hidden" name="tahsis_id" value={t.id} />
                   <input type="hidden" name="proje_id" value={id} />
-                  <button className="rounded-lg border border-hair px-3 py-1 text-sm text-red transition-colors hover:border-red">
+                  <button className="rounded-lg border border-hair px-3 py-1.5 text-sm font-medium text-red transition-colors hover:border-red hover:bg-red-soft">
                     Kaldır
                   </button>
                 </form>
