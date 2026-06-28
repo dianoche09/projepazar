@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { zamanOnce } from "@/lib/types";
 import { Donut, Lejant, OranBar, YiginBar } from "@/components/ui/Grafik";
+import { projeKapak } from "@/lib/gorsel";
 
 const C = { green: "#10b981", amber: "#f59e0b", red: "#ef4444", navy: "#1e293b" };
 
@@ -147,22 +148,17 @@ export default async function UreticiKokpit() {
               { etiket: "Opsiyon", deger: o.opsiyon, renk: C.amber },
               { etiket: "Satıldı", deger: o.satildi, renk: C.red },
             ];
-            const kapak = kapakMap.get(p.id);
+            const kapak = projeKapak(kapakMap.get(p.id), p.id);
             return (
               <Link
                 key={p.id}
                 href={`/uretici/proje/${p.id}`}
-                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card transition-all duration-300 hover:shadow-cardlg hover:-translate-y-0.5"
+                className="group overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-all duration-300 hover:shadow-cardlg hover:-translate-y-0.5"
               >
                 <div className="relative h-44 overflow-hidden sm:h-48">
-                  {kapak ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200">
-                      <span className="select-none font-display text-5xl font-extrabold text-slate-300/40">{(p.ad ?? "P").charAt(0).toUpperCase()}</span>
-                    </div>
-                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
                   {p.belge_dogrulandi ? (
                     <span className="absolute right-3 top-3 rounded-xl bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-bold text-teal shadow-sm">✓ Belgeli</span>
                   ) : null}

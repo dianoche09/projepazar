@@ -5,6 +5,7 @@ import Link from "next/link";
 import { zamanOnce } from "@/lib/types";
 import { YiginBar } from "@/components/ui/Grafik";
 import { HavuzFiltreler } from "./HavuzFiltreler";
+import { projeKapak } from "@/lib/gorsel";
 
 export type ProjeKart = {
   id: string;
@@ -159,6 +160,7 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
       <div className="grid gap-6 lg:grid-cols-2">
         {liste.map((p, i) => {
           const wa = `${p.ad} · ${[p.ilce, p.il].filter(Boolean).join(", ")}${p.min ? ` · ${fiyat(p.min)} ${paraSimge(p.para_birimi)}'den` : ""}`;
+          const kapak = projeKapak(p.kapak, p.id);
           return (
             <div
               key={p.id}
@@ -167,17 +169,9 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
             >
               {/* thumb — render görsel */}
               <Link href={`/havuz/proje/${p.id}`} className="relative block h-[180px] overflow-hidden border-b border-slate-100">
-                {p.kapak ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
-                ) : (
-                  <>
-                    <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200" />
-                    <span className="absolute inset-0 flex select-none items-center justify-center font-display text-7xl font-extrabold text-slate-300/40">
-                      {p.ad.charAt(0).toUpperCase()}
-                    </span>
-                  </>
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
                 {p.belge_dogrulandi && (
                   <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200/60 px-2.5 py-1 text-[11px] font-bold text-teal shadow-sm">
                     ✓ Doğrulanmış
