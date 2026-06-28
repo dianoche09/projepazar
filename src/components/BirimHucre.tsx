@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { DURUM_BG, DURUM_ETIKET } from "@/lib/types";
+import { DURUM_ETIKET } from "@/lib/types";
 import { DaireModal, type ModalBirim } from "./DaireModal";
 import { useSecim } from "./SecimDuzenle";
 
-/** Izgara hücresi — tıklanınca merkezi Daire MODAL açar. mod: üretici (durum/not) | emlakçı (paylaş). */
+/** Birim durumu → bina kesiti hücre gradyan sınıfı (v2 .hucre). */
+function hucreSinif(durum: string): string {
+  if (durum === "musait") return "h-musait";
+  if (durum === "opsiyonlu" || durum === "satis_beklemede") return "h-opsiyon";
+  if (durum === "satildi") return "h-satildi";
+  return "h-bos";
+}
+
+/**
+ * Bina kesiti hücresi — durum-renkli gradient + daire no + tip (oda).
+ * Tıkla → merkezi Daire MODAL. mod: üretici (durum/not) | emlakçı (paylaş/opsiyon).
+ * Seçim modunda (SecimDuzenle) toplu işaretleme.
+ */
 export function BirimHucre({
   birim,
   projeId,
@@ -23,16 +35,28 @@ export function BirimHucre({
   const secim = useSecim();
   const secimModu = secim?.secimModu ?? false;
   const seciliMi = secim?.secili.has(birim.id) ?? false;
+  const tip = birim.oda ?? birim.tip_ad ?? "";
 
   return (
     <>
       <button
         type="button"
         onClick={() => (secimModu ? secim!.toggle(birim.id) : setAcik(true))}
-        title={`${birim.daire_no} · ${DURUM_ETIKET[birim.durum]}${!birim.satilabilir ? " · arsa payı (satılamaz)" : ""}`}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-lg font-mono text-[10px] text-white transition-transform hover:scale-105 ${DURUM_BG[birim.durum]} ${!birim.satilabilir ? "opacity-70 ring-2 ring-inset ring-white/60" : ""} ${seciliMi ? "scale-105 ring-2 ring-ink ring-offset-1" : ""}`}
+        title={`${birim.daire_no ?? ""} · ${DURUM_ETIKET[birim.durum]}${!birim.satilabilir ? " · arsa payı (satılamaz)" : ""}`}
+        className={`hucre min-w-[48px] shrink-0 ${hucreSinif(birim.durum)} ${
+          !birim.satilabilir ? "opacity-80 ring-1 ring-inset ring-white/55" : ""
+        } ${seciliMi ? "ring-2 ring-white" : ""}`}
       >
-        {seciliMi ? "✓" : birim.daire_no}
+        {seciliMi ? (
+          <span className="text-[14px] font-bold">✓</span>
+        ) : (
+          <>
+            <span className="font-mono text-[11px] font-bold leading-none">{birim.daire_no ?? "—"}</span>
+            {tip ? (
+              <span className="mt-[3px] text-[8.5px] font-semibold leading-none opacity-85">{tip}</span>
+            ) : null}
+          </>
+        )}
       </button>
 
       {acik && !secimModu ? (
