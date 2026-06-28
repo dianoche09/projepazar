@@ -131,7 +131,8 @@ create table birim (
   yon text, manzara text,
   net_m2 numeric, brut_m2 numeric,
   sahiplik       sahiplik default 'muteahhit',   -- kat karşılığı etiketi (basit)
-  odeme_plani_url text,                     -- MVP: text/PDF eki
+  odeme_plani_url text,                     -- (eski) text/PDF eki — gösterim artık odeme_plani jsonb'den
+  odeme_plani    jsonb,                      -- {pesinat_pct, taksit_sayisi, ara_odemeler:[{ay,pct}], vade_farki_pct, para_birimi} (2026-06-28)
   durum_notu     text,                      -- durum değişimi notu (opsiyon: kim/ne zaman; satış: alıcı vb.)
   son_guncelleme timestamptz default now(),
   stale          boolean default false,     -- Tazelik Sigortası
