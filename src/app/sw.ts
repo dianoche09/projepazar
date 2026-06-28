@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { Serwist, NetworkFirst } from "serwist";
 
 // PWA service worker (serwist). next.config.ts swSrc tarafından derlenir.
 declare global {
@@ -17,7 +17,15 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  // Sayfa gezinmeleri NetworkFirst → online'da HER ZAMAN taze build gelir
+  // (eski "deploy sonrası eski görünüyor" sorununu bitirir); offline'da cache fallback.
+  runtimeCaching: [
+    {
+      matcher: ({ request }) => request.mode === "navigate",
+      handler: new NetworkFirst({ cacheName: "sayfalar", networkTimeoutSeconds: 3 }),
+    },
+    ...defaultCache,
+  ],
 });
 
 serwist.addEventListeners();
