@@ -25,6 +25,12 @@ export type ProjeKart = {
   max: number | null;
   tipler: string[];
   kapak: string | null;
+  // Connject-paritesi: birim türü + para birimi + yatırım/yabancı alanları
+  turler: string[];
+  para_birimi: string;
+  oturum_uygun: boolean;
+  golden_visa: boolean;
+  kira_getirisi: number | null;
 };
 
 function fiyat(n: number): string {
@@ -34,6 +40,10 @@ function fiyat(n: number): string {
 }
 function yil(iso: string | null): string {
   return iso ? `Teslim ${new Date(iso).getFullYear()}` : "";
+}
+const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
+function paraSimge(p: string): string {
+  return PARA_SIMGE[p] ?? "₺";
 }
 
 /** Mini kat planı çipi (Ekranlar.html typchip .mini) */
@@ -54,6 +64,13 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   const [ilce, setIlce] = useState("");
   const [tip, setTip] = useState<string[]>([]);
   const [durum, setDurum] = useState<"" | "musait" | "opsiyon">("");
+  const [tur, setTur] = useState<string[]>([]);
+  const [paraBirimi, setParaBirimi] = useState("");
+  const [fiyatMin, setFiyatMin] = useState("");
+  const [fiyatMax, setFiyatMax] = useState("");
+  const [goldenViza, setGoldenViza] = useState(false);
+  const [oturum, setOturum] = useState(false);
+  const [minKira, setMinKira] = useState("");
   const [sirala, setSirala] = useState<"taze" | "ucuz" | "musait">("taze");
 
   const iller = useMemo(() => [...new Set(projeler.map((p) => p.il).filter(Boolean))] as string[], [projeler]);
@@ -68,19 +85,34 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
         (!il || p.il === il) &&
         (!ilce || p.ilce === ilce) &&
         (!tip.length || tip.some((t) => p.tipler.some((pt) => pt.startsWith(t)))) &&
-        (durum === "" || (durum === "musait" ? p.musait > 0 : p.opsiyon > 0)),
+        (durum === "" || (durum === "musait" ? p.musait > 0 : p.opsiyon > 0)) &&
+        (!tur.length || tur.some((t) => p.turler.includes(t))) &&
+        (!paraBirimi || p.para_birimi === paraBirimi) &&
+        (!fiyatMin || (p.max != null && p.max >= Number(fiyatMin))) &&
+        (!fiyatMax || (p.min != null && p.min <= Number(fiyatMax))) &&
+        (!goldenViza || p.golden_visa) &&
+        (!oturum || p.oturum_uygun) &&
+        (!minKira || (p.kira_getirisi != null && p.kira_getirisi >= Number(minKira))),
     );
     return [...l].sort((a, b) => {
       if (sirala === "ucuz") return (a.min ?? Infinity) - (b.min ?? Infinity);
       if (sirala === "musait") return b.musait - a.musait;
       return b.son_guncelleme.localeCompare(a.son_guncelleme);
     });
-  }, [projeler, il, ilce, tip, durum, sirala]);
+  }, [projeler, il, ilce, tip, durum, tur, paraBirimi, fiyatMin, fiyatMax, goldenViza, oturum, minKira, sirala]);
 
   const toplamBirim = projeler.reduce((t, p) => t + p.toplam, 0);
   const tipAcKapa = (t: string) => setTip((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
-  const aktifSayi = (il ? 1 : 0) + (ilce ? 1 : 0) + tip.length + (durum ? 1 : 0);
-  const filtreProps = { il, setIl, ilce, setIlce, tip, tipAcKapa, durum, setDurum, iller, ilceler };
+  const turAcKapa = (t: string) => setTur((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
+  const aktifSayi =
+    (il ? 1 : 0) + (ilce ? 1 : 0) + tip.length + (durum ? 1 : 0) + tur.length +
+    (paraBirimi ? 1 : 0) + (fiyatMin ? 1 : 0) + (fiyatMax ? 1 : 0) +
+    (goldenViza ? 1 : 0) + (oturum ? 1 : 0) + (minKira ? 1 : 0);
+  const filtreProps = {
+    il, setIl, ilce, setIlce, tip, tipAcKapa, durum, setDurum, iller, ilceler,
+    tur, turAcKapa, paraBirimi, setParaBirimi, fiyatMin, setFiyatMin, fiyatMax, setFiyatMax,
+    goldenViza, setGoldenViza, oturum, setOturum, minKira, setMinKira,
+  };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
@@ -189,9 +221,23 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
                     <span><span className="mr-1.5 inline-block size-2 rounded-full bg-red align-middle" /><b className="text-ink">{p.satildi}</b> satıldı</span>
                   </div>
 
+                  {(p.kira_getirisi != null || p.oturum_uygun || p.golden_visa) && (
+                    <div className="mb-2 flex flex-wrap gap-1.5 text-[11px] font-medium">
+                      {p.kira_getirisi != null && (
+                        <span className="rounded-md bg-teal-soft px-2 py-0.5 text-teal-d">%{p.kira_getirisi} kira getirisi</span>
+                      )}
+                      {p.oturum_uygun && (
+                        <span className="rounded-md bg-navy-soft px-2 py-0.5 text-navy">Oturum uygun</span>
+                      )}
+                      {p.golden_visa && (
+                        <span className="rounded-md bg-amber/15 px-2 py-0.5 text-amber">Golden Vize</span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="mb-3 flex items-center justify-between">
                     <span className="font-mono text-[14.5px] font-medium text-ink">
-                      {p.min != null ? `${fiyat(p.min)} – ${p.max != null ? fiyat(p.max) : ""} ₺` : "fiyat —"}
+                      {p.min != null ? `${fiyat(p.min)} – ${p.max != null ? fiyat(p.max) : ""} ${paraSimge(p.para_birimi)}` : "fiyat —"}
                     </span>
                     <span className="font-mono text-[11px] text-gray">KDV dahil</span>
                   </div>

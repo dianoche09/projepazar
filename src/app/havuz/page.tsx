@@ -8,9 +8,9 @@ export default async function Havuz() {
   const [{ data: projeler }, { data: birimler }, { data: tipler }, { data: kapaklar }] = await Promise.all([
     supabase
       .from("proje")
-      .select("id, ad, il, ilce, mahalle, belge_dogrulandi, son_guncelleme, insaat_asamasi, ilerleme_yuzde, teslim_tarihi")
+      .select("id, ad, il, ilce, mahalle, belge_dogrulandi, son_guncelleme, insaat_asamasi, ilerleme_yuzde, teslim_tarihi, para_birimi, oturum_uygun, golden_visa_esik, kira_getirisi_pct")
       .order("son_guncelleme", { ascending: false }),
-    supabase.from("birim").select("proje_id, tip_id, durum, liste_fiyati"),
+    supabase.from("birim").select("proje_id, tip_id, durum, liste_fiyati, tur"),
     supabase.from("daire_tipi").select("proje_id, oda, ad, net_m2"),
     supabase.from("proje_belge").select("proje_id, url").eq("tip", "kapak"),
   ]);
@@ -46,6 +46,11 @@ export default async function Havuz() {
       max: fiyatlar.length ? Math.max(...fiyatlar) : null,
       tipler: tipSet,
       kapak: kapakMap.get(p.id) ?? null,
+      turler: [...new Set(bb.map((b) => b.tur).filter(Boolean))] as string[],
+      para_birimi: p.para_birimi ?? "TRY",
+      oturum_uygun: !!p.oturum_uygun,
+      golden_visa: p.golden_visa_esik != null,
+      kira_getirisi: p.kira_getirisi_pct != null ? Number(p.kira_getirisi_pct) : null,
     };
   });
 
