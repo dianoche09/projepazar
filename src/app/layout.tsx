@@ -1,12 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Geist_Mono } from "next/font/google";
+import { Outfit, Inter, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { PwaKur } from "@/components/ui/PwaKur";
 import "./globals.css";
 
-// Modern space typography: Outfit (UI & display) + Geist Mono (data/numbers)
+// Spatial tipografi: Outfit (başlık/wordmark) + Inter (arayüz) + Geist Mono (veri/sayı)
 const outfit = Outfit({
   variable: "--font-outfit",
+  subsets: ["latin"],
+  display: "swap",
+});
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -33,7 +38,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f4f5",
+  themeColor: "#eef1f6",
   width: "device-width",
   initialScale: 1,
 };
@@ -44,10 +49,10 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${outfit.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${inter.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
-        <NextTopLoader color="#2563eb" height={3} shadow="0 0 8px #2563eb" showSpinner={false} speed={250} />
+        <NextTopLoader color="#1e9b8a" height={3} shadow="0 0 8px #1e9b8a" showSpinner={false} speed={250} />
         {children}
         <PwaKur />
       </body>
