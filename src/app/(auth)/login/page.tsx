@@ -4,7 +4,7 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { AuthKabuk } from "@/components/ui/AuthKabuk";
 
 const inpCls =
-  "rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 font-sans text-base text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-teal focus:bg-white";
+  "min-h-12 w-full rounded-xl border border-hair bg-soft px-4 font-sans text-base text-ink outline-none transition-all placeholder:text-ink-soft/55 focus:border-teal focus:bg-white focus:ring-4 focus:ring-teal/12";
 
 export default async function LoginPage({
   searchParams,
@@ -15,9 +15,9 @@ export default async function LoginPage({
 
   return (
     <AuthKabuk>
-      <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-cardlg">
-        <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">Giriş yap</h1>
-        <p className="mt-2 text-sm text-slate-500 font-medium">
+      <div className="kart p-6 sm:p-8">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">Giriş yap</h1>
+        <p className="mt-2 text-sm font-medium text-ink-soft">
           Canlı stok ağına eriş. E-posta ve parolanla devam et.
         </p>
 
@@ -36,7 +36,7 @@ export default async function LoginPage({
         )}
 
         <form action={girisYap} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-2 text-sm font-bold text-slate-800">
+          <label className="flex flex-col gap-2 text-sm font-bold text-ink">
             E-posta
             <input
               name="email"
@@ -47,7 +47,7 @@ export default async function LoginPage({
               className={inpCls}
             />
           </label>
-          <label className="flex flex-col gap-2 text-sm font-bold text-slate-800">
+          <label className="flex flex-col gap-2 text-sm font-bold text-ink">
             Parola
             <input
               name="password"
@@ -60,11 +60,15 @@ export default async function LoginPage({
             />
           </label>
 
-          <SubmitButton className="mt-4 w-full bg-teal text-white hover:bg-teal-d rounded-xl py-3.5 font-bold transition-all duration-300 shadow-[0_4px_12px_rgba(37,99,235,0.2)]" bekleyenMetin="Giriş yapılıyor…">
+          <SubmitButton
+            varyant="teal"
+            bekleyenMetin="Giriş yapılıyor…"
+            className="mt-4 min-h-12 w-full rounded-xl bg-teal py-3.5 text-base font-bold text-white hover:bg-teal-d shadow-[0_6px_16px_rgba(30,155,138,0.3)]"
+          >
             Giriş yap
           </SubmitButton>
         </form>
-        <p className="mt-6 border-t border-slate-100 pt-4 text-center text-sm text-slate-500 font-medium">
+        <p className="mt-6 border-t border-hair pt-4 text-center text-sm font-medium text-ink-soft">
           Hesabın yok mu?{" "}
           <Link href="/kayit" className="font-bold text-teal hover:underline">
             Kayıt ol
@@ -72,7 +76,7 @@ export default async function LoginPage({
         </p>
       </div>
 
-      <p className="mt-6 text-center text-xs text-slate-400 font-semibold">
+      <p className="mt-6 text-center text-xs font-semibold text-ink-soft/70">
         Kapalı devre B2B ağ · yalnızca davetli üretici ve danışmanlar.
       </p>
     </AuthKabuk>

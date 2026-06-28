@@ -19,9 +19,9 @@ export default async function KayitPage({
 
   return (
     <AuthKabuk>
-      <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-cardlg">
-        <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">Hesap oluştur</h1>
-        <p className="mt-2 text-sm text-slate-500 font-medium">
+      <div className="kart p-6 sm:p-8">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">Hesap oluştur</h1>
+        <p className="mt-2 text-sm font-medium text-ink-soft">
           Kaydın admin onayından sonra aktifleşir. Onaylanınca giriş yapıp paneline erişirsin.
         </p>
 
@@ -33,7 +33,7 @@ export default async function KayitPage({
 
         <KayitForm />
 
-        <p className="mt-6 border-t border-slate-100 pt-4 text-center text-sm text-slate-500 font-medium">
+        <p className="mt-6 border-t border-hair pt-4 text-center text-sm font-medium text-ink-soft">
           Zaten hesabın var mı?{" "}
           <Link href="/login" className="font-bold text-teal hover:underline">
             Giriş yap
@@ -41,7 +41,7 @@ export default async function KayitPage({
         </p>
       </div>
 
-      <p className="mt-6 text-center text-xs text-slate-400 font-semibold">
+      <p className="mt-6 text-center text-xs font-semibold text-ink-soft/70">
         Kapalı devre B2B ağ · yalnızca davetli üretici ve danışmanlar.
       </p>
     </AuthKabuk>
