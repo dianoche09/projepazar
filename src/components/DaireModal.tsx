@@ -31,9 +31,17 @@ export type ModalBirim = {
   tip_ad: string | null;
   oda: string | null;
   plan_url?: string | null;
+  odeme_plani?: OdemePlani;
 };
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
+const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
+type OdemePlani = {
+  pesinat_pct?: number | null;
+  taksit_sayisi?: number | null;
+  vade_farki_pct?: number | null;
+  ara_odemeler?: { ay: number; pct: number }[] | null;
+} | null;
 
 function Kaydet() {
   const { pending } = useFormStatus();
@@ -72,6 +80,7 @@ export function DaireModal({
 
   const taban = birim.taban_fiyat;
   const liste = birim.liste_fiyati;
+  const psim = PARA_SIMGE[birim.para_birimi] ?? "₺";
   const sKat = birim.serefiye?.kat ?? null;
   const sManzara = birim.serefiye?.manzara ?? null;
   const katKatki = taban != null && sKat ? Math.round((taban * sKat) / 100) : null;
@@ -83,7 +92,7 @@ export function DaireModal({
     projeAd,
     `Daire ${birim.daire_no ?? ""}`.trim(),
     birim.oda ?? birim.tip_ad ?? "",
-    liste != null ? `${fmt(liste)} ${birim.para_birimi === "TRY" ? "₺" : birim.para_birimi}` : "",
+    liste != null ? `${fmt(liste)} ${psim}` : "",
     shareUrl,
   ]
     .filter(Boolean)
@@ -148,34 +157,68 @@ export function DaireModal({
           <div className="mt-4 rounded-xl border border-hair bg-paper p-3 font-mono text-sm">
             <div className="flex justify-between">
               <span className="text-gray">Taban fiyat</span>
-              <span className="text-ink">{fmt(taban)} ₺</span>
+              <span className="text-ink">{fmt(taban)} {psim}</span>
             </div>
             {katKatki != null ? (
               <div className="flex justify-between">
                 <span className="text-gray">+ Kat şerefiyesi %{sKat}</span>
-                <span className="text-ink">+{fmt(katKatki)} ₺</span>
+                <span className="text-ink">+{fmt(katKatki)} {psim}</span>
               </div>
             ) : null}
             {manzaraKatki != null ? (
               <div className="flex justify-between">
                 <span className="text-gray">+ Manzara şerefiyesi %{sManzara}</span>
-                <span className="text-ink">+{fmt(manzaraKatki)} ₺</span>
+                <span className="text-ink">+{fmt(manzaraKatki)} {psim}</span>
               </div>
             ) : null}
             {katKatki == null && manzaraKatki == null && fark != null && fark !== 0 ? (
               <div className="flex justify-between">
                 <span className="text-gray">+ Kat/konum farkı</span>
-                <span className="text-ink">{fark > 0 ? "+" : ""}{fmt(fark)} ₺</span>
+                <span className="text-ink">{fark > 0 ? "+" : ""}{fmt(fark)} {psim}</span>
               </div>
             ) : null}
             <div className="mt-1 flex justify-between border-t border-hair pt-1 font-semibold">
               <span className="text-ink">Liste fiyatı</span>
-              <span className="text-ink">{liste != null ? fmt(liste) : "—"} ₺</span>
+              <span className="text-ink">{liste != null ? fmt(liste) : "—"} {psim}</span>
             </div>
           </div>
         ) : liste != null ? (
-          <p className="mt-4 font-mono text-lg text-ink">{fmt(liste)} ₺</p>
+          <p className="mt-4 font-mono text-lg text-ink">{fmt(liste)} {psim}</p>
         ) : null}
+
+        {/* Ödeme planı — proje şablonu × canlı fiyat (Connject paritesi; aylık taksit fiyattan hesaplanır) */}
+        {liste != null && birim.odeme_plani && (birim.odeme_plani.pesinat_pct != null || birim.odeme_plani.taksit_sayisi != null)
+          ? (() => {
+              const op = birim.odeme_plani!;
+              const pesinatPct = op.pesinat_pct ?? 0;
+              const araPct = (op.ara_odemeler ?? []).reduce((t, a) => t + (a?.pct ?? 0), 0);
+              const pesinat = Math.round((liste * pesinatPct) / 100);
+              const kalan = Math.max(0, liste - pesinat - Math.round((liste * araPct) / 100));
+              const ay = op.taksit_sayisi ?? 0;
+              const vade = op.vade_farki_pct ?? 0;
+              const aylik = ay > 0 ? Math.round((kalan * (1 + vade / 100)) / ay) : null;
+              return (
+                <div className="mt-3 rounded-xl border border-hair bg-paper p-3 text-sm">
+                  <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray">Ödeme Planı</p>
+                  <div className="space-y-1 font-mono">
+                    {pesinatPct ? (
+                      <div className="flex justify-between">
+                        <span className="text-gray">Peşinat %{pesinatPct}</span>
+                        <span className="text-ink">{fmt(pesinat)} {psim}</span>
+                      </div>
+                    ) : null}
+                    {aylik != null ? (
+                      <div className="flex justify-between">
+                        <span className="text-gray">{ay} ay taksit</span>
+                        <span className="font-semibold text-ink">{fmt(aylik)} {psim}/ay</span>
+                      </div>
+                    ) : null}
+                  </div>
+                  {vade === 0 ? <p className="mt-1.5 text-[11px] font-medium text-teal-d">Vade farksız</p> : null}
+                </div>
+              );
+            })()
+          : null}
 
         {mod === "uretici" ? (
           <>
