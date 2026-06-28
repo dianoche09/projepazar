@@ -39,10 +39,15 @@ const OLAY_RENK: Record<string, string> = {
   durum: "var(--color-ink-soft)",
 };
 
+/** 7 gün öncesinin ISO damgası — Date.now() module-fonksiyonunda (render'da impure çağrı yasak). */
+function yediGunOncesi(): string {
+  return new Date(Date.now() - 7 * 86_400_000).toISOString();
+}
+
 export default async function UreticiTalepRadari() {
   const supabase = await createClient();
 
-  const yediGunOnce = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const yediGunOnce = yediGunOncesi();
   const [{ data: projeler }, { data: birimRaw }, { data: eventRaw }, { data: gorRaw }] = await Promise.all([
     supabase.from("proje").select("id, ad").order("created_at", { ascending: false }),
     supabase.from("birim").select("proje_id, durum, son_guncelleme"),
