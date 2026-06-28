@@ -44,7 +44,7 @@ export default async function ProjeDetay({
   const { data: birimler } = await supabase
     .from("birim")
     .select(
-      "id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, para_birimi, satilabilir, net_m2, brut_m2, yon, manzara, serefiye, durum_notu, son_guncelleme",
+      "id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, para_birimi, satilabilir, net_m2, brut_m2, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
     )
     .eq("proje_id", id);
 

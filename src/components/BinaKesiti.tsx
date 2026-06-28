@@ -16,6 +16,7 @@ export type BinaBirim = {
   yon: string | null;
   manzara: string | null;
   serefiye: unknown;
+  odeme_plani?: unknown;
   durum_notu: string | null;
   son_guncelleme: string;
 };
@@ -126,6 +127,12 @@ export function BinaKesiti({
                                     tip_ad: tip?.ad ?? null,
                                     oda: tip?.oda ?? null,
                                     plan_url: tip?.plan_url ?? null,
+                                    odeme_plani: b.odeme_plani as {
+                                      pesinat_pct?: number | null;
+                                      taksit_sayisi?: number | null;
+                                      vade_farki_pct?: number | null;
+                                      ara_odemeler?: { ay: number; pct: number }[] | null;
+                                    } | null,
                                   }}
                                 />
                               );
