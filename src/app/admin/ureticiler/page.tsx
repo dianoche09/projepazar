@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ureticiDogrula, ureticiEkle } from "../actions";
+import { Avatar, GeriLink, SayfaBaslik, Uyari } from "../_ortak";
 
-const inp = "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-teal";
+const inp = "rounded-lg border border-hair bg-soft px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
 
 export default async function UreticilerSayfasi({
   searchParams,
@@ -16,63 +16,118 @@ export default async function UreticilerSayfasi({
     supabase.from("proje").select("uretici_id"),
   ]);
   const projeSay = (uid: string) => (projeler ?? []).filter((p) => p.uretici_id === uid).length;
+  const liste = ureticiler ?? [];
+  const dogrulanmamisSay = liste.filter((u) => !u.dogrulanmis).length;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <Link href="/admin" className="text-sm font-medium text-teal hover:underline">
-        ← Yönetim
-      </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Üreticiler</h1>
-      <p className="mt-1 text-sm text-gray">Yeni üretici (müteahhit) hesabı aç, firmayı doğrula.</p>
+    <div className="mx-auto max-w-[1100px] space-y-4 px-4 py-6 sm:px-6">
+      <GeriLink href="/admin" etiket="Genel Bakış" />
 
-      {hata ? (
-        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">{hata}</p>
-      ) : null}
-      {mesaj ? (
-        <p className="mt-4 rounded-lg border border-green/30 bg-green/10 px-3 py-2 text-sm text-ink">{mesaj}</p>
-      ) : null}
+      <SayfaBaslik
+        baslik="Üreticiler"
+        noktaRenk={dogrulanmamisSay > 0 ? "var(--color-red)" : "var(--color-teal)"}
+        altEtiket={
+          <>
+            <span className="font-medium">{liste.length} müteahhit firma</span>
+            <span className="text-hair">·</span>
+            <span className="mono text-xs text-gray">hesap tanımlama · güven rozeti / doğrulama</span>
+          </>
+        }
+        sag={
+          dogrulanmamisSay > 0 ? (
+            <span className="rozet mono bg-red/12 text-red">{dogrulanmamisSay} doğrulama bekliyor</span>
+          ) : (
+            <span className="rozet bg-green-soft text-teal-d">tümü doğrulandı</span>
+          )
+        }
+      />
+
+      <Uyari hata={hata} mesaj={mesaj} />
 
       {/* Yeni üretici hesabı aç (firma + sahip kullanıcı) */}
-      <details className="mt-6 rounded-2xl border border-hair bg-card p-4" open={!ureticiler || ureticiler.length === 0}>
-        <summary className="cursor-pointer font-medium text-ink">+ Yeni üretici (müteahhit) hesabı aç</summary>
-        <form action={ureticiEkle} className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2 text-xs font-semibold uppercase tracking-wide text-gray">Firma</div>
-          <input name="ad" required minLength={2} placeholder="Firma adı (ör. Demo İnşaat A.Ş.)" className={inp} />
-          <input name="vergi_no" placeholder="Vergi no (opsiyonel)" className={inp} />
-          <div className="mt-1 sm:col-span-2 text-xs font-semibold uppercase tracking-wide text-gray">Yetkili / sahip kullanıcı</div>
-          <input name="sahip_ad" required minLength={2} placeholder="Ad Soyad" className={inp} />
-          <input name="sahip_email" type="email" required placeholder="E-posta" className={inp} />
-          <input name="sahip_parola" type="text" required minLength={8} placeholder="Geçici parola (min 8)" className={`${inp} sm:col-span-2`} />
-          <button className="rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink sm:col-span-2">
-            Üretici hesabı aç
-          </button>
-        </form>
-        <p className="mt-2 text-xs text-gray">Sahip doğrudan aktif + doğrulanmış oluşturulur; geçici parolayı ilet.</p>
+      <details className="kart belir belir-1 overflow-hidden p-0" open={liste.length === 0}>
+        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-ink transition-colors hover:bg-soft">
+          <span className="inline-flex items-center gap-2">
+            <span className="grid size-5 place-items-center rounded-md bg-navy text-white">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </span>
+            Yeni üretici (müteahhit) hesabı aç
+          </span>
+        </summary>
+        <div className="border-t border-hair px-5 py-4">
+          <form action={ureticiEkle} className="grid gap-3 sm:grid-cols-2">
+            <div className="text-xs font-semibold uppercase tracking-wide text-gray sm:col-span-2">Firma</div>
+            <input name="ad" required minLength={2} placeholder="Firma adı (ör. Demo İnşaat A.Ş.)" className={inp} />
+            <input name="vergi_no" placeholder="Vergi no (opsiyonel)" className={inp} />
+            <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-gray sm:col-span-2">Yetkili / sahip kullanıcı</div>
+            <input name="sahip_ad" required minLength={2} placeholder="Ad Soyad" className={inp} />
+            <input name="sahip_email" type="email" required placeholder="E-posta" className={inp} />
+            <input name="sahip_parola" type="text" required minLength={8} placeholder="Geçici parola (min 8)" className={`${inp} sm:col-span-2`} />
+            <button className="btn-primary sm:col-span-2">Üretici hesabı aç</button>
+          </form>
+          <p className="mt-2.5 text-xs text-gray">Sahip doğrudan aktif + doğrulanmış oluşturulur; geçici parolayı ilet.</p>
+        </div>
       </details>
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-hair bg-card">
-        {(ureticiler ?? []).map((u) => (
-          <div key={u.id} className="flex flex-wrap items-center gap-3 border-t border-hair px-4 py-3 first:border-t-0">
-            <div className="min-w-40 flex-1">
-              <p className="font-medium text-ink">{u.ad}</p>
-              <p className="font-mono text-xs text-gray">VKN {u.vergi_no ?? "—"} · {projeSay(u.id)} proje</p>
-            </div>
-            {u.dogrulanmis ? (
-              <span className="rounded-full bg-teal/10 px-2.5 py-1 text-xs font-medium text-teal">✓ Doğrulanmış</span>
-            ) : (
-              <span className="rounded-full bg-amber/10 px-2.5 py-1 text-xs font-medium text-amber">Beklemede</span>
-            )}
-            <form action={ureticiDogrula}>
-              <input type="hidden" name="uretici_id" value={u.id} />
-              <input type="hidden" name="dogrula" value={(!u.dogrulanmis).toString()} />
-              <button className="rounded-lg border border-hair px-3 py-1.5 text-sm font-medium text-navy transition-colors hover:border-teal">
-                {u.dogrulanmis ? "Rozeti kaldır" : "Doğrula"}
-              </button>
-            </form>
-          </div>
-        ))}
-        {!ureticiler || ureticiler.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-gray">Henüz üretici yok — yukarıdan ekle.</p>
+      <div className="kart belir belir-2 overflow-hidden !p-0">
+        <div className="overflow-x-auto">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Firma</th>
+                <th>Vergi no</th>
+                <th>Proje</th>
+                <th>Doğrulama</th>
+                <th className="!text-right">Aksiyon</th>
+              </tr>
+            </thead>
+            <tbody>
+              {liste.map((u) => (
+                <tr key={u.id}>
+                  <td>
+                    <div className="flex items-center gap-2.5">
+                      <Avatar ad={u.ad} id={u.id} boyut={32} />
+                      <span className="text-[13.5px] font-semibold text-ink">{u.ad}</span>
+                    </div>
+                  </td>
+                  <td className="mono text-[12.5px] text-ink-soft">{u.vergi_no ?? "—"}</td>
+                  <td>
+                    <span className="rozet bg-navy/10 text-navy">{projeSay(u.id)} proje</span>
+                  </td>
+                  <td>
+                    {u.dogrulanmis ? (
+                      <span className="rozet bg-green-soft text-teal-d">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                        Doğrulanmış
+                      </span>
+                    ) : (
+                      <span className="rozet bg-amber-soft text-amber">Beklemede</span>
+                    )}
+                  </td>
+                  <td className="!text-right">
+                    <form action={ureticiDogrula} className="flex justify-end">
+                      <input type="hidden" name="uretici_id" value={u.id} />
+                      <input type="hidden" name="dogrula" value={(!u.dogrulanmis).toString()} />
+                      <button
+                        className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+                          u.dogrulanmis ? "border-hair bg-card text-gray hover:border-red hover:text-red" : "border-teal/40 bg-teal/10 text-teal-d hover:bg-teal/20"
+                        }`}
+                      >
+                        {u.dogrulanmis ? "Rozeti kaldır" : "Doğrula"}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {liste.length === 0 ? (
+          <p className="px-5 py-12 text-center text-sm text-gray">Henüz üretici yok — yukarıdan ekle.</p>
         ) : null}
       </div>
     </div>

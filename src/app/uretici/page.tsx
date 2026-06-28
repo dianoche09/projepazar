@@ -383,21 +383,17 @@ export default async function UreticiKokpit() {
                 </span>
               </div>
               <div className="ml-auto flex items-center gap-1.5">
-                <span className="chip h-8 bg-navy px-3 text-white">Tümü</span>
-                {(projeler ?? []).slice(0, 2).map((p) => (
-                  <span key={p.id} className="chip h-8 px-3 text-[12px]">
-                    {p.ad}
-                  </span>
-                ))}
-                <span className="mx-1 h-5 w-px bg-[var(--cizgi-2)]" />
-                <span className="chip h-8 px-3 text-[12px]">
+                <Link href="/uretici/stok" className="chip h-8 px-3 text-[12px]">
                   <span className="size-[7px] rounded-full bg-green" />
                   Müsait
-                </span>
-                <span className="chip h-8 px-3 text-[12px]">
+                </Link>
+                <Link href="/uretici/stok" className="chip h-8 px-3 text-[12px]">
                   <span className="size-[7px] rounded-full bg-amber" />
                   Opsiyon
-                </span>
+                </Link>
+                <Link href="/uretici/stok" className="btn-ghost h-8 min-h-0 px-3 text-[12px]">
+                  Tümünü gör →
+                </Link>
               </div>
             </div>
 
@@ -521,12 +517,12 @@ export default async function UreticiKokpit() {
                 Bu projede kesit için birim yok.
               </p>
             ) : (
-              <div className="mt-3 space-y-[5px]">
-                {katlar.slice(0, 6).map(({ kat, birimler: kb }) => (
+              <div className="mt-3 max-h-[380px] space-y-[5px] overflow-y-auto pr-1">
+                {katlar.map(({ kat, birimler: kb }) => (
                   <div key={kat} className="flex items-center gap-[5px]">
-                    <span className="mono w-6 text-right text-[10px] text-[var(--ink-faint)]">K{kat}</span>
-                    <div className="grid flex-1 grid-cols-6 gap-[5px]">
-                      {kb.slice(0, 6).map((b) => {
+                    <span className="mono w-6 shrink-0 text-right text-[10px] text-[var(--ink-faint)]">K{kat}</span>
+                    <div className="grid flex-1 gap-[5px]" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))" }}>
+                      {kb.map((b) => {
                         const k = kova(b.durum);
                         const hSinif =
                           k === "musait" ? "h-musait" : k === "opsiyon" ? "h-opsiyon" : k === "satildi" ? "h-satildi" : "h-bos";

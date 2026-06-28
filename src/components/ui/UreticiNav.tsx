@@ -9,21 +9,21 @@ type NavLink = {
   ikon: string;
   /** true → tam eşleşme (sadece bu yol aktif). false → startsWith. */
   tam: boolean;
-  /** Gerçek route'u olmayanlar /uretici'ye gider; aktif vurgusu Kokpit'e bırakılır. */
-  kokpit?: boolean;
 };
 
-// NOT: Projeler/Stok/Tahsis/Opsiyonlar/Talep Radarı henüz ayrı route değil → /uretici (DEAD link yok).
+// Tüm item'lar gerçek route'lara bağlı (dead-end yok). Kokpit tam eşleşme,
+// diğerleri startsWith (alt sayfalar da ilgili item'ı aktif tutar).
 const LINKLER: NavLink[] = [
   { yol: "/uretici", etiket: "Kokpit", ikon: "kokpit", tam: true },
-  { yol: "/uretici", etiket: "Projeler", ikon: "projeler", tam: false, kokpit: true },
-  { yol: "/uretici", etiket: "Stok", ikon: "stok", tam: false, kokpit: true },
-  { yol: "/uretici", etiket: "Tahsis", ikon: "tahsis", tam: false, kokpit: true },
-  { yol: "/uretici", etiket: "Opsiyonlar", ikon: "opsiyon", tam: false, kokpit: true },
-  { yol: "/uretici", etiket: "Talep Radarı", ikon: "radar", tam: false, kokpit: true },
+  { yol: "/uretici/projeler", etiket: "Projeler", ikon: "projeler", tam: false },
+  { yol: "/uretici/stok", etiket: "Stok", ikon: "stok", tam: false },
+  { yol: "/uretici/tahsis", etiket: "Tahsis", ikon: "tahsis", tam: false },
+  { yol: "/uretici/opsiyonlar", etiket: "Opsiyonlar", ikon: "opsiyon", tam: false },
+  { yol: "/uretici/talep-radari", etiket: "Talep Radarı", ikon: "radar", tam: false },
   { yol: "/uretici/lead-sorgu", etiket: "Müşteri Sorgula", ikon: "ara", tam: false },
   { yol: "/uretici/raporlar", etiket: "Raporlar", ikon: "rapor", tam: false },
   { yol: "/uretici/proje/yeni", etiket: "Yeni Proje", ikon: "arti", tam: false },
+  { yol: "/uretici/ayarlar", etiket: "Ayarlar", ikon: "ayar", tam: false },
 ];
 
 function Ikon({ ad }: { ad: string }) {
@@ -90,6 +90,13 @@ function Ikon({ ad }: { ad: string }) {
           <path d="M7 14l4-4 3 3 5-6" />
         </svg>
       );
+    case "ayar":
+      return (
+        <svg {...ortak}>
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      );
     default:
       return (
         <svg {...ortak} strokeWidth={2.2}>
@@ -102,21 +109,18 @@ function Ikon({ ad }: { ad: string }) {
 /** Üretici workspace navigasyonu — v2 .nav-item stili, aktif çizgi. mobil=true → yatay çip. */
 export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
   const yol = usePathname();
-  const kokpitte = yol === "/uretici";
-  const aktif = (l: NavLink) => {
-    if (l.kokpit) return false; // route'u yok → Kokpit aktif kalsın
-    return l.tam ? yol === l.yol : yol.startsWith(l.yol);
-  };
+  // Kokpit (tam) → yalnız tam eşleşme; diğerleri startsWith → alt sayfalar item'ı aktif tutar.
+  const aktif = (l: NavLink) => (l.tam ? yol === l.yol : yol.startsWith(l.yol));
 
   if (mobil) {
     return (
       <nav className="flex gap-2 overflow-x-auto pb-1">
-        {LINKLER.filter((l) => !l.kokpit).map((l) => (
+        {LINKLER.map((l) => (
           <Link
             key={l.etiket}
             href={l.yol}
             className={`flex shrink-0 items-center gap-2 rounded-xl border px-3.5 py-2.5 text-sm font-semibold transition-all duration-200 ${
-              (l.yol === "/uretici" ? kokpitte : aktif(l))
+              aktif(l)
                 ? "border-teal/20 bg-white text-navy shadow-[var(--golge-1)]"
                 : "border-transparent text-ink-soft hover:bg-[rgba(16,36,58,.05)] hover:text-ink"
             }`}
@@ -131,15 +135,12 @@ export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
 
   return (
     <nav className="flex flex-col gap-[3px]">
-      {LINKLER.map((l) => {
-        const isAktif = l.yol === "/uretici" && l.tam ? kokpitte : aktif(l);
-        return (
-          <Link key={l.etiket} href={l.yol} className={`nav-item${isAktif ? " active" : ""}`}>
-            <Ikon ad={l.ikon} />
-            {l.etiket}
-          </Link>
-        );
-      })}
+      {LINKLER.map((l) => (
+        <Link key={l.etiket} href={l.yol} className={`nav-item${aktif(l) ? " active" : ""}`}>
+          <Ikon ad={l.ikon} />
+          {l.etiket}
+        </Link>
+      ))}
     </nav>
   );
 }

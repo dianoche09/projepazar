@@ -235,6 +235,88 @@ p {
   background: rgba(16, 36, 58, 0.07);
 }
 
+/* ---- durum rozeti (müsait/opsiyon/satıldı) — kokpit + üretici ekranları ---- */
+.durum {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.durum .nokta {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+.d-musait {
+  background: var(--color-green-soft);
+  color: #1f7d4c;
+}
+.d-musait .nokta {
+  background: var(--color-green);
+}
+.d-opsiyon {
+  background: var(--color-amber-soft);
+  color: #9a6a12;
+}
+.d-opsiyon .nokta {
+  background: var(--color-amber);
+}
+.d-satildi {
+  background: var(--color-red-soft);
+  color: #a23f34;
+}
+.d-satildi .nokta {
+  background: var(--color-red);
+}
+
+/* ---- tazelik etiketi (X önce + nabız noktası) — eşik renk kodlu ---- */
+.taze {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.taze .nokta {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex: none;
+}
+.t-0 {
+  color: #1f7d4c;
+}
+.t-0 .nokta {
+  background: var(--color-green);
+  box-shadow: 0 0 0 3px rgba(47, 179, 107, 0.15);
+}
+.t-7 {
+  color: var(--color-ink-soft);
+}
+.t-7 .nokta {
+  background: var(--color-green);
+}
+.t-15 {
+  color: #9a6a12;
+}
+.t-15 .nokta {
+  background: var(--color-amber);
+}
+.t-eski {
+  color: var(--color-red);
+}
+.t-eski .nokta {
+  background: var(--color-red);
+}
+
 /* ---- veri tablosu (stok / fiyat listesi) ---- */
 .tbl {
   width: 100%;

@@ -6,8 +6,7 @@ import type { ReactNode } from "react";
 
 /**
  * Emlakçı sidebar navigasyonu — v2-emlakci `.nav-item` (aktif çizgi + dolu menü).
- * Not: "Opsiyonlarım" / "Paylaştıklarım" için ayrı rota henüz yok → DEAD link yapmamak
- * adına en yakın mevcut sayfaya (Lead'lerim) bağlanır.
+ * Tüm item'lar gerçek route'lara bağlı (dead-link yok). Görünürlük tahsisli RLS ile sınırlı.
  */
 const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon: ReactNode }[] = [
   {
@@ -36,8 +35,9 @@ const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon:
     ),
   },
   {
-    href: "/havuz/leadler",
+    href: "/havuz/opsiyonlarim",
     etiket: "Opsiyonlarım",
+    tam: true,
     ikon: (
       <>
         <path d="M12 8v4l3 2" />
@@ -47,8 +47,9 @@ const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon:
     ),
   },
   {
-    href: "/havuz/leadler",
+    href: "/havuz/paylastiklarim",
     etiket: "Paylaştıklarım",
+    tam: true,
     ikon: (
       <>
         <circle cx="18" cy="5" r="3" />

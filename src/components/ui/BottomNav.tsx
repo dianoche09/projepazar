@@ -21,6 +21,29 @@ const TABS = [
     ),
   },
   {
+    href: "/havuz/opsiyonlarim",
+    etiket: "Opsiyon",
+    ikon: (
+      <>
+        <path d="M12 8v4l3 2" />
+        <path d="M3.05 11a9 9 0 1 1 .5 4" />
+        <path d="M3 4v4h4" />
+      </>
+    ),
+  },
+  {
+    href: "/havuz/paylastiklarim",
+    etiket: "Paylaşım",
+    ikon: (
+      <>
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98" />
+      </>
+    ),
+  },
+  {
     href: "/havuz/profil",
     etiket: "Profil",
     ikon: (

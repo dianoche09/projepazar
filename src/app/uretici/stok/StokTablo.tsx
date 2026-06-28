@@ -1,0 +1,220 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { kova, DURUM_AD, paraKisa, tazelik, type DurumKova } from "@/lib/stok";
+
+export type StokSatir = {
+  id: string;
+  proje_id: string;
+  proje_ad: string;
+  blok_ad: string | null;
+  kat: number | null;
+  daire_no: string | null;
+  tip_ad: string | null;
+  net_m2: number | null;
+  brut_m2: number | null;
+  liste_fiyati: number | null;
+  kira_bedeli: number | null;
+  para_birimi: string | null;
+  durum: string;
+  son_guncelleme: string | null;
+};
+
+type ProjeFiltre = { id: string; ad: string };
+
+const DURUM_FILTRELER: { anahtar: DurumKova | "tumu"; etiket: string; nokta?: string }[] = [
+  { anahtar: "tumu", etiket: "Tüm durum" },
+  { anahtar: "musait", etiket: "Müsait", nokta: "bg-green" },
+  { anahtar: "opsiyon", etiket: "Opsiyon", nokta: "bg-amber" },
+  { anahtar: "satildi", etiket: "Satıldı", nokta: "bg-red" },
+];
+
+const SATIR_ZEMIN: Record<DurumKova, string | undefined> = {
+  musait: undefined,
+  opsiyon: "rgba(227,161,44,.045)",
+  satildi: "rgba(209,90,78,.035)",
+  diger: undefined,
+};
+
+export function StokTablo({
+  satirlar,
+  projeler,
+  kiraVar,
+}: {
+  satirlar: StokSatir[];
+  projeler: ProjeFiltre[];
+  kiraVar: boolean;
+}) {
+  const [projeId, setProjeId] = useState<string>("tumu");
+  const [durum, setDurum] = useState<DurumKova | "tumu">("tumu");
+
+  const gosterilen = useMemo(() => {
+    return satirlar.filter((s) => {
+      if (projeId !== "tumu" && s.proje_id !== projeId) return false;
+      if (durum !== "tumu" && kova(s.durum) !== durum) return false;
+      return true;
+    });
+  }, [satirlar, projeId, durum]);
+
+  // sayfalama — 30 satır/sayfa
+  const SAYFA_BOYUT = 30;
+  const [sayfa, setSayfa] = useState(1);
+  useEffect(() => setSayfa(1), [projeId, durum]);
+  const toplamSayfa = Math.max(1, Math.ceil(gosterilen.length / SAYFA_BOYUT));
+  const aktifSayfa = Math.min(sayfa, toplamSayfa);
+  const sayfada = gosterilen.slice((aktifSayfa - 1) * SAYFA_BOYUT, aktifSayfa * SAYFA_BOYUT);
+
+  return (
+    <>
+      {/* filtre çipleri */}
+      <div className="mb-4 flex flex-wrap items-center gap-1.5">
+        <span className="mr-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-faint)]">
+          Proje
+        </span>
+        <button
+          type="button"
+          onClick={() => setProjeId("tumu")}
+          className={`chip h-8 px-3 text-[12px] ${projeId === "tumu" ? "bg-navy text-white" : ""}`}
+        >
+          Tümü
+        </button>
+        {projeler.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => setProjeId(p.id)}
+            className={`chip h-8 px-3 text-[12px] ${projeId === p.id ? "bg-navy text-white" : ""}`}
+          >
+            {p.ad}
+          </button>
+        ))}
+
+        <span className="mx-1.5 h-5 w-px bg-[var(--cizgi-2)]" />
+
+        {DURUM_FILTRELER.map((f) => (
+          <button
+            key={f.anahtar}
+            type="button"
+            onClick={() => setDurum(f.anahtar)}
+            className={`chip h-8 px-3 text-[12px] ${durum === f.anahtar ? "bg-navy text-white" : ""}`}
+          >
+            {f.nokta ? <span className={`size-[7px] rounded-full ${f.nokta}`} /> : null}
+            {f.etiket}
+          </button>
+        ))}
+
+        <span className="ml-auto mono text-[12px] text-[var(--ink-faint)]">
+          {gosterilen.length} / {satirlar.length} birim
+        </span>
+      </div>
+
+      {/* tablo */}
+      <div className="kart belir belir-2 overflow-hidden">
+        <div className="overflow-x-auto" style={{ maxHeight: 680, overflowY: "auto" }}>
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>Proje</th>
+                <th>Blok</th>
+                <th>Kat</th>
+                <th>No</th>
+                <th>Tip</th>
+                <th className="text-right">Net m²</th>
+                <th className="text-right">Brüt m²</th>
+                <th className="text-right">Fiyat</th>
+                {kiraVar ? <th className="text-right">Kira</th> : null}
+                <th>Durum</th>
+                <th>Son Güncelleme</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {sayfada.map((s) => {
+                const k = kova(s.durum);
+                const t = tazelik(s.son_guncelleme);
+                return (
+                  <tr key={s.id} style={SATIR_ZEMIN[k] ? { background: SATIR_ZEMIN[k] } : undefined}>
+                    <td>
+                      <span className="text-[12px] text-ink-soft">{s.proje_ad}</span>
+                    </td>
+                    <td className="mono font-medium">{s.blok_ad ?? "—"}</td>
+                    <td className="mono">{s.kat ?? "—"}</td>
+                    <td className="mono">{s.daire_no ?? "—"}</td>
+                    <td>{s.tip_ad ?? "—"}</td>
+                    <td className="mono text-right">{s.net_m2 != null ? s.net_m2 : "—"}</td>
+                    <td className="mono text-right">{s.brut_m2 != null ? s.brut_m2 : "—"}</td>
+                    <td
+                      className="mono text-right font-semibold"
+                      style={k === "satildi" ? { color: "var(--ink-faint)" } : undefined}
+                    >
+                      {s.liste_fiyati ? paraKisa(s.liste_fiyati, s.para_birimi) : "—"}
+                    </td>
+                    {kiraVar ? (
+                      <td className="mono text-right text-ink-soft">
+                        {s.kira_bedeli ? paraKisa(s.kira_bedeli, s.para_birimi) : "—"}
+                      </td>
+                    ) : null}
+                    <td>
+                      <span className={`durum d-${k === "diger" ? "musait" : k}`}>
+                        <span className="nokta" />
+                        {DURUM_AD[k]}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`taze ${t.sinif}`}>
+                        <span className="nokta" />
+                        <span className="mono">{t.metin}</span>
+                      </span>
+                    </td>
+                    <td>
+                      <Link
+                        href={`/uretici/proje/${s.proje_id}`}
+                        className="btn-action h-auto min-h-0 px-2.5 py-[5px] text-[11px]"
+                      >
+                        Yönet
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
+              {gosterilen.length === 0 ? (
+                <tr>
+                  <td colSpan={kiraVar ? 12 : 11} className="py-10 text-center text-sm text-[var(--ink-faint)]">
+                    {satirlar.length === 0
+                      ? "Henüz birim yok — proje kurulumundan üret."
+                      : "Bu filtreyle birim yok."}
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {toplamSayfa > 1 ? (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSayfa((s) => Math.max(1, s - 1))}
+            disabled={aktifSayfa <= 1}
+            className="btn-ghost h-9 min-h-0 px-4 text-[13px] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            ‹ Önceki
+          </button>
+          <span className="mono text-[13px] text-ink-soft">
+            Sayfa {aktifSayfa} / {toplamSayfa}
+          </span>
+          <button
+            type="button"
+            onClick={() => setSayfa((s) => Math.min(toplamSayfa, s + 1))}
+            disabled={aktifSayfa >= toplamSayfa}
+            className="btn-ghost h-9 min-h-0 px-4 text-[13px] disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Sonraki ›
+          </button>
+        </div>
+      ) : null}
+    </>
+  );
+}

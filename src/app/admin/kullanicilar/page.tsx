@@ -1,11 +1,11 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ROL_ETIKET, type Rol } from "@/lib/roller";
 import { KullanicilarTablo, type Kullanici } from "./KullanicilarTablo";
 import { kullaniciOlustur } from "../actions";
+import { GeriLink, SayfaBaslik, Uyari } from "../_ortak";
 
 const ATANABILIR_ROLLER: Rol[] = ["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi", "admin"];
-const inp = "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-teal";
+const inp = "rounded-lg border border-hair bg-soft px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
 
 export default async function KullanicilarSayfasi({
   searchParams,
@@ -21,65 +21,73 @@ export default async function KullanicilarSayfasi({
       .order("created_at", { ascending: false }),
     supabase.from("ofis").select("id, ad").order("ad"),
   ]);
+  const liste = (kullanicilar ?? []) as Kullanici[];
+  const aktifSay = liste.filter((k) => k.durum === "aktif").length;
+  const bekleyenSay = liste.filter((k) => k.durum === "onay_bekliyor").length;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-10">
-      <Link href="/admin" className="text-sm font-medium text-teal hover:underline">
-        ← Yönetim
-      </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Kullanıcılar</h1>
-      <p className="mt-1 text-sm text-gray">
-        Tüm hesaplar — rol, ofis ve durum yönetimi. Onay bekleyenler de burada görünür.
-      </p>
+    <div className="mx-auto max-w-[1100px] space-y-4 px-4 py-6 sm:px-6">
+      <GeriLink href="/admin" etiket="Genel Bakış" />
 
-      {hata ? (
-        <p role="alert" className="mt-4 rounded-lg border border-red/30 bg-red/10 px-3 py-2 text-sm text-red">
-          {hata}
-        </p>
-      ) : null}
-      {mesaj ? (
-        <p className="mt-4 rounded-lg border border-green/30 bg-green/10 px-3 py-2 text-sm text-ink">
-          {mesaj}
-        </p>
-      ) : null}
+      <SayfaBaslik
+        baslik="Kullanıcılar"
+        altEtiket={
+          <>
+            <span className="font-medium">{liste.length} hesap · {aktifSay} aktif</span>
+            <span className="text-hair">·</span>
+            <span className="mono text-xs text-gray">rol · ofis · durum yönetimi</span>
+          </>
+        }
+        sag={
+          bekleyenSay > 0 ? (
+            <span className="rozet mono bg-amber-soft text-amber">{bekleyenSay} onay bekliyor</span>
+          ) : (
+            <span className="rozet bg-green-soft text-teal-d">tümü işlendi</span>
+          )
+        }
+      />
+
+      <Uyari hata={hata} mesaj={mesaj} />
 
       {/* Yeni kullanıcı oluştur (admin — service-role; doğrudan aktif) */}
-      <details className="mt-6 rounded-2xl border border-hair bg-card p-4">
-        <summary className="cursor-pointer font-medium text-ink">+ Yeni kullanıcı oluştur</summary>
-        <form action={kullaniciOlustur} className="mt-4 grid gap-3 sm:grid-cols-2">
-          <input name="ad" required minLength={2} placeholder="Ad Soyad" className={inp} />
-          <input name="email" type="email" required placeholder="E-posta" className={inp} />
-          <input name="telefon" placeholder="Telefon (opsiyonel)" className={inp} />
-          <input name="parola" type="text" required minLength={8} placeholder="Geçici parola (min 8)" className={inp} />
-          <select name="rol" required defaultValue="emlakci" className={inp}>
-            {ATANABILIR_ROLLER.map((r) => (
-              <option key={r} value={r}>
-                {ROL_ETIKET[r]}
-              </option>
-            ))}
-          </select>
-          <select name="ofis_id" defaultValue="" className={inp}>
-            <option value="">— ofis yok —</option>
-            {(ofisler ?? []).map((o) => (
-              <option key={o.id} value={o.id}>
-                {o.ad}
-              </option>
-            ))}
-          </select>
-          <button className="rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink sm:col-span-2">
-            Oluştur
-          </button>
-        </form>
-        <p className="mt-2 text-xs text-gray">
-          Hesap doğrudan aktif oluşturulur. Geçici parolayı kullanıcıya ilet (girişte değiştirebilir).
-        </p>
+      <details className="kart belir belir-1 overflow-hidden p-0">
+        <summary className="cursor-pointer list-none px-5 py-4 text-sm font-semibold text-ink transition-colors hover:bg-soft">
+          <span className="inline-flex items-center gap-2">
+            <span className="grid size-5 place-items-center rounded-md bg-navy text-white">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden>
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </span>
+            Yeni kullanıcı oluştur
+          </span>
+        </summary>
+        <div className="border-t border-hair px-5 py-4">
+          <form action={kullaniciOlustur} className="grid gap-3 sm:grid-cols-2">
+            <input name="ad" required minLength={2} placeholder="Ad Soyad" className={inp} />
+            <input name="email" type="email" required placeholder="E-posta" className={inp} />
+            <input name="telefon" placeholder="Telefon (opsiyonel)" className={inp} />
+            <input name="parola" type="text" required minLength={8} placeholder="Geçici parola (min 8)" className={inp} />
+            <select name="rol" required defaultValue="emlakci" className={inp}>
+              {ATANABILIR_ROLLER.map((r) => (
+                <option key={r} value={r}>{ROL_ETIKET[r]}</option>
+              ))}
+            </select>
+            <select name="ofis_id" defaultValue="" className={inp}>
+              <option value="">— ofis yok —</option>
+              {(ofisler ?? []).map((o) => (
+                <option key={o.id} value={o.id}>{o.ad}</option>
+              ))}
+            </select>
+            <button className="btn-primary sm:col-span-2">Oluştur</button>
+          </form>
+          <p className="mt-2.5 text-xs text-gray">
+            Hesap doğrudan aktif oluşturulur. Geçici parolayı kullanıcıya ilet (girişte değiştirebilir).
+          </p>
+        </div>
       </details>
 
-      <div className="mt-6">
-        <KullanicilarTablo
-          kullanicilar={(kullanicilar ?? []) as Kullanici[]}
-          ofisler={ofisler ?? []}
-        />
+      <div className="belir belir-2">
+        <KullanicilarTablo kullanicilar={liste} ofisler={ofisler ?? []} />
       </div>
     </div>
   );
