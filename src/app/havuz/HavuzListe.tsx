@@ -102,6 +102,7 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   }, [projeler, il, ilce, tip, durum, tur, paraBirimi, fiyatMin, fiyatMax, goldenViza, oturum, minKira, sirala]);
 
   const toplamBirim = projeler.reduce((t, p) => t + p.toplam, 0);
+  const sonSenkron = projeler[0]?.son_guncelleme ? zamanOnce(projeler[0].son_guncelleme) : null;
   const tipAcKapa = (t: string) => setTip((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
   const turAcKapa = (t: string) => setTur((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
   const aktifSayi =
@@ -130,13 +131,18 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
         </div>
       </details>
 
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="belir mb-4 flex items-center justify-between gap-3">
           <div>
-            <h2 className="font-display text-xl font-extrabold text-ink">
-              {il ? `${ilce || il} · Yetkili Projeler` : "Yetkili Projeler"}
-            </h2>
+            <div className="flex items-center gap-2.5">
+              <h2 className="font-display text-xl font-extrabold text-ink">
+                {il ? `${ilce || il} · Yetkili Projeler` : "Yetkili Projeler"}
+              </h2>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-2.5 py-0.5 font-mono text-[11px] font-medium text-teal-d">
+                <span className="nabiz size-1.5 rounded-full bg-green" aria-hidden /> Canlı
+              </span>
+            </div>
             <p className="text-[13px] text-gray">
-              {liste.length} proje · {toplamBirim} birim canlı
+              {liste.length} proje · {toplamBirim} birim canlı{sonSenkron ? ` · son senkron ${sonSenkron}` : ""}
             </p>
           </div>
           <select
@@ -151,18 +157,19 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          {liste.map((p) => {
+          {liste.map((p, i) => {
             const wa = `${p.ad} · ${[p.ilce, p.il].filter(Boolean).join(", ")}${p.min ? ` · ${fiyat(p.min)}₺'den` : ""}`;
             return (
               <div
                 key={p.id}
-                className="overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
+                style={{ animationDelay: `${Math.min(i, 8) * 0.04}s` }}
+                className="belir group overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
               >
                 {/* thumb — render görsel */}
                 <Link href={`/havuz/proje/${p.id}`} className="relative block h-[160px] overflow-hidden">
                   {p.kapak ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover" />
+                    <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
                   ) : (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-br from-navy-soft via-teal-soft to-soft" />

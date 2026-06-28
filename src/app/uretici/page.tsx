@@ -7,9 +7,20 @@ const C = { green: "#2FB36B", amber: "#E3A12C", red: "#D15A4E", navy: "#13314B" 
 
 type Ozet = { toplam: number; musait: number; opsiyon: number; satildi: number };
 
-function Stat({ etiket, deger, alt }: { etiket: string; deger: string; alt?: string }) {
+function Stat({
+  etiket,
+  deger,
+  alt,
+  sinyal,
+}: {
+  etiket: string;
+  deger: string;
+  alt?: string;
+  sinyal?: string;
+}) {
   return (
-    <div className="rounded-xl border border-hair bg-card p-4">
+    <div className="relative overflow-hidden rounded-xl border border-hair bg-card p-4">
+      {sinyal ? <span className={`absolute inset-x-0 top-0 h-0.5 ${sinyal}`} aria-hidden /> : null}
       <p className="text-xs uppercase tracking-wide text-gray">{etiket}</p>
       <p className="mt-1 font-mono text-3xl font-semibold tabular-nums leading-none text-ink">{deger}</p>
       {alt ? <p className="mt-1 text-xs text-gray">{alt}</p> : null}
@@ -55,12 +66,26 @@ export default async function UreticiKokpit() {
     { etiket: "Satıldı", deger: satildi, renk: C.red },
   ];
 
+  const enYeni = (projeler ?? [])
+    .map((p) => p.son_guncelleme)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  const sonSenkron = enYeni ? zamanOnce(enYeni as string) : null;
+
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="belir flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-ink">Kokpit</h1>
-          <p className="mt-1 text-sm text-gray">Stok, satış ve tazelik tek bakışta.</p>
+          <div className="flex items-center gap-2.5">
+            <h1 className="font-display text-2xl font-semibold text-ink">Kokpit</h1>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-2.5 py-0.5 font-mono text-[11px] font-medium text-teal-d">
+              <span className="nabiz size-1.5 rounded-full bg-green" aria-hidden /> Canlı
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-gray">
+            Stok, satış ve tazelik tek bakışta{sonSenkron ? ` · son senkron ${sonSenkron}` : ""}.
+          </p>
         </div>
         <Link href="/uretici/proje/yeni" className="btn rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-ink">
           + Yeni proje
@@ -68,7 +93,7 @@ export default async function UreticiKokpit() {
       </div>
 
       {/* GENEL BAKIŞ — donut + metrikler */}
-      <section className="grid gap-4 lg:grid-cols-3">
+      <section className="belir belir-1 grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
           <h2 className="font-display text-sm font-semibold text-ink">Stok dağılımı</h2>
           <div className="mt-4 flex items-center gap-6">
@@ -80,16 +105,16 @@ export default async function UreticiKokpit() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 lg:col-span-2">
-          <Stat etiket="Proje" deger={String(projeler?.length ?? 0)} alt="aktif portföy" />
-          <Stat etiket="Satış oranı" deger={`%${satisOrani}`} alt={`${satildi} / ${toplamBirim} birim`} />
-          <Stat etiket="Müsait" deger={String(musait)} alt="satışa hazır" />
-          <Stat etiket="Opsiyonda" deger={String(opsiyon)} alt="kilitli, karar bekliyor" />
+          <Stat etiket="Proje" deger={String(projeler?.length ?? 0)} alt="aktif portföy" sinyal="bg-navy" />
+          <Stat etiket="Satış oranı" deger={`%${satisOrani}`} alt={`${satildi} / ${toplamBirim} birim`} sinyal="bg-red" />
+          <Stat etiket="Müsait" deger={String(musait)} alt="satışa hazır" sinyal="bg-green" />
+          <Stat etiket="Opsiyonda" deger={String(opsiyon)} alt="kilitli, karar bekliyor" sinyal="bg-amber" />
         </div>
       </section>
 
       {/* SATIŞ KIYASI — projelere göre */}
       {(projeler?.length ?? 0) > 0 ? (
-        <section className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+        <section className="belir belir-2 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
           <h2 className="font-display text-sm font-semibold text-ink">Projelere göre satış</h2>
           <div className="mt-4 space-y-3">
             {(projeler ?? []).map((p) => {
@@ -109,7 +134,7 @@ export default async function UreticiKokpit() {
       ) : null}
 
       {/* PROJELER */}
-      <section>
+      <section className="belir belir-3">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold text-ink">Projeler</h2>
           <span className="text-sm text-gray">{projeler?.length ?? 0}</span>
@@ -177,7 +202,7 @@ export default async function UreticiKokpit() {
       </section>
 
       {/* MÜŞTERİ SORGULA — kim-getirdi görünürlüğü (akış DEĞİL, sorgu) */}
-      <section className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
+      <section className="belir belir-4 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="max-w-xl">
             <h2 className="font-display text-lg font-semibold text-ink">Müşteri sorgula</h2>
