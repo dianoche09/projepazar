@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { medyaYukle, medyaSil, projeKunyeGuncelle, mahalEkle, mahalSil } from "@/app/uretici/actions";
+import { medyaYukle, medyaSil, projeKunyeGuncelle, projeYatirimGuncelle, mahalEkle, mahalSil } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { StokKurulumu } from "../StokKurulumu";
 
@@ -212,6 +212,27 @@ export default async function ProjeKurulum({
           <textarea name="malzeme" defaultValue={Array.isArray(kunye.malzeme) ? (kunye.malzeme as string[]).join("\n") : ""} placeholder="Malzeme (her satır: Pencere · Schüco)" rows={3} className={`${inpCls} sm:col-span-2`} />
           <input name="donati" defaultValue={Array.isArray(kunye.donati) ? (kunye.donati as string[]).join(", ") : ""} placeholder="Sosyal donatı (virgülle: Havuz, Fitness, Güvenlik)" className={`${inpCls} sm:col-span-2`} />
           <div className="sm:col-span-2"><SubmitButton>Künyeyi kaydet</SubmitButton></div>
+        </form>
+      </Bolum>
+
+      {/* Yatırım & Yabancı Alıcı */}
+      <Bolum baslik="Yatırım & Yabancı Alıcı" aciklama="Para birimi, golden vize/oturum uygunluğu, kira getirisi — yabancı yatırımcı havuzunda filtrelenir.">
+        <form action={projeYatirimGuncelle} className="grid gap-2 sm:grid-cols-2">
+          <input type="hidden" name="proje_id" value={id} />
+          <select name="para_birimi" defaultValue={proje.para_birimi ?? "TRY"} className={inpCls}>
+            <option value="TRY">₺ Türk Lirası</option>
+            <option value="USD">$ Amerikan Doları</option>
+            <option value="EUR">€ Euro</option>
+            <option value="GBP">£ Sterlin</option>
+            <option value="AED">AED Dirhem</option>
+          </select>
+          <input name="kira_getirisi_pct" type="number" step="0.1" defaultValue={proje.kira_getirisi_pct ?? ""} placeholder="Yıllık kira getirisi %" className={inpCls} />
+          <input name="amortisman_yil" type="number" step="0.1" defaultValue={proje.amortisman_yil ?? ""} placeholder="Yatırım geri dönüş süresi (yıl)" className={inpCls} />
+          <input name="golden_visa_esik" type="number" defaultValue={proje.golden_visa_esik ?? ""} placeholder="Golden vize eşiği (tutar; boş = uygun değil)" className={inpCls} />
+          <label className="flex items-center gap-2 text-sm text-ink sm:col-span-2">
+            <input type="checkbox" name="oturum_uygun" defaultChecked={!!proje.oturum_uygun} className="size-4" /> Oturum izni başvurusuna uygun
+          </label>
+          <div className="sm:col-span-2"><SubmitButton>Yatırım bilgilerini kaydet</SubmitButton></div>
         </form>
       </Bolum>
 

@@ -771,6 +771,32 @@ export async function projeKunyeGuncelle(formData: FormData) {
   redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Künye güncellendi")}`);
 }
 
+// ── Yatırım & Yabancı Alıcı (Connject paritesi: para birimi + golden vize/oturum + kira getirisi/amortisman) ──
+// Alanlar şemada zaten var (proje.*); yabancı yatırımcı havuz filtresi bunları kullanır.
+export async function projeYatirimGuncelle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const sayi = (v: FormDataEntryValue | null) => {
+    const s = String(v ?? "").trim();
+    return s === "" ? null : Number(s);
+  };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("proje")
+    .update({
+      para_birimi: String(formData.get("para_birimi") ?? "TRY"),
+      oturum_uygun: formData.get("oturum_uygun") === "on",
+      golden_visa_esik: sayi(formData.get("golden_visa_esik")),
+      kira_getirisi_pct: sayi(formData.get("kira_getirisi_pct")),
+      amortisman_yil: sayi(formData.get("amortisman_yil")),
+      son_guncelleme: new Date().toISOString(),
+    })
+    .eq("id", proje_id);
+  if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
+  revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Yatırım bilgileri kaydedildi")}`);
+}
+
 // ── Mahal Listesi (proje teslim standardı: her mahal için zemin/duvar/tavan) ──
 export async function mahalEkle(formData: FormData) {
   const proje_id = String(formData.get("proje_id"));
