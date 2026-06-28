@@ -54,10 +54,10 @@ export default async function Opsiyonlarim() {
   const acilSayi = liste.filter((o) => kalanSure(o.kilit_bitis).acil && !kalanSure(o.kilit_bitis).bitti).length;
 
   return (
-    <div className="mx-auto max-w-[1080px] text-ink">
+    <div className="mx-auto max-w-[1240px] text-ink">
       <header className="belir mb-6">
         <div className="mb-1.5 flex items-center gap-2.5">
-          <span className="rozet" style={{ background: "rgba(227,161,44,.14)", color: "var(--color-amber)" }}>
+          <span className="rozet" style={{ background: "var(--color-amber-soft)", color: "#9a6a12" }}>
             <span className="freshdot nabiz" style={{ background: "var(--color-amber)" }} />
             48 saat kilit
           </span>
@@ -149,13 +149,14 @@ export default async function Opsiyonlarim() {
                           {b?.liste_fiyati != null ? `${fmt(Number(b.liste_fiyati))} ${ps}` : "—"}
                         </td>
                         <td>
-                          <span className="lead-pill" style={{ background: "rgba(16,36,58,.05)", color: renk }}>
+                          <span className="lead-pill" style={{ background: "var(--color-navy-soft)", color: renk }}>
                             <span className="freshdot" style={{ background: renk }} />
                             {k.metin}
                           </span>
                         </td>
                         <td>
-                          <span className="lead-pill" style={{ background: "rgba(227,161,44,.14)", color: "var(--color-amber)" }}>
+                          <span className="durum d-opsiyon">
+                            <span className="nokta" />
                             {DURUM_ETIKET[o.durum]}
                           </span>
                         </td>
@@ -190,12 +191,12 @@ export default async function Opsiyonlarim() {
                         {[b?.proje?.il, b?.proje?.ilce].filter(Boolean).join(" · ") || "—"}
                       </p>
                     </div>
-                    <span className="lead-pill flex-none" style={{ background: "rgba(16,36,58,.05)", color: renk }}>
+                    <span className="lead-pill flex-none" style={{ background: "var(--color-navy-soft)", color: renk }}>
                       <span className="freshdot" style={{ background: renk }} />
                       {k.metin}
                     </span>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3 text-[12px]">
+                  <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-[12px]" style={{ borderColor: "var(--cizgi)" }}>
                     <div>
                       <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">Daire</span>
                       <span className="mono font-semibold text-ink">{b?.daire_no ?? "—"}</span>

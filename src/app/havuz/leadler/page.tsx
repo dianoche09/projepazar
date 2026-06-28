@@ -94,7 +94,7 @@ export default async function Leadler() {
                 </div>
               </div>
 
-              <div className="mt-3 border-t border-slate-100 pt-3">
+              <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--cizgi)" }}>
                 <LeadDurum leadId={l.id} durum={l.durum} />
               </div>
 

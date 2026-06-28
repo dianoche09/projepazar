@@ -134,12 +134,14 @@ export const HESAP_DURUM_ETIKET: Record<HesapDurum, string> = {
   arsivli: "Arşivli",
 };
 
+// Hesap durum rozetleri — okunur soft-bg + koyu metin (Genel Bakış dili).
+// Düşük-kontrastlı bg-*/10 + text-* tonlarından kaçınılır (soluk/anlaşılmaz YOK).
 export const HESAP_DURUM_ROZET: Record<HesapDurum, string> = {
-  onay_bekliyor: "bg-amber/10 text-amber",
-  aktif: "bg-green/10 text-green",
-  pasif: "bg-gray/10 text-gray",
-  askida: "bg-red/10 text-red",
-  arsivli: "bg-gray/10 text-gray",
+  onay_bekliyor: "bg-amber-soft text-amber",
+  aktif: "bg-green-soft text-teal-d",
+  pasif: "bg-gray/12 text-gray",
+  askida: "bg-red/12 text-red",
+  arsivli: "bg-gray/12 text-gray",
 };
 
 /** Para birimine göre kısa biçim (1.5M ₺ / 7.500 ₺). */

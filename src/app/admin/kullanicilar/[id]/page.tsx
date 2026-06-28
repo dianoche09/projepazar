@@ -43,12 +43,17 @@ export default async function KullaniciDetay({
     <div className="mx-auto max-w-[860px] space-y-4 px-4 py-6 sm:px-6">
       <GeriLink href="/admin/kullanicilar" etiket="Kullanıcılar" />
 
-      {/* Başlık kartı — avatar + ad + durum + rol */}
+      {/* Başlık kartı — avatar + ad + durum + rol (SayfaBaslik hiyerarşisiyle uyumlu) */}
       <header className="kart belir signal-top flex flex-wrap items-center gap-4 p-5" style={{ ["--_sig" as string]: "var(--color-teal)" }}>
         <Avatar ad={k.ad} id={k.id} boyut={52} />
         <div className="min-w-0">
-          <h1 className="font-display text-[22px] font-bold leading-tight text-ink">{k.ad ?? "—"}</h1>
-          <p className="mono mt-1 text-[12px] text-gray">{ROL_ETIKET[k.rol as Rol]} · {k.telefon ?? "tel —"}</p>
+          <h1 className="font-display text-[27px] font-bold leading-none tracking-tight text-ink">{k.ad ?? "—"}</h1>
+          <div className="mt-1.5 flex items-center gap-2 text-[13px] text-ink-soft">
+            <span className="size-2 shrink-0 rounded-full bg-teal" aria-hidden />
+            <span className="font-medium">{ROL_ETIKET[k.rol as Rol]}</span>
+            <span className="text-hair">·</span>
+            <span className="mono text-xs text-gray">{k.telefon ?? "tel —"}</span>
+          </div>
         </div>
         <span className={`rozet ml-auto ${HESAP_DURUM_ROZET[durum]}`}>{HESAP_DURUM_ETIKET[durum]}</span>
       </header>

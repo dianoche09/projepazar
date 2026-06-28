@@ -65,10 +65,16 @@ export default async function Profil() {
           </div>
         </div>
 
-        <dl className="mt-5 grid grid-cols-1 gap-3 border-t border-slate-100 pt-5 sm:grid-cols-2">
+        <dl className="mt-5 grid grid-cols-1 gap-3 border-t pt-5 sm:grid-cols-2" style={{ borderColor: "var(--cizgi)" }}>
           {kunye.map(([et, deger]) => (
-            <div key={et} className="rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5">
-              <dt className="mono text-[10px] font-bold uppercase tracking-wider text-slate-400">{et}</dt>
+            <div
+              key={et}
+              className="rounded-xl border px-3.5 py-2.5"
+              style={{ borderColor: "var(--cizgi)", background: "var(--color-soft)" }}
+            >
+              <dt className="mono text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--ink-faint)" }}>
+                {et}
+              </dt>
               <dd className="mt-1 truncate text-[13.5px] font-semibold text-ink">{deger}</dd>
             </div>
           ))}
@@ -77,25 +83,27 @@ export default async function Profil() {
 
       {/* Ofis kartı */}
       <div className="kart kart-3d belir belir-2 mt-4 p-6">
-        <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+        <div className="mb-4 flex items-center gap-2 border-b pb-3" style={{ borderColor: "var(--cizgi)" }}>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--color-teal)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 21h18M5 21V7l7-4 7 4v14" />
             <path d="M9 9h.01M9 13h.01M9 17h.01M15 9h.01M15 13h.01M15 17h.01" />
           </svg>
-          <h2 className="font-display text-[10px] font-bold uppercase tracking-widest text-slate-400">Bağlı Ofis</h2>
+          <h2 className="font-display text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--ink-faint)" }}>
+            Bağlı Ofis
+          </h2>
         </div>
         {ofis ? (
           <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5">
-              <dt className="mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Ofis</dt>
+            <div className="rounded-xl border px-3.5 py-2.5" style={{ borderColor: "var(--cizgi)", background: "var(--color-soft)" }}>
+              <dt className="mono text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--ink-faint)" }}>Ofis</dt>
               <dd className="mt-1 text-[13.5px] font-semibold text-ink">{ofis.ad}</dd>
             </div>
-            <div className="rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5">
-              <dt className="mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Marka</dt>
+            <div className="rounded-xl border px-3.5 py-2.5" style={{ borderColor: "var(--cizgi)", background: "var(--color-soft)" }}>
+              <dt className="mono text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--ink-faint)" }}>Marka</dt>
               <dd className="mt-1 text-[13.5px] font-semibold text-ink">{ofis.marka ?? "—"}</dd>
             </div>
-            <div className="rounded-xl border border-slate-200/60 bg-slate-50 px-3.5 py-2.5 sm:col-span-2">
-              <dt className="mono text-[10px] font-bold uppercase tracking-wider text-slate-400">Konum</dt>
+            <div className="rounded-xl border px-3.5 py-2.5 sm:col-span-2" style={{ borderColor: "var(--cizgi)", background: "var(--color-soft)" }}>
+              <dt className="mono text-[10px] font-bold uppercase tracking-wider" style={{ color: "var(--ink-faint)" }}>Konum</dt>
               <dd className="mt-1 text-[13.5px] font-semibold text-ink">
                 {[ofis.il, ofis.ilce].filter(Boolean).join(" · ") || "—"}
               </dd>

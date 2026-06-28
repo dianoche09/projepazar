@@ -78,14 +78,14 @@ export default async function Denetim({
   const bMap = new Map(birimler.map((b) => [b.id, b.daire_no as string | null]));
 
   return (
-    <div className="mx-auto max-w-[960px] space-y-4 px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-[1100px] space-y-4 px-4 py-6 sm:px-6">
       <GeriLink href="/admin" etiket="Genel Bakış" />
 
       <SayfaBaslik
         baslik="Denetim"
+        noktaRenk="var(--color-teal)"
         altEtiket={
           <>
-            <span className="nabiz size-2 -ml-2 rounded-full bg-teal-d" aria-hidden />
             <span className="font-medium">canlı iz zinciri</span>
             <span className="text-hair">·</span>
             <span className="mono text-xs text-gray">opsiyon · satış · durum · lead · paylaşım (son 100)</span>
