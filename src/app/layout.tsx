@@ -1,17 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Instrument_Sans, Geist_Mono } from "next/font/google";
+import { Outfit, Geist_Mono } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { PwaKur } from "@/components/ui/PwaKur";
 import "./globals.css";
 
-// Berrak Güven tipografisi (Bölüm 8): başlık / arayüz / veri
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
-  subsets: ["latin"],
-  display: "swap",
-});
-const instrument = Instrument_Sans({
-  variable: "--font-instrument",
+// Modern space typography: Outfit (UI & display) + Geist Mono (data/numbers)
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
   display: "swap",
 });
@@ -38,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#13314b",
+  themeColor: "#020617",
   width: "device-width",
   initialScale: 1,
 };
@@ -49,10 +44,11 @@ export default function RootLayout({
   return (
     <html
       lang="tr"
-      className={`${bricolage.variable} ${instrument.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${geistMono.variable} h-full antialiased dark`}
+      style={{ colorScheme: "dark" }}
     >
-      <body className="flex min-h-full flex-col bg-paper text-ink">
-        <NextTopLoader color="#1e9b8a" height={3} shadow="0 0 8px #1e9b8a" showSpinner={false} speed={250} />
+      <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
+        <NextTopLoader color="#06b6d4" height={3} shadow="0 0 8px #06b6d4" showSpinner={false} speed={250} />
         {children}
         <PwaKur />
       </body>

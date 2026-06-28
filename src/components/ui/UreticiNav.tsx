@@ -50,13 +50,15 @@ export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
   const aktif = (l: { yol: string; tam: boolean }) => (l.tam ? yol === l.yol : yol.startsWith(l.yol));
 
   return (
-    <nav className={mobil ? "flex gap-2 overflow-x-auto" : "flex flex-col gap-1"}>
+    <nav className={mobil ? "flex gap-2 overflow-x-auto pb-1" : "flex flex-col gap-1"}>
       {LINKLER.map((l) => (
         <Link
           key={l.yol}
           href={l.yol}
-          className={`flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            aktif(l) ? "bg-navy text-white" : "text-gray hover:bg-soft hover:text-ink"
+          className={`flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+            aktif(l)
+              ? "bg-white/5 border border-white/10 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+              : "border border-transparent text-gray/70 hover:bg-white/5 hover:text-white"
           }`}
         >
           <Ikon ad={l.yol} />

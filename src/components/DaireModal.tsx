@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
 const inp =
-  "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
+  "rounded-xl border border-white/5 bg-[#0f172a] px-3.5 py-2.5 text-sm text-white/90 outline-none transition-all focus:border-teal/30 focus:bg-[#090d16]";
 
 export type ModalBirim = {
   id: string;
@@ -56,7 +56,7 @@ function Kaydet() {
   return (
     <button
       disabled={pending}
-      className="rounded-lg bg-navy px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink disabled:opacity-50"
+      className="rounded-xl bg-teal px-5 py-2.5 text-xs font-bold text-navy transition-all duration-300 hover:bg-teal/90 disabled:opacity-50 shadow-[0_0_12px_rgba(6,182,212,0.15)] cursor-pointer"
     >
       {pending ? "Kaydediliyor…" : "Kaydet"}
     </button>
@@ -109,92 +109,95 @@ export function DaireModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
-      <div className="absolute inset-0 bg-ink/40" onClick={onKapat} aria-hidden />
-      <div className="sheet-in relative z-10 max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-hair bg-card p-5 shadow-xl sm:rounded-2xl">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onKapat} aria-hidden />
+      <div className="sheet-in glass-card relative z-10 max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl p-6 shadow-cardlg sm:rounded-2xl border border-white/10">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="font-display text-lg font-semibold text-ink">Daire {birim.daire_no ?? "—"}</h3>
-            <p className="text-sm text-gray">
+            <h3 className="font-display text-lg font-bold text-white tracking-tight">Daire {birim.daire_no ?? "—"}</h3>
+            <p className="text-xs text-gray/60 font-medium mt-0.5">
               {birim.tip_ad ?? birim.oda ?? "—"}
               {birim.kat != null ? ` · ${birim.kat}. kat` : ""}
               {!birim.satilabilir ? " · arsa payı (satılamaz)" : ""}
             </p>
           </div>
-          <button onClick={onKapat} className="rounded-lg px-2 py-1 text-gray transition-colors hover:bg-paper" aria-label="Kapat">
+          <button onClick={onKapat} className="rounded-xl px-3 py-1.5 text-gray/50 transition-colors hover:bg-white/10 hover:text-white text-xs font-bold" aria-label="Kapat">
             ✕
           </button>
         </div>
 
         {mod === "emlakci" ? (
-          <span className={`mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-medium text-white ${DURUM_BG[birim.durum]}`}>
+          <span className={`mt-3 inline-block rounded-lg px-2.5 py-1 text-[11px] font-bold text-white uppercase tracking-wider ${DURUM_BG[birim.durum]}`}>
             {DURUM_ETIKET[birim.durum]}
           </span>
         ) : null}
 
         {/* Daire planı — tip görseli varsa onu, yoksa şematik plan */}
-        <div className="mt-4 overflow-hidden rounded-xl border border-hair">
+        <div className="mt-4 overflow-hidden rounded-xl border border-white/5 bg-black/20">
           {birim.plan_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={birim.plan_url} alt={`${birim.tip_ad ?? "Daire"} planı`} className="max-h-72 w-full object-contain bg-paper" />
+            <img src={birim.plan_url} alt={`${birim.tip_ad ?? "Daire"} planı`} className="max-h-72 w-full object-contain bg-[#030712]/50" />
           ) : (
             <KatPlani etiket={birim.oda ?? birim.tip_ad ?? undefined} buyuk />
           )}
         </div>
 
         {birim.net_m2 || birim.brut_m2 || birim.yon || birim.manzara || birim.oda ? (
-          <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+          <div className="mt-4 grid grid-cols-2 gap-2 text-xs font-semibold text-white/90">
             {birim.oda ? (
-              <div><span className="text-gray">Oda </span><span className="text-ink">{birim.oda}</span></div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl px-3 py-2"><span className="text-gray/50 block text-[10px] uppercase font-mono tracking-wider">Oda </span><span className="text-white">{birim.oda}</span></div>
             ) : null}
             {birim.net_m2 ? (
-              <div><span className="text-gray">Net </span><span className="font-mono text-ink">{birim.net_m2} m²</span></div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl px-3 py-2"><span className="text-gray/50 block text-[10px] uppercase font-mono tracking-wider">Net Alan</span><span className="font-mono text-white">{birim.net_m2} m²</span></div>
             ) : null}
             {birim.brut_m2 ? (
-              <div><span className="text-gray">Brüt </span><span className="font-mono text-ink">{birim.brut_m2} m²</span></div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl px-3 py-2"><span className="text-gray/50 block text-[10px] uppercase font-mono tracking-wider">Brüt Alan</span><span className="font-mono text-white">{birim.brut_m2} m²</span></div>
             ) : null}
             {birim.yon ? (
-              <div><span className="text-gray">Yön </span><span className="text-ink">{birim.yon}</span></div>
+              <div className="bg-white/[0.02] border border-white/5 rounded-xl px-3 py-2"><span className="text-gray/50 block text-[10px] uppercase font-mono tracking-wider">Cephe</span><span className="text-white">{birim.yon}</span></div>
             ) : null}
             {birim.manzara ? (
-              <div><span className="text-gray">Manzara </span><span className="text-ink">{birim.manzara}</span></div>
+              <div className="col-span-2 bg-white/[0.02] border border-white/5 rounded-xl px-3 py-2"><span className="text-gray/50 block text-[10px] uppercase font-mono tracking-wider">Manzara</span><span className="text-white">{birim.manzara}</span></div>
             ) : null}
           </div>
         ) : null}
 
         {taban != null ? (
-          <div className="mt-4 rounded-xl border border-hair bg-paper p-3 font-mono text-sm">
+          <div className="mt-4 rounded-xl border border-white/5 bg-[#020617]/50 p-4 font-mono text-xs space-y-2 shadow-card">
             <div className="flex justify-between">
-              <span className="text-gray">Taban fiyat</span>
-              <span className="text-ink">{fmt(taban)} {psim}</span>
+              <span className="text-gray/60">Taban fiyat</span>
+              <span className="text-white font-bold">{fmt(taban)} {psim}</span>
             </div>
             {katKatki != null ? (
               <div className="flex justify-between">
-                <span className="text-gray">+ Kat şerefiyesi %{sKat}</span>
-                <span className="text-ink">+{fmt(katKatki)} {psim}</span>
+                <span className="text-gray/60">+ Kat şerefiyesi %{sKat}</span>
+                <span className="text-white font-bold">+{fmt(katKatki)} {psim}</span>
               </div>
             ) : null}
             {manzaraKatki != null ? (
               <div className="flex justify-between">
-                <span className="text-gray">+ Manzara şerefiyesi %{sManzara}</span>
-                <span className="text-ink">+{fmt(manzaraKatki)} {psim}</span>
+                <span className="text-gray/60">+ Manzara şerefiyesi %{sManzara}</span>
+                <span className="text-white font-bold">+{fmt(manzaraKatki)} {psim}</span>
               </div>
             ) : null}
             {katKatki == null && manzaraKatki == null && fark != null && fark !== 0 ? (
               <div className="flex justify-between">
-                <span className="text-gray">+ Kat/konum farkı</span>
-                <span className="text-ink">{fark > 0 ? "+" : ""}{fmt(fark)} {psim}</span>
+                <span className="text-gray/60">+ Kat/konum farkı</span>
+                <span className="text-white font-bold">{fark > 0 ? "+" : ""}{fmt(fark)} {psim}</span>
               </div>
             ) : null}
-            <div className="mt-1 flex justify-between border-t border-hair pt-1 font-semibold">
-              <span className="text-ink">Liste fiyatı</span>
-              <span className="text-ink">{liste != null ? fmt(liste) : "—"} {psim}</span>
+            <div className="mt-2.5 flex justify-between border-t border-white/5 pt-2.5 font-bold text-sm">
+              <span className="text-white">Liste fiyatı</span>
+              <span className="text-teal font-extrabold">{liste != null ? fmt(liste) : "—"} {psim}</span>
             </div>
           </div>
         ) : liste != null ? (
-          <p className="mt-4 font-mono text-lg text-ink">{fmt(liste)} {psim}</p>
+          <div className="mt-4 bg-[#020617]/50 border border-white/5 rounded-xl p-4 flex justify-between items-center shadow-card">
+            <span className="text-xs font-semibold text-gray/60">Liste Fiyatı</span>
+            <span className="font-mono text-lg font-extrabold text-teal">{fmt(liste)} {psim}</span>
+          </div>
         ) : null}
 
-        {/* Ödeme planı — proje şablonu × canlı fiyat (Connject paritesi; aylık taksit fiyattan hesaplanır) */}
+        {/* Ödeme planı — proje şablonu × canlı fiyat */}
         {liste != null && birim.odeme_plani && (birim.odeme_plani.pesinat_pct != null || birim.odeme_plani.taksit_sayisi != null)
           ? (() => {
               const op = birim.odeme_plani!;
@@ -206,23 +209,23 @@ export function DaireModal({
               const vade = op.vade_farki_pct ?? 0;
               const aylik = ay > 0 ? Math.round((kalan * (1 + vade / 100)) / ay) : null;
               return (
-                <div className="mt-3 rounded-xl border border-hair bg-paper p-3 text-sm">
-                  <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-gray">Ödeme Planı</p>
-                  <div className="space-y-1 font-mono">
+                <div className="mt-3 rounded-xl border border-white/5 bg-[#020617]/50 p-4 text-xs">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-gray/50 font-mono">Ödeme Planı Şablonu</p>
+                  <div className="space-y-1.5 font-mono text-white/90">
                     {pesinatPct ? (
                       <div className="flex justify-between">
-                        <span className="text-gray">Peşinat %{pesinatPct}</span>
-                        <span className="text-ink">{fmt(pesinat)} {psim}</span>
+                        <span className="text-gray/60">Peşinat %{pesinatPct}</span>
+                        <span className="text-white font-semibold">{fmt(pesinat)} {psim}</span>
                       </div>
                     ) : null}
                     {aylik != null ? (
-                      <div className="flex justify-between">
-                        <span className="text-gray">{ay} ay taksit</span>
-                        <span className="font-semibold text-ink">{fmt(aylik)} {psim}/ay</span>
+                      <div className="flex justify-between border-t border-white/5 pt-1.5 mt-1.5">
+                        <span className="text-gray/60">{ay} ay taksit</span>
+                        <span className="font-extrabold text-white">{fmt(aylik)} {psim}/ay</span>
                       </div>
                     ) : null}
                   </div>
-                  {vade === 0 ? <p className="mt-1.5 text-[11px] font-medium text-teal-d">Vade farksız</p> : null}
+                  {vade === 0 ? <p className="mt-2 text-[10px] font-bold text-teal uppercase font-mono">Vade farksız</p> : null}
                 </div>
               );
             })()
@@ -239,13 +242,15 @@ export function DaireModal({
           >
             <input type="hidden" name="birim_id" value={birim.id} />
             <input type="hidden" name="proje_id" value={projeId} />
-            <p className="text-sm font-medium text-ink">Durum</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-gray/50 font-mono mb-2">Birim Durumu</p>
             <div className="mt-2 flex flex-wrap gap-1.5">
               {DURUMLAR.map((d) => (
                 <label
                   key={d}
-                  className={`cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                    durum === d ? `border-transparent text-white ${DURUM_BG[d]}` : "border-hair text-gray hover:border-teal"
+                  className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-semibold transition-all duration-300 ${
+                    durum === d
+                      ? `border-transparent text-white font-extrabold ${DURUM_BG[d]}`
+                      : "border-white/5 bg-[#0f172a] text-gray/70 hover:border-white/10 hover:text-white"
                   }`}
                 >
                   <input
@@ -265,25 +270,27 @@ export function DaireModal({
               defaultValue={birim.durum_notu ?? ""}
               rows={2}
               placeholder="Durum notu — opsiyon: kim/ne zaman; satış: alıcı vb."
-              className="mt-3 w-full rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal"
+              className="mt-3 w-full rounded-xl border border-white/5 bg-[#0f172a] p-3 text-sm text-white outline-none transition-all focus:border-teal/30 focus:bg-[#090d16] placeholder:text-gray/40"
             />
-            <div className="mt-3 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1 font-mono text-xs text-gray">
-                <span className={`size-1.5 rounded-full ${tazelikDot(birim.son_guncelleme)}`} />
+            <div className="mt-4 flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 font-mono text-xs text-gray/60">
+                <span className={`size-2 rounded-full ${tazelikDot(birim.son_guncelleme)} shadow-sm`} />
                 {zamanOnce(birim.son_guncelleme)}
               </span>
               <Kaydet />
             </div>
           </form>
 
-          <details className="mt-3 rounded-lg border border-hair">
-            <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-ink">Daireyi düzenle (no · kat · fiyat · yön · m²)</summary>
+          <details className="mt-4 rounded-xl border border-white/5 bg-[#030712]/40 overflow-hidden transition-all duration-300">
+            <summary className="cursor-pointer px-4 py-3 text-xs font-semibold text-white/95 hover:bg-white/5 select-none">
+              Daire Bilgilerini Düzenle
+            </summary>
             <form
               action={async (fd) => {
                 await birimGuncelle(fd);
                 onKapat();
               }}
-              className="grid grid-cols-2 gap-2 p-3"
+              className="grid grid-cols-2 gap-3 p-4 border-t border-white/5"
             >
               <input type="hidden" name="birim_id" value={birim.id} />
               <input type="hidden" name="proje_id" value={projeId} />
@@ -294,26 +301,29 @@ export function DaireModal({
               <input name="brut_m2" type="number" defaultValue={birim.brut_m2 ?? ""} placeholder="Brüt m²" className={inp} />
               <input name="yon" defaultValue={birim.yon ?? ""} placeholder="Yön" className={inp} />
               <input name="manzara" defaultValue={birim.manzara ?? ""} placeholder="Manzara" className={`${inp} col-span-2`} />
-              <label className="col-span-2 flex items-center gap-2 text-sm text-ink">
-                <input type="checkbox" name="satilabilir" defaultChecked={birim.satilabilir} className="size-4" /> Satılabilir (arsa payı değil)
+              <label className="col-span-2 flex items-center gap-2 text-xs font-semibold text-white/90 cursor-pointer py-1 select-none">
+                <input type="checkbox" name="satilabilir" defaultChecked={birim.satilabilir} className="size-4 rounded border-white/10 bg-[#0f172a] text-teal focus:ring-0 focus:ring-offset-0" />
+                <span>Satılabilir (arsa payı değil)</span>
               </label>
-              <div className="col-span-2"><Kaydet /></div>
+              <div className="col-span-2 mt-1"><Kaydet /></div>
             </form>
           </details>
           </>
         ) : (
-          <div className="mt-4 space-y-2">
+          <div className="mt-5 space-y-3">
             <a
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-lg bg-green px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              className="flex items-center justify-center gap-2 rounded-xl bg-[#10b981] hover:bg-[#059669] py-3.5 text-xs font-bold text-white transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] hover:shadow-[0_0_20px_rgba(16,185,129,0.25)]"
             >
+              <svg className="size-4.5 fill-current" viewBox="0 0 24 24">
+                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.859 4.373-9.864 9.803-.002 1.757.475 3.468 1.385 4.988L2.082 21.82l6.565-1.666zM17.29 14.7c-.283-.143-1.67-.82-1.929-.915-.258-.094-.446-.142-.634.143-.188.283-.729.915-.892 1.102-.163.189-.327.213-.61.072-2.046-1.023-3.4-1.918-4.755-4.249-.356-.61.356-.566 1.02-1.888.106-.212.053-.399-.026-.541-.079-.142-.633-1.526-.867-2.09-.228-.548-.46-.473-.633-.482-.164-.008-.352-.01-.54-.01s-.494.07-.753.353c-.259.283-.988.962-.988 2.348s1.009 2.72 1.15 2.908c.141.189 1.984 3.01 4.806 4.217.672.287 1.196.459 1.603.589.675.215 1.29.185 1.776.113.541-.08 1.67-.68 1.905-1.339.235-.66.235-1.226.165-1.343-.07-.118-.282-.189-.564-.332z"/>
+              </svg>
               WhatsApp ile Paylaş
             </a>
-            {/* Yasal: sosyal medyada gayrimenkul ilanı yasak (Tic. Bak. 2024). Link birebir paylaşım içindir. */}
-            <p className="text-center text-[11px] leading-snug text-gray">
-              Yalnız müşterinle birebir paylaş — sosyal medyada yayınlama (yetkisiz ilan = yasal risk).
+            <p className="text-center text-[10.5px] leading-snug text-gray/50 font-medium">
+              Müşterinizle birebir paylaşın — yetkisiz ilan yasal risk taşımaktadır.
             </p>
 
             {birim.durum === "musait" && birim.satilabilir ? (
@@ -327,9 +337,9 @@ export function DaireModal({
                     if (r.ok) onKapat();
                   })
                 }
-                className="w-full rounded-lg bg-amber px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="w-full rounded-xl bg-teal font-bold py-3.5 text-xs text-navy transition-all duration-300 hover:bg-teal/90 disabled:opacity-50 shadow-[0_0_15px_rgba(6,182,212,0.15)] cursor-pointer"
               >
-                {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48s"}
+                {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48 Saat"}
               </button>
             ) : birim.durum === "opsiyonlu" ? (
               <button
@@ -342,20 +352,23 @@ export function DaireModal({
                     if (r.ok) onKapat();
                   })
                 }
-                className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-amber transition-colors hover:border-amber disabled:opacity-50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 py-3.5 text-xs font-semibold text-amber transition-all duration-300 hover:bg-white/10 disabled:opacity-50 cursor-pointer"
               >
-                {bekliyor ? "İşleniyor…" : "Opsiyonu bırak (yalnız kendi opsiyonun)"}
+                {bekliyor ? "İşleniyor…" : "Opsiyonu Bırak"}
               </button>
             ) : (
-              <button disabled className="w-full rounded-lg border border-hair px-4 py-2.5 text-sm font-medium text-gray opacity-60">
+              <button disabled className="w-full rounded-xl border border-white/5 bg-white/[0.02] py-3.5 text-xs font-semibold text-gray/40">
                 {DURUM_ETIKET[birim.durum]} — opsiyon alınamaz
               </button>
             )}
 
-            <p className="inline-flex items-center gap-1 font-mono text-xs text-gray">
-              <span className={`size-1.5 rounded-full ${tazelikDot(birim.son_guncelleme)}`} />
-              {zamanOnce(birim.son_guncelleme)} güncellendi
-            </p>
+            <div className="flex justify-between items-center pt-2 font-mono text-[10px] text-gray/50 border-t border-white/5">
+              <span>GÜNCELLİK DURUMU</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className={`size-1.5 rounded-full ${tazelikDot(birim.son_guncelleme)} shadow-sm`} />
+                {zamanOnce(birim.son_guncelleme)} güncellendi
+              </span>
+            </div>
           </div>
         )}
       </div>

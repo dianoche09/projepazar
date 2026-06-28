@@ -116,170 +116,173 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+    <div className="mx-auto max-w-6xl py-4">
       {/* Filtrele — açılır panel (tüm ekranlar) */}
-      <details className="mb-4 rounded-xl border border-hair bg-card">
-        <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-medium text-ink">
-          <span>Filtrele</span>
+      <details className="mb-6 rounded-2xl glass-card transition-all duration-300">
+        <summary className="flex cursor-pointer items-center gap-2 px-5 py-4 text-sm font-semibold text-white/95">
+          <span>Filtreleme Seçenekleri</span>
           {aktifSayi > 0 ? (
-            <span className="rounded-full bg-navy px-2 py-0.5 font-mono text-xs text-white">{aktifSayi}</span>
+            <span className="rounded-full bg-teal px-2 py-0.5 font-mono text-[11px] font-bold text-navy shadow-[0_0_8px_var(--color-teal)]">{aktifSayi}</span>
           ) : null}
-          <span className="ml-auto text-xs text-gray">{liste.length} proje</span>
+          <span className="ml-auto text-xs text-gray/50 font-mono">{liste.length} proje listeleniyor</span>
         </summary>
-        <div className="border-t border-hair px-4 py-4">
+        <div className="border-t border-white/5 px-5 py-5 bg-[#030712]/40">
           <HavuzFiltreler {...filtreProps} />
         </div>
       </details>
 
-      <div className="belir mb-4 flex items-center justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h2 className="font-display text-xl font-extrabold text-ink">
-                {il ? `${ilce || il} · Yetkili Projeler` : "Yetkili Projeler"}
-              </h2>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-2.5 py-0.5 font-mono text-[11px] font-medium text-teal-d">
-                <span className="nabiz size-1.5 rounded-full bg-green" aria-hidden /> Canlı
-              </span>
-            </div>
-            <p className="text-[13px] text-gray">
-              {liste.length} proje · {toplamBirim} birim canlı{sonSenkron ? ` · son senkron ${sonSenkron}` : ""}
-            </p>
+      <div className="belir mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <h2 className="font-display text-xl font-bold tracking-tight text-white">
+              {il ? `${ilce || il} · Yetkili Projeler` : "Yetkili Projeler"}
+            </h2>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-2.5 py-1 font-mono text-[11px] font-semibold text-green border border-green/20">
+              <span className="nabiz size-1.5 rounded-full bg-green shadow-[0_0_8px_var(--color-green)]" aria-hidden /> Canlı
+            </span>
           </div>
-          <select
-            value={sirala}
-            onChange={(e) => setSirala(e.target.value as typeof sirala)}
-            className="rounded-lg border border-hair bg-card px-3 py-1.5 text-[12.5px] text-ink outline-none focus:border-teal"
-          >
-            <option value="taze">En taze ▾</option>
-            <option value="musait">En çok müsait</option>
-            <option value="ucuz">En uygun</option>
-          </select>
+          <p className="text-xs text-gray/60 mt-1 font-medium">
+            {liste.length} proje · {toplamBirim} birim canlı{sonSenkron ? ` · son senkron ${sonSenkron}` : ""}
+          </p>
         </div>
+        <select
+          value={sirala}
+          onChange={(e) => setSirala(e.target.value as typeof sirala)}
+          className="rounded-xl border border-white/5 bg-[#0f172a] px-4 py-2.5 text-xs font-semibold text-white outline-none focus:border-teal/50 shadow-card"
+        >
+          <option value="taze">En taze ▾</option>
+          <option value="musait">En çok müsait</option>
+          <option value="ucuz">En uygun</option>
+        </select>
+      </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
-          {liste.map((p, i) => {
-            const wa = `${p.ad} · ${[p.ilce, p.il].filter(Boolean).join(", ")}${p.min ? ` · ${fiyat(p.min)}₺'den` : ""}`;
-            return (
-              <div
-                key={p.id}
-                style={{ animationDelay: `${Math.min(i, 8) * 0.04}s` }}
-                className="belir group overflow-hidden rounded-2xl border border-hair bg-card shadow-card transition-shadow hover:shadow-cardlg"
-              >
-                {/* thumb — render görsel */}
-                <Link href={`/havuz/proje/${p.id}`} className="relative block h-[160px] overflow-hidden">
-                  {p.kapak ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
-                  ) : (
-                    <>
-                      <div className="absolute inset-0 bg-gradient-to-br from-navy-soft via-teal-soft to-soft" />
-                      <span className="absolute inset-0 flex select-none items-center justify-center font-display text-6xl font-bold text-teal-d/25">
-                        {p.ad.charAt(0).toUpperCase()}
-                      </span>
-                    </>
-                  )}
-                  {p.belge_dogrulandi && (
-                    <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-teal-soft px-2 py-1 text-[11px] font-semibold text-teal-d shadow-sm">
-                      ✓ Doğrulanmış
+      <div className="grid gap-6 lg:grid-cols-2">
+        {liste.map((p, i) => {
+          const wa = `${p.ad} · ${[p.ilce, p.il].filter(Boolean).join(", ")}${p.min ? ` · ${fiyat(p.min)} ${paraSimge(p.para_birimi)}'den` : ""}`;
+          return (
+            <div
+              key={p.id}
+              style={{ animationDelay: `${Math.min(i, 8) * 0.04}s` }}
+              className="belir group overflow-hidden rounded-2xl glass-card transition-all duration-300 hover:border-teal/20 hover:-translate-y-0.5 hover:shadow-cardlg"
+            >
+              {/* thumb — render görsel */}
+              <Link href={`/havuz/proje/${p.id}`} className="relative block h-[180px] overflow-hidden border-b border-white/5">
+                {p.kapak ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.kapak} alt={p.ad} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" />
+                ) : (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#020617]" />
+                    <span className="absolute inset-0 flex select-none items-center justify-center font-display text-7xl font-extrabold text-teal/10">
+                      {p.ad.charAt(0).toUpperCase()}
                     </span>
-                  )}
-                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full border border-green bg-green-soft px-2.5 py-1 font-mono text-[11.5px] text-ink">
-                    <span className="nabiz size-2 rounded-full bg-green" />
-                    {zamanOnce(p.son_guncelleme)}
+                  </>
+                )}
+                {p.belge_dogrulandi && (
+                  <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-full bg-teal-soft border border-teal/20 px-2.5 py-1 text-[11px] font-semibold text-teal shadow-[0_0_8px_rgba(6,182,212,0.15)]">
+                    ✓ Doğrulanmış
                   </span>
-                  <span className="absolute bottom-3 right-3 rounded-md bg-ink/70 px-2 py-1 font-mono text-[10.5px] text-white backdrop-blur-sm">
-                    ◳ {p.toplam} birim
-                  </span>
-                </Link>
+                )}
+                <span className="absolute bottom-3.5 left-3.5 inline-flex items-center gap-1.5 rounded-full border border-green/30 bg-green-soft px-3 py-1 font-mono text-[11px] font-semibold text-green backdrop-blur-md">
+                  <span className="nabiz size-1.5 rounded-full bg-green shadow-[0_0_8px_var(--color-green)]" />
+                  {zamanOnce(p.son_guncelleme)}
+                </span>
+                <span className="absolute bottom-3.5 right-3.5 rounded-lg bg-black/60 px-2.5 py-1.5 font-mono text-[10.5px] font-bold text-white/95 backdrop-blur-md border border-white/5">
+                  ◳ {p.toplam} BİRİM
+                </span>
+              </Link>
 
-                {/* gövde */}
-                <div className="p-3.5">
-                  <Link href={`/havuz/proje/${p.id}`}>
-                    <h3 className="font-display text-[17px] font-bold text-ink hover:text-teal-d">{p.ad}</h3>
-                  </Link>
-                  <p className="text-[12.5px] text-gray">
-                    {[p.ilce, p.mahalle].filter(Boolean).join(" · ") || "—"}
-                    {yil(p.teslim_tarihi) ? ` · ${yil(p.teslim_tarihi)}` : ""}
-                  </p>
-
-                  {p.tipler.length > 0 && (
-                    <div className="my-2.5 flex flex-wrap gap-1.5">
-                      {p.tipler.slice(0, 3).map((t) => (
-                        <span key={t} className="inline-flex items-center gap-1.5 rounded-lg border border-hair py-1 pl-1 pr-2 text-[11.5px] text-ink">
-                          <MiniPlan /> {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mt-2.5">
-                    <YiginBar
-                      parcalar={[
-                        { etiket: "Müsait", deger: p.musait, renk: "#2FB36B" },
-                        { etiket: "Opsiyon", deger: p.opsiyon, renk: "#E3A12C" },
-                        { etiket: "Satıldı", deger: p.satildi, renk: "#D15A4E" },
-                      ]}
-                    />
-                  </div>
-
-                  <div className="my-2.5 flex flex-wrap gap-3 text-[12px] text-gray">
-                    <span><span className="mr-1.5 inline-block size-2 rounded-full bg-green align-middle" /><b className="text-ink">{p.musait}</b> müsait</span>
-                    <span><span className="mr-1.5 inline-block size-2 rounded-full bg-amber align-middle" /><b className="text-ink">{p.opsiyon}</b> opsiyon</span>
-                    <span><span className="mr-1.5 inline-block size-2 rounded-full bg-red align-middle" /><b className="text-ink">{p.satildi}</b> satıldı</span>
-                  </div>
-
-                  {(p.kira_getirisi != null || p.oturum_uygun || p.golden_visa) && (
-                    <div className="mb-2 flex flex-wrap gap-1.5 text-[11px] font-medium">
-                      {p.kira_getirisi != null && (
-                        <span className="rounded-md bg-teal-soft px-2 py-0.5 text-teal-d">%{p.kira_getirisi} kira getirisi</span>
-                      )}
-                      {p.oturum_uygun && (
-                        <span className="rounded-md bg-navy-soft px-2 py-0.5 text-navy">Oturum uygun</span>
-                      )}
-                      {p.golden_visa && (
-                        <span className="rounded-md bg-amber/15 px-2 py-0.5 text-amber">Golden Vize</span>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="font-mono text-[14.5px] font-medium text-ink">
-                      {p.min != null ? `${fiyat(p.min)} – ${p.max != null ? fiyat(p.max) : ""} ${paraSimge(p.para_birimi)}` : "fiyat —"}
-                    </span>
-                    <span className="font-mono text-[11px] text-gray">KDV dahil</span>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/havuz/proje/${p.id}`}
-                      className="flex-1 rounded-lg bg-green py-2.5 text-center text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-                    >
-                      İncele
+              {/* gövde */}
+              <div className="p-5">
+                <div className="flex justify-between items-start gap-2">
+                  <div>
+                    <Link href={`/havuz/proje/${p.id}`}>
+                      <h3 className="font-display text-lg font-bold text-white hover:text-teal transition-colors tracking-tight">{p.ad}</h3>
                     </Link>
-                    <a
-                      href={`https://wa.me/?text=${encodeURIComponent(wa)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 rounded-lg border border-teal py-2.5 text-center text-[13px] font-semibold text-teal-d transition-colors hover:bg-teal-soft"
-                    >
-                      WhatsApp Paylaş
-                    </a>
+                    <p className="text-xs text-gray/70 mt-1 font-medium">
+                      {[p.ilce, p.mahalle].filter(Boolean).join(" · ") || "—"}
+                      {yil(p.teslim_tarihi) ? ` · ${yil(p.teslim_tarihi)}` : ""}
+                    </p>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="font-mono text-base font-bold text-white tracking-tight">
+                      {p.min != null ? `${fiyat(p.min)} – ${p.max != null ? fiyat(p.max) : ""} ${paraSimge(p.para_birimi)}` : "Fiyat Belirtilmedi"}
+                    </span>
+                    <span className="font-mono text-[10px] text-gray/50 uppercase mt-0.5">KDV dahil</span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
 
-          {liste.length === 0 && (
-            <div className="col-span-full rounded-2xl border border-dashed border-hair bg-card/50 p-12 text-center">
-              <p className="text-sm text-gray">
-                {projeler.length === 0
-                  ? "Sana tahsisli proje yok. Üretici tahsis edince burada canlı görünür."
-                  : "Filtreye uyan proje yok."}
-              </p>
+                {p.tipler.length > 0 && (
+                  <div className="my-4 flex flex-wrap gap-1.5">
+                    {p.tipler.slice(0, 3).map((t) => (
+                      <span key={t} className="inline-flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] py-1.5 pl-1.5 pr-2.5 text-[11px] font-medium text-white/80">
+                        <MiniPlan /> {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <YiginBar
+                    parcalar={[
+                      { etiket: "Müsait", deger: p.musait, renk: "#10b981" },
+                      { etiket: "Opsiyon", deger: p.opsiyon, renk: "#f59e0b" },
+                      { etiket: "Satıldı", deger: p.satildi, renk: "#ef4444" },
+                    ]}
+                  />
+                </div>
+
+                <div className="my-3 flex flex-wrap gap-3.5 text-[11px] text-gray/70 font-mono uppercase">
+                  <span><span className="mr-1.5 inline-block size-1.5 rounded-full bg-green align-middle shadow-[0_0_6px_var(--color-green)]" /><b className="text-white font-sans">{p.musait}</b> Müsait</span>
+                  <span><span className="mr-1.5 inline-block size-1.5 rounded-full bg-amber align-middle shadow-[0_0_6px_var(--color-amber)]" /><b className="text-white font-sans">{p.opsiyon}</b> Opsiyon</span>
+                  <span><span className="mr-1.5 inline-block size-1.5 rounded-full bg-red align-middle shadow-[0_0_6px_var(--color-red)]" /><b className="text-white font-sans">{p.satildi}</b> Satıldı</span>
+                </div>
+
+                {(p.kira_getirisi != null || p.oturum_uygun || p.golden_visa) && (
+                  <div className="mb-4 flex flex-wrap gap-2 text-[10.5px] font-semibold">
+                    {p.kira_getirisi != null && (
+                      <span className="rounded-lg bg-teal-soft border border-teal/10 px-2.5 py-1 text-teal">%{p.kira_getirisi} Kira Getirisi</span>
+                    )}
+                    {p.oturum_uygun && (
+                      <span className="rounded-lg bg-white/5 border border-white/10 px-2.5 py-1 text-white/90">Oturuma Uygun</span>
+                    )}
+                    {p.golden_visa && (
+                      <span className="rounded-lg bg-amber-soft border border-amber/10 px-2.5 py-1 text-amber">Golden Visa</span>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex gap-3 mt-5">
+                  <Link
+                    href={`/havuz/proje/${p.id}`}
+                    className="flex-1 rounded-xl bg-teal py-3 text-center text-xs font-bold text-navy transition-all duration-300 hover:bg-teal/90 shadow-[0_0_15px_rgba(6,182,212,0.1)] hover:shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+                  >
+                    Detaylı İncele
+                  </Link>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(wa)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 rounded-xl border border-white/10 bg-white/5 py-3 text-center text-xs font-semibold text-white/90 transition-all duration-300 hover:bg-white/10 hover:border-white/20"
+                  >
+                    WhatsApp ile Paylaş
+                  </a>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          );
+        })}
+
+        {liste.length === 0 && (
+          <div className="col-span-full rounded-2xl border border-dashed border-white/5 bg-white/[0.01] p-16 text-center">
+            <p className="text-sm text-gray/50 font-medium">
+              {projeler.length === 0
+                ? "Sana tahsisli proje bulunmuyor. Üretici tahsis tanımladığında burada canlı olarak listelenecektir."
+                : "Filtreleme kriterlerinize uygun proje bulunamadı."}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

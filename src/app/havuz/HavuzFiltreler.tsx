@@ -72,16 +72,18 @@ export function HavuzFiltreler({
   setMinKira: (v: string) => void;
 }) {
   const inp =
-    "w-full rounded-lg border border-hair bg-card px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
+    "w-full rounded-xl border border-white/5 bg-[#0f172a] px-3.5 py-3 font-sans text-xs text-white/90 outline-none transition-all focus:border-teal/30 focus:bg-[#090d16]";
   const cip = (aktif: boolean) =>
-    `rounded-lg border px-2.5 py-1.5 text-[12.5px] transition-colors ${
-      aktif ? "border-navy bg-navy text-white" : "border-hair bg-card text-ink hover:border-teal"
+    `rounded-xl border px-3 py-2 text-[12px] font-semibold transition-all duration-300 ${
+      aktif
+        ? "border-white/10 bg-teal text-navy shadow-[0_0_10px_var(--color-teal)]"
+        : "border-white/5 bg-[#0f172a] text-gray/70 hover:border-white/10 hover:bg-white/5 hover:text-white"
     }`;
-  const baslik = "mt-5 text-[11px] font-bold uppercase tracking-wider text-gray";
+  const baslik = "mt-5 text-[10px] font-bold uppercase tracking-widest text-gray/50 font-mono";
 
   return (
     <div>
-      <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray">Konum</h4>
+      <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray/50 font-mono">Konum</h4>
       <select
         value={il}
         onChange={(e) => {

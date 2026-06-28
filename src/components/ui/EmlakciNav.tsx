@@ -40,11 +40,13 @@ export function EmlakciNav() {
         <Link
           key={n.href}
           href={n.href}
-          className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-            aktif(n) ? "bg-navy text-white" : "text-gray hover:bg-soft hover:text-ink"
+          className={`flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+            aktif(n)
+              ? "bg-white/5 border border-white/10 text-teal shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+              : "border border-transparent text-gray/70 hover:bg-white/5 hover:text-white"
           }`}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="size-[18px]">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-[18px]">
             {n.ikon}
           </svg>
           {n.etiket}

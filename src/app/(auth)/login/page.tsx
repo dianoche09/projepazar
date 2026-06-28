@@ -15,28 +15,28 @@ export default async function LoginPage({
 
   return (
     <AuthKabuk>
-      <div className="rounded-2xl border border-hair bg-card p-6 shadow-card sm:p-7">
-        <h1 className="font-display text-2xl font-semibold text-ink">Giriş yap</h1>
-        <p className="mt-1.5 text-sm text-gray">
+      <div className="glass-card rounded-2xl p-6 sm:p-8 shadow-cardlg">
+        <h1 className="font-display text-2xl font-bold text-white tracking-tight">Giriş yap</h1>
+        <p className="mt-2 text-sm text-gray/80">
           Canlı stok ağına eriş. E-posta ve parolanla devam et.
         </p>
 
         {hata && (
           <p
             role="alert"
-            className="mt-4 rounded-lg border border-red/30 bg-red-soft px-3 py-2 text-sm text-red"
+            className="mt-4 rounded-xl border border-red/20 bg-red-soft px-4 py-2.5 text-sm text-red"
           >
             {hata}
           </p>
         )}
         {mesaj && (
-          <p className="mt-4 rounded-lg border border-green/30 bg-green-soft px-3 py-2 text-sm text-teal-d">
+          <p className="mt-4 rounded-xl border border-green/20 bg-green-soft px-4 py-2.5 text-sm text-green">
             {mesaj}
           </p>
         )}
 
         <form action={girisYap} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+          <label className="flex flex-col gap-2 text-sm font-semibold text-white/90">
             E-posta
             <input
               name="email"
@@ -47,7 +47,7 @@ export default async function LoginPage({
               className={inpCls}
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-sm font-medium text-ink">
+          <label className="flex flex-col gap-2 text-sm font-semibold text-white/90">
             Parola
             <input
               name="password"
@@ -60,19 +60,19 @@ export default async function LoginPage({
             />
           </label>
 
-          <SubmitButton className="mt-2 w-full" bekleyenMetin="Giriş yapılıyor…">
+          <SubmitButton className="mt-4 w-full bg-teal text-navy hover:bg-teal/90 rounded-xl py-3 font-semibold transition-all duration-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]" bekleyenMetin="Giriş yapılıyor…">
             Giriş yap
           </SubmitButton>
         </form>
-        <p className="mt-5 border-t border-hair pt-4 text-center text-sm text-gray">
+        <p className="mt-6 border-t border-white/5 pt-4 text-center text-sm text-gray/70">
           Hesabın yok mu?{" "}
-          <Link href="/kayit" className="font-medium text-teal-d hover:underline">
+          <Link href="/kayit" className="font-semibold text-teal hover:underline">
             Kayıt ol
           </Link>
         </p>
       </div>
 
-      <p className="mt-6 text-center text-xs text-gray">
+      <p className="mt-6 text-center text-xs text-gray/50">
         Kapalı devre B2B ağ · yalnızca davetli üretici ve danışmanlar.
       </p>
     </AuthKabuk>

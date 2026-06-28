@@ -5,32 +5,32 @@
    Sinyal: yeşil=müsait, amber=opsiyon, kırmızı=satıldı
    ========================================================= */
 @theme {
-  --color-ink: #0f2638;
-  --color-navy: #13314b;
-  --color-teal: #1e9b8a;
-  --color-teal-d: #137163;
-  --color-green: #2fb36b;
-  --color-amber: #e3a12c;
-  --color-red: #d15a4e;
-  --color-paper: #eef1f5;
-  --color-card: #ffffff;
-  --color-gray: #5e6b78;
-  --color-hair: #e6ebef;
+  --color-ink: #f8fafc;
+  --color-navy: #020617;
+  --color-teal: #06b6d4;
+  --color-teal-d: #0891b2;
+  --color-green: #10b981;
+  --color-amber: #f59e0b;
+  --color-red: #ef4444;
+  --color-paper: #090d16;
+  --color-card: #0f172a;
+  --color-gray: #94a3b8;
+  --color-hair: rgba(255, 255, 255, 0.08);
 
   /* soft yüzeyler (rozet/çip/panel zeminleri) */
-  --color-soft: #f5f8fa;
-  --color-navy-soft: #eaf0f5;
-  --color-green-soft: #e5f5ec;
-  --color-amber-soft: #fbf0da;
-  --color-red-soft: #f8e7e4;
-  --color-teal-soft: #e2f3f0;
+  --color-soft: #1e293b;
+  --color-navy-soft: #0f172a;
+  --color-green-soft: rgba(16, 185, 129, 0.12);
+  --color-amber-soft: rgba(245, 158, 11, 0.12);
+  --color-red-soft: rgba(239, 68, 68, 0.12);
+  --color-teal-soft: rgba(6, 182, 212, 0.12);
 
   /* gölge: kart border+gölgeyi BİRLİKTE ağır kullanma (ghost-card yasak) → kart için tight tek gölge */
-  --shadow-card: 0 1px 2px rgba(15, 38, 56, 0.05);
-  --shadow-cardlg: 0 2px 8px rgba(15, 38, 56, 0.08), 0 24px 60px rgba(15, 38, 56, 0.12);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-cardlg: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
-  --font-display: var(--font-bricolage); /* başlık / wordmark */
-  --font-sans: var(--font-instrument); /* arayüz / metin */
+  --font-display: var(--font-outfit); /* başlık / wordmark */
+  --font-sans: var(--font-outfit); /* arayüz / metin */
   --font-mono: var(--font-geist-mono); /* veri / fiyat / işaret */
 }
 
@@ -239,4 +239,31 @@ a:focus-visible,
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Glassmorphism & Neon helper classes for dark theme */
+.glass-card {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.glass-card-hover:hover {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(6, 182, 212, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(6, 182, 212, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #06b6d4 30%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
