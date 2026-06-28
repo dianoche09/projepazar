@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { kova, DURUM_AD, paraKisa, tazelik, type DurumKova } from "@/lib/stok";
 
@@ -60,7 +60,14 @@ export function StokTablo({
   // sayfalama — 30 satır/sayfa
   const SAYFA_BOYUT = 30;
   const [sayfa, setSayfa] = useState(1);
-  useEffect(() => setSayfa(1), [projeId, durum]);
+  const projeSec = (id: string) => {
+    setProjeId(id);
+    setSayfa(1);
+  };
+  const durumSec = (d: DurumKova | "tumu") => {
+    setDurum(d);
+    setSayfa(1);
+  };
   const toplamSayfa = Math.max(1, Math.ceil(gosterilen.length / SAYFA_BOYUT));
   const aktifSayfa = Math.min(sayfa, toplamSayfa);
   const sayfada = gosterilen.slice((aktifSayfa - 1) * SAYFA_BOYUT, aktifSayfa * SAYFA_BOYUT);
@@ -74,7 +81,7 @@ export function StokTablo({
         </span>
         <button
           type="button"
-          onClick={() => setProjeId("tumu")}
+          onClick={() => projeSec("tumu")}
           className={`chip h-8 px-3 text-[12px] ${projeId === "tumu" ? "bg-navy text-white" : ""}`}
         >
           Tümü
@@ -83,7 +90,7 @@ export function StokTablo({
           <button
             key={p.id}
             type="button"
-            onClick={() => setProjeId(p.id)}
+            onClick={() => projeSec(p.id)}
             className={`chip h-8 px-3 text-[12px] ${projeId === p.id ? "bg-navy text-white" : ""}`}
           >
             {p.ad}
@@ -96,7 +103,7 @@ export function StokTablo({
           <button
             key={f.anahtar}
             type="button"
-            onClick={() => setDurum(f.anahtar)}
+            onClick={() => durumSec(f.anahtar)}
             className={`chip h-8 px-3 text-[12px] ${durum === f.anahtar ? "bg-navy text-white" : ""}`}
           >
             {f.nokta ? <span className={`size-[7px] rounded-full ${f.nokta}`} /> : null}
