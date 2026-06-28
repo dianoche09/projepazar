@@ -36,6 +36,14 @@ export type ModalBirim = {
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
 const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
+/** Tazelik tier nokta rengi (tasarım dili imzası): 0-24sa yeşil · 1-7g teal · 7-15g amber · 15g+ gri. */
+function tazelikDot(iso: string): string {
+  const gun = (Date.now() - new Date(iso).getTime()) / 86_400_000;
+  if (gun <= 1) return "bg-green";
+  if (gun <= 7) return "bg-teal";
+  if (gun <= 15) return "bg-amber";
+  return "bg-gray";
+}
 type OdemePlani = {
   pesinat_pct?: number | null;
   taksit_sayisi?: number | null;
@@ -261,7 +269,7 @@ export function DaireModal({
             />
             <div className="mt-3 flex items-center justify-between">
               <span className="inline-flex items-center gap-1 font-mono text-xs text-gray">
-                <span className="size-1.5 rounded-full bg-green" />
+                <span className={`size-1.5 rounded-full ${tazelikDot(birim.son_guncelleme)}`} />
                 {zamanOnce(birim.son_guncelleme)}
               </span>
               <Kaydet />
@@ -345,7 +353,7 @@ export function DaireModal({
             )}
 
             <p className="inline-flex items-center gap-1 font-mono text-xs text-gray">
-              <span className="size-1.5 rounded-full bg-green" />
+              <span className={`size-1.5 rounded-full ${tazelikDot(birim.son_guncelleme)}`} />
               {zamanOnce(birim.son_guncelleme)} güncellendi
             </p>
           </div>
