@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import { verifyShareToken } from "@/lib/sharing";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { kayitYaz } from "@/lib/events";
 import { DURUM_BG, DURUM_ETIKET, ASAMA_ETIKET, zamanOnce, type BirimDurum, type InsaatAsama } from "@/lib/types";
 import LeadForm from "./LeadForm";
 import { GridMark } from "@/components/GridMark";
@@ -95,6 +97,18 @@ export default async function PublicBirimPage({
     const vade = op.vade_farki_pct ?? 0;
     odeme = { pesinat, ay, aylik: ay > 0 ? Math.round((kalan * (1 + vade / 100)) / ay) : 0, vade };
   }
+
+  // Katman A — ANONİM görüntüleme sinyali (veri yerçekimi; backfill edilemez = moat).
+  // Müşteri kimliği/IP/telefon YOK → yalnız "bu birim bu danışman linkinden görüntülendi". KVKK-safe.
+  after(() =>
+    kayitYaz({
+      tip: "goruntuleme",
+      profileId: emlakci,
+      projeId: p?.id ?? null,
+      birimId: b.id,
+      payload: { kaynak: "mikrosite" },
+    }),
+  );
 
   return (
     <div className="min-h-screen bg-paper pb-16">

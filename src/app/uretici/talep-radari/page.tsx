@@ -42,7 +42,8 @@ const OLAY_RENK: Record<string, string> = {
 export default async function UreticiTalepRadari() {
   const supabase = await createClient();
 
-  const [{ data: projeler }, { data: birimRaw }, { data: eventRaw }] = await Promise.all([
+  const yediGunOnce = new Date(Date.now() - 7 * 86_400_000).toISOString();
+  const [{ data: projeler }, { data: birimRaw }, { data: eventRaw }, { data: gorRaw }] = await Promise.all([
     supabase.from("proje").select("id, ad").order("created_at", { ascending: false }),
     supabase.from("birim").select("proje_id, durum, son_guncelleme"),
     supabase
@@ -50,11 +51,25 @@ export default async function UreticiTalepRadari() {
       .select("tip, proje_id, created_at")
       .order("created_at", { ascending: false })
       .limit(20),
+    // Görüntüleme sinyali (son 7g, anonim — Katman A veri yerçekimi; RLS: kendi projeleri)
+    supabase
+      .from("events")
+      .select("proje_id")
+      .eq("tip", "goruntuleme")
+      .gte("created_at", yediGunOnce)
+      .limit(2000),
   ]);
 
   const birimler = (birimRaw ?? []) as BirimRaw[];
   const events = (eventRaw ?? []) as EventRaw[];
   const projeAd = new Map((projeler ?? []).map((p) => [p.id, p.ad as string]));
+
+  // — Görüntüleme sinyali (son 7 gün, anonim) → en çok ilgi gören proje —
+  const goruntulemeler = (gorRaw ?? []) as { proje_id: string | null }[];
+  const toplamGoruntuleme = goruntulemeler.length;
+  const projeGor = new Map<string, number>();
+  for (const g of goruntulemeler) if (g.proje_id) projeGor.set(g.proje_id, (projeGor.get(g.proje_id) ?? 0) + 1);
+  const enCokGor = [...projeGor.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
 
   // Proje başı özet (müsait sayısı + satış oranı)
   type Ozet = { toplam: number; musait: number; opsiyon: number; satildi: number };
@@ -95,7 +110,9 @@ export default async function UreticiTalepRadari() {
           </span>
         </div>
         <p className="mt-1 text-[12.5px] text-[var(--ink-faint)]">
-          Canlı stoğundan türetilen içgörüler — şişen görüntülenme yok, yalnız gerçek hareket.
+          {toplamGoruntuleme > 0
+            ? `Canlı stok + gerçek görüntüleme sinyali (son 7g: ${toplamGoruntuleme} görüntüleme) — şişirilmiş veri yok.`
+            : "Canlı stoğundan türetilen içgörüler. Mikrosite paylaşımların görüntülendikçe ilgi sinyali burada birikir (geçmişe dönük doldurulamaz = moat)."}
         </p>
       </header>
 
@@ -113,6 +130,18 @@ export default async function UreticiTalepRadari() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px]">
           {/* İÇGÖRÜ KARTLARI */}
           <div className="belir belir-1 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {enCokGor ? (
+              <Insight
+                sig="var(--color-teal)"
+                ust="En çok ilgi gören proje · 7g"
+                deger={String(enCokGor[1])}
+                renk="text-teal-d"
+                metin={`${projeAd.get(enCokGor[0]) ?? "—"} — son 7 günde en çok görüntülenen proje (toplam ${toplamGoruntuleme} görüntüleme).`}
+                href={`/uretici/proje/${enCokGor[0]}`}
+                hrefMetin="Projeyi aç →"
+              />
+            ) : null}
+
             {opsiyon > 0 ? (
               <Insight
                 sig="var(--color-amber)"
