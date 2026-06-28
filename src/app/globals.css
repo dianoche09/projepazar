@@ -647,3 +647,26 @@ a:focus-visible,
     scroll-behavior: auto !important;
   }
 }
+
+/* =========================================================
+   YAZDIR / MÜŞTERİYE PDF — mikrosite print-optimize (canlı veri)
+   ========================================================= */
+@media print {
+  body {
+    background: #fff !important;
+  }
+  /* renkli rozet/kapak/durum baskıda KAYBOLMASIN */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* gölge/animasyon baskıda gereksiz */
+  .kart,
+  header,
+  [class*="shadow"] {
+    box-shadow: none !important;
+  }
+  @page {
+    margin: 14mm;
+  }
+}

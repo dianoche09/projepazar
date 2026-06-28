@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { DURUM_BG, DURUM_ETIKET, ASAMA_ETIKET, zamanOnce, type BirimDurum, type InsaatAsama } from "@/lib/types";
 import LeadForm from "./LeadForm";
 import { GridMark } from "@/components/GridMark";
+import { YazdirButonu } from "./YazdirButonu";
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
 const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
@@ -106,12 +107,15 @@ export default async function PublicBirimPage({
               Proje<span className="text-teal">Pazar</span>
             </span>
           </div>
-          <div className={`flex items-center gap-1.5 font-mono text-xs ${tazelik.text}`}>
-            <span className="relative flex size-2">
-              <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${tazelik.dot} opacity-75`}></span>
-              <span className={`relative inline-flex size-2 rounded-full ${tazelik.dot}`}></span>
-            </span>
-            Canlı stoktan alındı · {zamanOnce(b.son_guncelleme)} güncellendi
+          <div className="flex items-center gap-4">
+            <YazdirButonu />
+            <div className={`flex items-center gap-1.5 font-mono text-xs ${tazelik.text}`}>
+              <span className="relative flex size-2">
+                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full ${tazelik.dot} opacity-75 print:hidden`}></span>
+                <span className={`relative inline-flex size-2 rounded-full ${tazelik.dot}`}></span>
+              </span>
+              Canlı stoktan alındı · {zamanOnce(b.son_guncelleme)} güncellendi
+            </div>
           </div>
         </div>
       </header>
@@ -298,20 +302,18 @@ export default async function PublicBirimPage({
               </div>
             </div>
 
-            {/* Lead Formu */}
-            {b.satilabilir && bDurum === "musait" ? (
-              <LeadForm
-                projeId={p?.id}
-                birimId={b.id}
-                emlakciId={emlakci}
-              />
-            ) : (
-              <div className="rounded-2xl border border-hair bg-paper p-5 text-center">
-                <p className="text-sm text-gray font-medium">
-                  Bu daire {DURUM_ETIKET[bDurum]} olduğu için talep alımına kapalıdır.
-                </p>
-              </div>
-            )}
+            {/* Lead Formu — baskıda gizli (müşteriye PDF'te gerekmez) */}
+            <div className="print:hidden">
+              {b.satilabilir && bDurum === "musait" ? (
+                <LeadForm projeId={p?.id} birimId={b.id} emlakciId={emlakci} />
+              ) : (
+                <div className="rounded-2xl border border-hair bg-paper p-5 text-center">
+                  <p className="text-sm text-gray font-medium">
+                    Bu daire {DURUM_ETIKET[bDurum]} olduğu için talep alımına kapalıdır.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </main>
