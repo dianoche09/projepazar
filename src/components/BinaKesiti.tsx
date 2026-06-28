@@ -30,9 +30,9 @@ type Tip = {
 type Blok = { id: string; ad: string | null; kat_sayisi: number | null };
 
 /**
- * Birim dizilimini DÜZ ızgara yerine gerçek BİNA KESİTİ olarak gösterir:
- * çatı + parapet → katlar (üstten alta, daireler durum-renkli birimler/pencereler) → zemin giriş (lobi+kapı) → kaldırım.
- * Katlara daire eklendikçe bina yükselir. Daireye tıkla → Daire MODAL.
+ * BİNA KESİTİ — sistemin İMZA öğesi (v2 spatial "komuta şeması").
+ * Her blok bir kart: navy blueprint çerçevede üstten alta katlar, durum-renkli
+ * daire hücreleri (tıkla → DaireModal), zemin giriş. Seçim modu (SecimDuzenle) korunur.
  */
 export function BinaKesiti({
   bloklar,
@@ -54,37 +54,58 @@ export function BinaKesiti({
   const tipMap = new Map(tipler.map((t) => [t.id, t]));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {bloklar.map((blok) => {
         const bb = birimler.filter((b) => b.blok_id === blok.id);
         const katlar = [...new Set(bb.map((b) => b.kat).filter((k): k is number => k != null))].sort(
           (a, b) => b - a,
         );
+        const musait = bb.filter((b) => b.durum === "musait").length;
+        const opsiyon = bb.filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length;
+        const satildi = bb.filter((b) => b.durum === "satildi").length;
 
         return (
-          <div key={blok.id}>
-            <div className="mb-2 flex items-center gap-2">
-              <h3 className="font-display text-base font-semibold text-ink">{blok.ad}</h3>
-              <span className="font-mono text-xs text-gray">{bb.length} bağımsız bölüm</span>
+          <div key={blok.id} className="kart overflow-hidden">
+            {/* blok başlık + lejant */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--cizgi)] px-5 py-3.5">
+              <div className="flex items-center gap-2.5">
+                <h3 className="font-display text-[15px] font-bold text-ink">{blok.ad} Blok</h3>
+                <span className="mono rounded-md bg-navy-soft px-2 py-[2px] text-[11px] text-ink-soft">
+                  {bb.length} bağımsız bölüm
+                </span>
+              </div>
+              <div className="flex items-center gap-3 font-mono text-[11px] font-medium text-ink-soft">
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-green" />
+                  {musait}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-amber" />
+                  {opsiyon}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2 rounded-full bg-red" />
+                  {satildi}
+                </span>
+              </div>
             </div>
 
             {katlar.length === 0 ? (
-              <p className="rounded-xl border border-dashed border-hair bg-card/50 p-4 text-sm text-gray">
-                Bu blokta henüz birim yok — generator ile üret.
+              <p className="m-5 rounded-xl border border-dashed border-hair bg-soft p-5 text-sm text-[var(--ink-faint)]">
+                Bu blokta henüz birim yok — kurulumdan üret.
               </p>
             ) : (
-              <div className="mx-auto max-w-lg">
-                {/* gökyüzü zemini */}
-                <div className="rounded-t-2xl bg-gradient-to-b from-[#CFE5F1] to-[#EAF4F8] px-5 pt-4">
-                  {/* çatı + parapet + teknik kat */}
-                  <div className="relative mx-auto h-6 w-full max-w-[420px] rounded-t-md bg-[#243B50]">
-                    <div className="absolute inset-x-3 top-1 h-1.5 rounded bg-[#33536E]" />
-                    <div className="absolute left-1/2 top-[-7px] h-2.5 w-14 -translate-x-1/2 rounded-t bg-[#243B50]" />
-                    <div className="absolute right-5 top-[-12px] h-3 w-1 bg-[#243B50]" />
-                  </div>
+              <div className="relative overflow-hidden bg-gradient-to-b from-navy to-ink p-5">
+                {/* blueprint ızgara dokusu */}
+                <div className="izgara-doku pointer-events-none absolute inset-0 opacity-40" aria-hidden />
 
-                  {/* bina gövdesi — katlar */}
-                  <div className="mx-auto w-full max-w-[420px] border-x-[5px] border-[#3A5670] bg-[#ECE6DC]">
+                <div className="relative mx-auto w-full max-w-[560px]">
+                  {/* çatı */}
+                  <div className="mx-auto h-3 w-[calc(100%-28px)] rounded-t-lg bg-teal/80" />
+                  <div className="mx-auto -mt-px h-2 w-[calc(100%-56px)] rounded-t bg-teal/40" />
+
+                  {/* gövde — katlar (cam panel) */}
+                  <div className="overflow-hidden rounded-b-xl border border-white/10 bg-white/[0.04] shadow-[0_10px_40px_rgba(0,0,0,.35)] backdrop-blur-sm">
                     {katlar.map((kat) => {
                       const kb = bb
                         .filter((b) => b.kat === kat)
@@ -92,10 +113,10 @@ export function BinaKesiti({
                       return (
                         <div
                           key={kat}
-                          className="flex items-center gap-2 border-b border-[#D2CABD] px-2.5 py-2 last:border-b-0"
+                          className="flex items-center gap-2.5 border-b border-white/[0.06] px-3.5 py-2 last:border-b-0"
                         >
-                          <span className="w-7 shrink-0 text-right font-mono text-[10px] font-medium text-[#7A8893]">
-                            {kat}.
+                          <span className="w-8 shrink-0 text-right font-mono text-[10px] font-semibold text-white/45">
+                            K{kat}
                           </span>
                           <div className="flex flex-1 flex-wrap gap-1.5">
                             {kb.map((b) => {
@@ -142,16 +163,23 @@ export function BinaKesiti({
                       );
                     })}
 
-                    {/* zemin kat / giriş lobisi */}
-                    <div className="relative flex h-12 items-end justify-center gap-2 border-t-2 border-[#D2CABD] bg-[#E3DCD0] px-3 pb-0">
-                      <div className="absolute bottom-2 left-3 h-6 w-7 rounded-t-sm bg-[#A9D4E6]" />
-                      <div className="h-9 w-12 rounded-t-md bg-[#243B50]" />
-                      <div className="absolute bottom-2 right-3 h-6 w-7 rounded-t-sm bg-[#A9D4E6]" />
+                    {/* zemin giriş / lobi */}
+                    <div className="flex items-center gap-2.5 border-t border-white/10 bg-white/[0.02] px-3.5 py-2.5">
+                      <span className="w-8 shrink-0 text-right font-mono text-[10px] font-semibold text-white/45">
+                        Z
+                      </span>
+                      <div className="flex flex-1 items-center gap-2">
+                        <span className="h-6 flex-1 rounded bg-white/[0.05]" />
+                        <span className="rounded-md bg-teal/25 px-3 py-1 font-mono text-[10px] font-semibold tracking-wide text-white/85">
+                          GİRİŞ
+                        </span>
+                        <span className="h-6 flex-1 rounded bg-white/[0.05]" />
+                      </div>
                     </div>
                   </div>
 
-                  {/* kaldırım / çim */}
-                  <div className="mx-auto h-3 w-full max-w-[460px] rounded-b-2xl bg-[#CDE7D4]" />
+                  {/* zemin çizgisi / kaldırım */}
+                  <div className="mx-auto mt-px h-1.5 w-full rounded-b bg-black/25" />
                 </div>
               </div>
             )}
