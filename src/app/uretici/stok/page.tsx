@@ -85,7 +85,13 @@ export default async function UreticiStok() {
   return (
     <div className="mx-auto max-w-[1640px] px-4 py-6 text-ink sm:px-6">
       <header className="belir mb-5">
-        <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Stok / Fiyat Listesi</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Stok / Fiyat Listesi</h1>
+          <span className="inline-flex items-center gap-2 rounded-full bg-green-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-[#1f7d4c]">
+            <span className="nabiz inline-block size-[7px] rounded-full bg-green" aria-hidden />
+            Canlı
+          </span>
+        </div>
         <p className="mt-1 text-[12.5px] text-[var(--ink-faint)]">
           Tüm projelerin tek canlı stok tablosu — fiyat/durum yalnız birim tablosundan, anlık.
         </p>

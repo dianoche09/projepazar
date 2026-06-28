@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { kova, DURUM_AD, paraKisa, tazelik, type DurumKova } from "@/lib/stok";
+import { kova, DURUM_AD, DURUM_SINIF, paraKisa, tazelik, type DurumKova } from "@/lib/stok";
 
 export type StokSatir = {
   id: string;
@@ -163,7 +163,7 @@ export function StokTablo({
                       </td>
                     ) : null}
                     <td>
-                      <span className={`durum d-${k === "diger" ? "musait" : k}`}>
+                      <span className={`durum ${DURUM_SINIF[k]}`}>
                         <span className="nokta" />
                         {DURUM_AD[k]}
                       </span>

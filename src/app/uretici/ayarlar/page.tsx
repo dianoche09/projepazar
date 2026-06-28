@@ -41,7 +41,20 @@ export default async function UreticiAyarlar() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
       <header className="belir mb-5">
-        <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Ayarlar</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Ayarlar</h1>
+          <span
+            className={`inline-flex items-center gap-2 rounded-full px-2.5 py-[5px] text-[11.5px] font-semibold ${
+              dogrulanmis ? "bg-green-soft text-[#1f7d4c]" : "bg-amber-soft text-[#9a6a12]"
+            }`}
+          >
+            <span
+              className={`inline-block size-[7px] rounded-full ${dogrulanmis ? "bg-green" : "bg-amber"}`}
+              aria-hidden
+            />
+            {dogrulanmis ? "Doğrulandı" : "Bekliyor"}
+          </span>
+        </div>
         <p className="mt-1 text-[12.5px] text-[var(--ink-faint)]">
           Hesap ve firma bilgilerin — güncelleme için platform yöneticinle (concierge) iletişime geç.
         </p>

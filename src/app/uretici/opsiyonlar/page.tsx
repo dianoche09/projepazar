@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { paraKisa, tazelik, DURUM_AD, kova } from "@/lib/stok";
+import { paraKisa, tazelik, DURUM_AD, DURUM_SINIF, kova } from "@/lib/stok";
 
 /* =========================================================
    OPSİYONLAR — aktif opsiyon/satış bekleyen birimler (üretici).
@@ -79,7 +79,8 @@ export default async function UreticiOpsiyonlar() {
         <div className="flex items-center gap-3">
           <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Opsiyonlar</h1>
           {satirlar.length > 0 ? (
-            <span className="rounded-full bg-amber-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-amber">
+            <span className="inline-flex items-center gap-2 rounded-full bg-amber-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-[#9a6a12]">
+              <span className="inline-block size-[7px] rounded-full bg-amber" aria-hidden />
               {satirlar.length} aktif
             </span>
           ) : null}
@@ -89,8 +90,17 @@ export default async function UreticiOpsiyonlar() {
         </p>
       </header>
 
+      {/* KPI ŞERİDİ */}
+      <section className="kart belir belir-1 mb-5 p-1">
+        <div className="grid grid-cols-3 divide-x divide-[var(--cizgi)]">
+          <Kpi etiket="Toplam Kilit" deger={String(satirlar.length)} alt="aktif opsiyon + satış" />
+          <Kpi etiket="Opsiyon" deger={String(opsiyonlu)} renk="text-amber" alt="karar bekliyor" />
+          <Kpi etiket="Satış Bekleyen" deger={String(satisBekleyen)} renk="text-red" alt="teyit aşaması" />
+        </div>
+      </section>
+
       {satirlar.length === 0 ? (
-        <div className="kart belir belir-1 p-12 text-center">
+        <div className="kart belir belir-2 p-12 text-center">
           <svg
             width="40"
             height="40"
@@ -112,7 +122,7 @@ export default async function UreticiOpsiyonlar() {
           </Link>
         </div>
       ) : (
-        <div className="kart belir belir-1 overflow-hidden">
+        <div className="kart belir belir-2 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="tbl">
               <thead>
@@ -146,7 +156,7 @@ export default async function UreticiOpsiyonlar() {
                         {b.liste_fiyati ? paraKisa(b.liste_fiyati, b.para_birimi) : "—"}
                       </td>
                       <td>
-                        <span className={`durum d-${k === "diger" ? "opsiyon" : k}`}>
+                        <span className={`durum ${DURUM_SINIF[k]}`}>
                           <span className="nokta" />
                           {DURUM_AD[k]}
                         </span>
@@ -179,6 +189,26 @@ export default async function UreticiOpsiyonlar() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Kpi({
+  etiket,
+  deger,
+  alt,
+  renk = "text-ink",
+}: {
+  etiket: string;
+  deger: string;
+  alt?: string;
+  renk?: string;
+}) {
+  return (
+    <div className="px-5 py-4">
+      <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-faint)]">{etiket}</div>
+      <div className={`mono text-[30px] font-semibold leading-none ${renk}`}>{deger}</div>
+      {alt ? <div className="mono mt-2 text-[11.5px] text-[var(--ink-faint)]">{alt}</div> : null}
     </div>
   );
 }

@@ -89,8 +89,9 @@ export default async function UreticiTalepRadari() {
       <header className="belir mb-5">
         <div className="flex items-center gap-3">
           <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Talep Radarı</h1>
-          <span className="rounded-full bg-teal-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-teal">
-            stoktan
+          <span className="inline-flex items-center gap-2 rounded-full bg-teal-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-teal">
+            <span className="inline-block size-[7px] rounded-full bg-teal" aria-hidden />
+            Stoktan
           </span>
         </div>
         <p className="mt-1 text-[12.5px] text-[var(--ink-faint)]">
@@ -233,7 +234,7 @@ function Insight({
       style={{ ["--_sig" as string]: sig }}
     >
       <div className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-faint)]">{ust}</div>
-      <div className={`mono mt-1 text-[34px] font-semibold leading-none ${renk}`}>{deger}</div>
+      <div className={`mono mt-1 text-[30px] font-semibold leading-none ${renk}`}>{deger}</div>
       <p className="mt-2 text-[12.5px] leading-snug text-ink-soft">{metin}</p>
       <span className="mt-3 inline-block text-[11.5px] font-semibold text-teal group-hover:underline">
         {hrefMetin}

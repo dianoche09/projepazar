@@ -56,7 +56,7 @@ export default async function UreticiProjeler() {
   return (
     <div className="mx-auto max-w-[1640px] px-4 py-6 text-ink sm:px-6">
       {/* başlık */}
-      <header className="belir mb-5 flex flex-wrap items-end justify-between gap-4">
+      <header className="belir mb-5 flex flex-wrap items-center gap-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Projeler</h1>
@@ -70,7 +70,7 @@ export default async function UreticiProjeler() {
             <span className="mono text-green">{toplamMusait}</span> müsait
           </p>
         </div>
-        <Link href="/uretici/proje/yeni" className="btn-primary h-[42px]">
+        <Link href="/uretici/proje/yeni" className="btn-primary ml-auto h-[42px]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M12 5v14M5 12h14" />
           </svg>

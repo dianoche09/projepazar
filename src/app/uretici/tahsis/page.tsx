@@ -76,24 +76,28 @@ export default async function UreticiTahsis() {
   return (
     <div className="mx-auto max-w-[1640px] px-4 py-6 text-ink sm:px-6">
       <header className="belir mb-5">
-        <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Tahsis</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-[27px] font-bold tracking-tight text-ink">Tahsis</h1>
+          <span className="inline-flex items-center gap-2 rounded-full bg-teal-soft px-2.5 py-[5px] text-[11.5px] font-semibold text-teal">
+            <span className="inline-block size-[7px] rounded-full bg-teal" aria-hidden />
+            Dağıtım ağı
+          </span>
+        </div>
         <p className="mt-1 text-[12.5px] text-[var(--ink-faint)]">
           Dağıtım ağı (MOAT) — kapsam kime açık, komisyon ne. Emlakçı yalnız tahsisli birimi görür.
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-[12px]">
-          <span className="rounded-lg bg-navy-soft px-3 py-1.5 text-ink-soft">
-            <b className="mono text-ink">{toplamTahsis}</b> tahsis
-          </span>
-          <span className="rounded-lg bg-navy-soft px-3 py-1.5 text-ink-soft">
-            <b className="mono text-ink">{tahsisliProje}</b> proje dağıtımda
-          </span>
-          <span className="rounded-lg bg-teal-soft px-3 py-1.5 text-teal">
-            <b className="mono">{munhasirSay}</b> münhasır
-          </span>
-        </div>
       </header>
 
-      <div className="belir belir-1 flex flex-col gap-5">
+      {/* KPI ŞERİDİ */}
+      <section className="kart belir belir-1 mb-5 p-1">
+        <div className="grid grid-cols-3 divide-x divide-[var(--cizgi)]">
+          <Kpi etiket="Toplam Tahsis" deger={String(toplamTahsis)} alt="dağıtım kuralı" />
+          <Kpi etiket="Dağıtımda" deger={String(tahsisliProje)} alt="proje paylaşımda" />
+          <Kpi etiket="Münhasır" deger={String(munhasirSay)} renk="text-teal" alt="tek-kanal tahsis" />
+        </div>
+      </section>
+
+      <div className="belir belir-2 flex flex-col gap-5">
         {(projeler ?? []).map((p) => {
           const liste = projeTahsis.get(p.id) ?? [];
           return (
@@ -153,17 +157,17 @@ export default async function UreticiTahsis() {
                           <td className="mono">{komisyonMetin(t)}</td>
                           <td>
                             {t.munhasir ? (
-                              <span className="rozet bg-amber-soft text-amber">Münhasır</span>
+                              <span className="rozet bg-amber-soft text-[#9a6a12]">Münhasır</span>
                             ) : (
-                              <span className="text-[12px] text-[var(--ink-faint)]">paylaşımlı</span>
+                              <span className="rozet bg-navy-soft text-ink-soft">Paylaşımlı</span>
                             )}
                           </td>
                           <td className="mono text-right">{t.kontenjan ?? "—"}</td>
                           <td>
                             {t.fiyat_gorunur ? (
-                              <span className="text-[12px] text-green">görünür</span>
+                              <span className="rozet bg-green-soft text-[#1f7d4c]">Görünür</span>
                             ) : (
-                              <span className="text-[12px] text-[var(--ink-faint)]">gizli</span>
+                              <span className="rozet bg-navy-soft text-ink-soft">Gizli</span>
                             )}
                           </td>
                           <td>
@@ -193,6 +197,26 @@ export default async function UreticiTahsis() {
           </div>
         ) : null}
       </div>
+    </div>
+  );
+}
+
+function Kpi({
+  etiket,
+  deger,
+  alt,
+  renk = "text-ink",
+}: {
+  etiket: string;
+  deger: string;
+  alt?: string;
+  renk?: string;
+}) {
+  return (
+    <div className="px-5 py-4">
+      <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-faint)]">{etiket}</div>
+      <div className={`mono text-[30px] font-semibold leading-none ${renk}`}>{deger}</div>
+      {alt ? <div className="mono mt-2 text-[11.5px] text-[var(--ink-faint)]">{alt}</div> : null}
     </div>
   );
 }
