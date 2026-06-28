@@ -5,9 +5,24 @@ import { Donut, Lejant } from "@/components/ui/Grafik";
 
 const C = { navy: "#13314B", teal: "#1E9B8A", green: "#2FB36B", amber: "#E3A12C" };
 
-function Stat({ etiket, deger, alt, vurgu }: { etiket: string; deger: string; alt?: string; vurgu?: boolean }) {
+function Stat({
+  etiket,
+  deger,
+  alt,
+  vurgu,
+  sinyal,
+}: {
+  etiket: string;
+  deger: string;
+  alt?: string;
+  vurgu?: boolean;
+  sinyal?: string;
+}) {
   return (
-    <div className={`rounded-xl border p-4 ${vurgu ? "border-teal/30 bg-teal-soft" : "border-hair bg-card"}`}>
+    <div
+      className={`relative overflow-hidden rounded-xl border p-4 ${vurgu ? "border-teal/30 bg-teal-soft" : "border-hair bg-card"}`}
+    >
+      {sinyal ? <span className={`absolute inset-x-0 top-0 h-0.5 ${sinyal}`} aria-hidden /> : null}
       <p className="text-xs uppercase tracking-wide text-gray">{etiket}</p>
       <p className={`mt-1 font-mono text-3xl font-semibold tabular-nums leading-none ${vurgu ? "text-teal-d" : "text-ink"}`}>{deger}</p>
       {alt ? <p className="mt-1 text-xs text-gray">{alt}</p> : null}
@@ -59,8 +74,13 @@ export default async function AdminPanel() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-      <div>
-        <h1 className="font-display text-2xl font-semibold text-ink">Genel Bakış</h1>
+      <div className="belir">
+        <div className="flex items-center gap-2.5">
+          <h1 className="font-display text-2xl font-semibold text-ink">Genel Bakış</h1>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-green-soft px-2.5 py-0.5 font-mono text-[11px] font-medium text-teal-d">
+            <span className="nabiz size-1.5 rounded-full bg-green" aria-hidden /> Sistem canlı
+          </span>
+        </div>
         <p className="mt-1 text-sm text-gray">Üyelik/abonelik, hesap, kapasite/kota, doğrulama, gelir.</p>
       </div>
 
@@ -82,7 +102,7 @@ export default async function AdminPanel() {
       ) : null}
 
       {/* GENEL BAKIŞ — kullanıcı dağılımı + metrikler */}
-      <section className="grid gap-4 lg:grid-cols-3">
+      <section className="belir belir-1 grid gap-4 lg:grid-cols-3">
         <div className="rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
           <h2 className="font-display text-sm font-semibold text-ink">Kullanıcı dağılımı</h2>
           <div className="mt-4 flex items-center gap-6">
@@ -95,14 +115,14 @@ export default async function AdminPanel() {
 
         <div className="grid grid-cols-2 gap-4 lg:col-span-2">
           <Stat etiket="MRR" deger={fmtPara(mrr)} alt={`${abonelikler?.length ?? 0} aktif abonelik`} vurgu />
-          <Stat etiket="Onay bekleyen" deger={String(bekleyen)} alt="kuyrukta" />
-          <Stat etiket="Üretici firma" deger={String(ureticiler?.length ?? 0)} alt={`${dogrulanmamis} doğrulanmamış`} />
-          <Stat etiket="Ofis" deger={String(ofisler?.length ?? 0)} alt="abonelik sahibi" />
+          <Stat etiket="Onay bekleyen" deger={String(bekleyen)} alt="kuyrukta" sinyal="bg-amber" />
+          <Stat etiket="Üretici firma" deger={String(ureticiler?.length ?? 0)} alt={`${dogrulanmamis} doğrulanmamış`} sinyal="bg-navy" />
+          <Stat etiket="Ofis" deger={String(ofisler?.length ?? 0)} alt="abonelik sahibi" sinyal="bg-green" />
         </div>
       </section>
 
       {/* MODÜLLER */}
-      <section>
+      <section className="belir belir-2">
         <h2 className="font-display text-lg font-semibold text-ink">Yönetim modülleri</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {MODULLER.map((m) => (
