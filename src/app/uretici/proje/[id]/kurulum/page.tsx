@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { medyaYukle, medyaSil, projeKunyeGuncelle, projeYatirimGuncelle, mahalEkle, mahalSil } from "@/app/uretici/actions";
+import { medyaYukle, medyaSil, projeKunyeGuncelle, projeYatirimGuncelle, projeOdemePlaniGuncelle, mahalEkle, mahalSil } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { StokKurulumu } from "../StokKurulumu";
 
@@ -234,6 +234,20 @@ export default async function ProjeKurulum({
           </label>
           <div className="sm:col-span-2"><SubmitButton>Yatırım bilgilerini kaydet</SubmitButton></div>
         </form>
+      </Bolum>
+
+      {/* Ödeme Planı */}
+      <Bolum baslik="Ödeme Planı" aciklama="Proje geneli ödeme planı — tüm birimlere uygulanır. Aylık taksit her dairenin canlı fiyatından hesaplanır.">
+        <form action={projeOdemePlaniGuncelle} className="grid gap-2 sm:grid-cols-3">
+          <input type="hidden" name="proje_id" value={id} />
+          <input name="pesinat_pct" type="number" step="1" min="0" max="100" placeholder="Peşinat %" className={inpCls} />
+          <input name="taksit_sayisi" type="number" step="1" min="1" placeholder="Taksit sayısı (ay)" className={inpCls} />
+          <input name="vade_farki_pct" type="number" step="0.1" placeholder="Vade farkı % (0 = vade farksız)" className={inpCls} />
+          <div className="sm:col-span-3"><SubmitButton>Ödeme planını uygula</SubmitButton></div>
+        </form>
+        <p className="mt-2 text-xs text-gray">
+          Önce <code className="rounded bg-soft px-1 font-mono">db/2026-06-28_odeme-plani.sql</code> migration&apos;ı Supabase SQL Editor&apos;den çalıştırılmalı.
+        </p>
       </Bolum>
 
       {/* ── Mahal Listesi ── */}

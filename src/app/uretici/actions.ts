@@ -797,6 +797,38 @@ export async function projeYatirimGuncelle(formData: FormData) {
   redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Yatırım bilgileri kaydedildi")}`);
 }
 
+// ── Ödeme Planı (proje şablonu → tüm birimlere uygulanır; aylık taksit UI'da fiyattan hesaplanır) ──
+// Şema: birim.odeme_plani jsonb {pesinat_pct, taksit_sayisi, vade_farki_pct, ara_odemeler:[{ay,pct}]}.
+// NOT: db/2026-06-28_odeme-plani.sql migration'ı çalışmadan UPDATE hata verir (graceful).
+export async function projeOdemePlaniGuncelle(formData: FormData) {
+  const proje_id = String(formData.get("proje_id"));
+  const sayi = (v: FormDataEntryValue | null) => {
+    const s = String(v ?? "").trim();
+    return s === "" ? null : Number(s);
+  };
+  const geri = `/uretici/proje/${proje_id}/kurulum`;
+  const pesinat_pct = sayi(formData.get("pesinat_pct"));
+  const taksit_sayisi = sayi(formData.get("taksit_sayisi"));
+  const vade_farki_pct = sayi(formData.get("vade_farki_pct")) ?? 0;
+
+  const supabase = await createClient();
+  if (!(await projeSahibiMi(supabase, proje_id))) hataya("/uretici", "Bu projeye erişim yok");
+  // Boş submit = kazara tüm planları silme; no-op uyarısı.
+  if (pesinat_pct == null && taksit_sayisi == null) {
+    redirect(`${geri}?mesaj=${encodeURIComponent("Ödeme planı için en az peşinat % veya taksit sayısı girin")}`);
+  }
+
+  const plan = { pesinat_pct, taksit_sayisi, vade_farki_pct, ara_odemeler: [] as { ay: number; pct: number }[] };
+  const { error } = await supabase
+    .from("birim")
+    .update({ odeme_plani: plan, son_guncelleme: new Date().toISOString() })
+    .eq("proje_id", proje_id);
+  if (error) hataya(geri, `Ödeme planı kaydedilemedi (migration çalıştı mı?): ${error.message}`);
+  revalidatePath(geri);
+  revalidatePath(`/uretici/proje/${proje_id}`);
+  redirect(`${geri}?mesaj=${encodeURIComponent("Ödeme planı tüm birimlere uygulandı")}`);
+}
+
 // ── Mahal Listesi (proje teslim standardı: her mahal için zemin/duvar/tavan) ──
 export async function mahalEkle(formData: FormData) {
   const proje_id = String(formData.get("proje_id"));
