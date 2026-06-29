@@ -60,6 +60,9 @@ export default async function ProjeDetay({
     .order("created_at", { ascending: false });
   const kunye = (proje.kunye ?? {}) as Record<string, unknown>;
   const kapak = (belgeler ?? []).find((b) => b.tip === "kapak") ?? null;
+  const fotolar = (belgeler ?? []).filter((b) => b.tip === "foto" && b.url);
+  const videolar = (belgeler ?? []).filter((b) => b.tip === "video" && b.url);
+  const brosurler = (belgeler ?? []).filter((b) => b.tip === "brosur" && b.url);
 
   const tahsisKatlar = [
     ...new Set((birimler ?? []).map((b) => b.kat).filter((k): k is number => k != null)),
@@ -122,6 +125,42 @@ export default async function ProjeDetay({
           </Link>
         </p>
       </details>
+
+      {/* Tanıtım & Medya — seed/kurulumdan gelen görseller */}
+      {fotolar.length > 0 || videolar.length > 0 || brosurler.length > 0 ? (
+        <section className="kart mt-5 p-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-base font-semibold text-ink">Tanıtım & Medya</h2>
+            <Link href={`/uretici/proje/${id}/kurulum`} className="text-xs font-medium text-teal-d hover:underline">
+              Yönet →
+            </Link>
+          </div>
+          {fotolar.length > 0 ? (
+            <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+              {fotolar.map((f) => (
+                <a key={f.id} href={f.url!} target="_blank" rel="noopener noreferrer" className="group overflow-hidden rounded-xl border border-hair">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={f.url!} alt={f.ad ?? "Görsel"} className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                </a>
+              ))}
+            </div>
+          ) : null}
+          {videolar.length > 0 || brosurler.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {videolar.map((v) => (
+                <a key={v.id} href={v.url!} target="_blank" rel="noopener noreferrer" className="btn-ghost h-9 min-h-0 px-3 text-xs">
+                  ▶ {v.ad || "Video"}
+                </a>
+              ))}
+              {brosurler.map((b) => (
+                <a key={b.id} href={b.url!} target="_blank" rel="noopener noreferrer" className="btn-ghost h-9 min-h-0 px-3 text-xs">
+                  Broşür: {b.ad || "PDF"}
+                </a>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {/* Birim ızgarası */}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
