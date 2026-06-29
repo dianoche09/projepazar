@@ -282,7 +282,17 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
       {/* ============ PROJE KARTLARI ============ */}
       <div className="proj-grid grid grid-cols-1 gap-4 lg:grid-cols-2">
         {liste.map((p, i) => {
-          const wa = `${p.ad} · ${[p.ilce, p.il].filter(Boolean).join(", ")}${p.min ? ` · ${fiyat(p.min)} ${paraSimge(p.para_birimi)}'den` : ""}`;
+          const wa = [
+            p.ad,
+            [p.ilce, p.il].filter(Boolean).join(", "),
+            p.musait > 0
+              ? `${p.musait} müsait daire${p.tipler.length ? ` · ${p.tipler.slice(0, 4).join(", ")}` : ""}`
+              : null,
+            p.min ? `${fiyat(p.min)} ${paraSimge(p.para_birimi)}'den başlayan fiyatlarla` : null,
+            "Detaylı bilgi ve randevu için bana ulaşabilirsiniz.",
+          ]
+            .filter(Boolean)
+            .join("\n");
           const kapak = projeKapak(p.kapak, p.id);
           const sig = p.musait > 0 ? "var(--color-green)" : p.opsiyon > 0 ? "var(--color-amber)" : "var(--color-red)";
           const bayat = bayatMi(p.son_guncelleme);
@@ -407,26 +417,14 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
                     ) : null}
                   </div>
 
-                  {/* yatırım rozetleri */}
-                  {(p.kira_getirisi != null || p.oturum_uygun || p.golden_visa) && (
+                  {/* yatırım rozeti — Faz-1 yurtiçi (golden vize / oturum YOK) */}
+                  {p.kira_getirisi != null ? (
                     <div className="mt-3 flex flex-wrap gap-2 text-[10.5px] font-bold">
-                      {p.kira_getirisi != null ? (
-                        <span className="rounded-lg border border-teal/10 bg-teal-soft px-2.5 py-1 text-teal">
-                          %{p.kira_getirisi} Kira Getirisi
-                        </span>
-                      ) : null}
-                      {p.oturum_uygun ? (
-                        <span className="rounded-lg border border-slate-200/60 bg-slate-100 px-2.5 py-1 text-slate-700">
-                          Oturuma Uygun
-                        </span>
-                      ) : null}
-                      {p.golden_visa ? (
-                        <span className="rounded-lg border border-amber/10 bg-amber-soft px-2.5 py-1 text-amber-700">
-                          Golden Visa
-                        </span>
-                      ) : null}
+                      <span className="rounded-lg border border-teal/10 bg-teal-soft px-2.5 py-1 text-teal">
+                        %{p.kira_getirisi} Kira Getirisi
+                      </span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
 

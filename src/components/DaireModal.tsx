@@ -95,16 +95,17 @@ export function DaireModal({
   const manzaraKatki = taban != null && sManzara ? Math.round((taban * sManzara) / 100) : null;
   const fark = taban != null && liste != null ? liste - taban : null;
 
-  // Paylaşımda fiyat CANLI değerden basılır (DEĞİŞMEZ #2)
+  // Paylaşımda fiyat CANLI değerden basılır (DEĞİŞMEZ #2). Çok-satırlı + mikrosite link'i.
   const paylasMetni = [
     projeAd,
-    `Daire ${birim.daire_no ?? ""}`.trim(),
-    birim.oda ?? birim.tip_ad ?? "",
+    [`Daire ${birim.daire_no ?? ""}`.trim(), birim.oda ?? birim.tip_ad, birim.net_m2 ? `${birim.net_m2} m²` : null]
+      .filter(Boolean)
+      .join(" · "),
     liste != null ? `${fmt(liste)} ${psim}` : "",
-    shareUrl,
+    shareUrl ? `Detay ve randevu: ${shareUrl}` : "",
   ]
     .filter(Boolean)
-    .join(" · ");
+    .join("\n");
   const waLink = `https://wa.me/?text=${encodeURIComponent(paylasMetni)}`;
 
   return (
