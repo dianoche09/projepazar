@@ -1,6 +1,21 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
+import { TalepGeriCekBtn } from "./TalepGeriCekBtn";
+
+type TalepSatir = {
+  id: string;
+  created_at: string;
+  birim: {
+    id: string;
+    daire_no: string | null;
+    kat: number | null;
+    liste_fiyati: number | null;
+    para_birimi: string | null;
+    proje: { id: string; ad: string } | null;
+    tip: { ad: string | null; oda: string | null } | null;
+  } | null;
+};
 
 const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
 const fmt = (n: number) => n.toLocaleString("tr-TR");
@@ -49,6 +64,17 @@ export default async function Opsiyonlarim() {
     .in("durum", ["opsiyonlu", "satis_beklemede"])
     .order("kilit_bitis", { ascending: true });
 
+  // Bekleyen opsiyon taleplerim (müteahhit onayında)
+  const { data: talepData } = await supabase
+    .from("opsiyon_talep")
+    .select(
+      "id, created_at, birim:birim_id(id, daire_no, kat, liste_fiyati, para_birimi, proje:proje_id(id, ad), tip:tip_id(ad, oda))",
+    )
+    .eq("talep_eden_id", user?.id ?? "")
+    .eq("durum", "beklemede")
+    .order("created_at", { ascending: false });
+  const talepler = (talepData ?? []) as unknown as TalepSatir[];
+
   const liste = (data ?? []) as unknown as OpsiyonSatir[];
   const aktif = liste.length;
   const acilSayi = liste.filter((o) => kalanSure(o.kilit_bitis).acil && !kalanSure(o.kilit_bitis).bitti).length;
@@ -88,6 +114,45 @@ export default async function Opsiyonlarim() {
           </div>
         </div>
       </div>
+
+      {/* BEKLEYEN TALEPLERİM — müteahhit onayında */}
+      {talepler.length > 0 ? (
+        <section className="kart belir belir-2 mb-6 overflow-hidden" style={{ borderLeft: "3px solid var(--color-teal)" }}>
+          <div className="flex items-center justify-between border-b px-5 py-3.5" style={{ borderColor: "var(--cizgi)" }}>
+            <h2 className="font-display text-[15px] font-bold text-ink">Bekleyen Taleplerim</h2>
+            <span className="rozet" style={{ background: "var(--color-teal-soft)", color: "var(--color-teal-d)" }}>
+              {talepler.length} onayda
+            </span>
+          </div>
+          <ul className="divide-y" style={{ borderColor: "var(--cizgi)" }}>
+            {talepler.map((t) => {
+              const b = t.birim;
+              const ps = PARA_SIMGE[b?.para_birimi ?? "TRY"] ?? "₺";
+              return (
+                <li key={t.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5">
+                  <div className="min-w-0">
+                    <p className="text-[13.5px] font-semibold text-ink">
+                      {b?.proje?.ad ?? "—"} · <span className="mono">{b?.daire_no ?? "—"}</span>
+                    </p>
+                    <p className="mt-0.5 text-[11.5px] text-ink-soft">
+                      {b?.tip?.oda ?? b?.tip?.ad ?? "—"}
+                      {b?.liste_fiyati != null ? ` · ${fmt(Number(b.liste_fiyati))} ${ps}` : ""}
+                      {` · ${zamanOnce(t.created_at)}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="lead-pill" style={{ background: "var(--color-teal-soft)", color: "var(--color-teal-d)" }}>
+                      <span className="freshdot" style={{ background: "var(--color-teal)" }} />
+                      Müteahhit onayında
+                    </span>
+                    {b?.proje ? <TalepGeriCekBtn talepId={t.id} projeId={b.proje.id} /> : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       {aktif === 0 ? (
         <div className="kart belir belir-2 p-14 text-center">

@@ -423,6 +423,27 @@ export async function birimGuncelle(formData: FormData) {
   revalidatePath("/uretici/stok");
 }
 
+// ── Opsiyon TALEBİ: müteahhit kararı. RPC SECURITY DEFINER (yetki + çift-satış fonksiyon içinde). ──
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export async function talepOnayla(talepId: string, gun = 7): Promise<{ ok: boolean; mesaj: string }> {
+  if (!UUID_RE.test(talepId)) return { ok: false, mesaj: "Geçersiz talep" };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("opsiyon_talep_onayla", { p_talep: talepId, p_gun: gun });
+  revalidatePath("/uretici/opsiyonlar");
+  revalidatePath("/uretici/stok");
+  revalidatePath("/uretici");
+  return error ? { ok: false, mesaj: error.message } : { ok: true, mesaj: "Talep onaylandı — opsiyon açıldı" };
+}
+
+export async function talepReddet(talepId: string): Promise<{ ok: boolean; mesaj: string }> {
+  if (!UUID_RE.test(talepId)) return { ok: false, mesaj: "Geçersiz talep" };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("opsiyon_talep_reddet", { p_talep: talepId });
+  revalidatePath("/uretici/opsiyonlar");
+  return error ? { ok: false, mesaj: error.message } : { ok: true, mesaj: "Talep reddedildi" };
+}
+
 // ---- Çoklu seçim: toplu durum/fiyat güncelle ----
 function idListesi(formData: FormData): string[] {
   return String(formData.get("birim_idler") ?? "")

@@ -10,45 +10,11 @@ import { kayitYaz } from "@/lib/events";
 const uuid = z.string().uuid();
 
 /**
- * Emlakçı birimi 48 saat opsiyonlar. Çift-satış kalkanı:
- * RLS opsiyon_insert (satilabilir + musait) + unique partial index (tek aktif opsiyon).
- * Trigger birim.durum'u 'opsiyonlu' yapar (emlakçı birim'i doğrudan yazamaz).
+ * OPSİYON TALEP→ONAY (üretici-kontrollü — DEĞİŞMEZ #3 korunur).
+ * Emlakçı DOĞRUDAN opsiyon ALAMAZ (RLS opsiyon_insert artık admin-only).
+ * Tahsisli + müsait birime "opsiyon talebi" (beklemede) açar; müteahhit onaylarsa
+ * opsiyon doğar (kilit) — çift-satış kalkanı (unique index + trigger) onay anında devreye girer.
  */
-export async function opsiyonAl(formData: FormData) {
-  const birim = uuid.safeParse(formData.get("birim_id"));
-  const proje = uuid.safeParse(formData.get("proje_id"));
-  if (!birim.success || !proje.success) return;
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const kilit = new Date(Date.now() + 48 * 3600 * 1000).toISOString();
-  const { error } = await supabase.from("opsiyon").insert({
-    birim_id: birim.data,
-    satici_id: user.id,
-    durum: "opsiyonlu",
-    kilit_bitis: kilit,
-  });
-  if (!error) {
-    await kayitYaz({
-      tip: "opsiyon",
-      profileId: user.id,
-      projeId: proje.data,
-      birimId: birim.data,
-      payload: { eylem: "al", kilit_bitis: kilit },
-    });
-  }
-  revalidatePath(`/havuz/proje/${proje.data}`);
-  revalidatePath("/havuz");
-  redirect(
-    error
-      ? `/havuz/proje/${proje.data}?hata=${encodeURIComponent("Bu birim müsait değil veya başkası opsiyonladı")}`
-      : `/havuz/proje/${proje.data}?mesaj=${encodeURIComponent("48 saat opsiyon alındı")}`,
-  );
-}
 
 /** Emlakçı kendi opsiyonunu bırakır → birim müsait (trigger). */
 export async function opsiyonBirak(formData: FormData) {
@@ -82,8 +48,8 @@ export async function opsiyonBirak(formData: FormData) {
   redirect(`/havuz/proje/${proje.data}?mesaj=${encodeURIComponent("Opsiyon bırakıldı")}`);
 }
 
-/** Optimistic UI için sessiz varyantlar — redirect yok, sonuç döner; ızgara Realtime ile güncellenir. */
-export async function opsiyonAlSessiz(
+/** Emlakçı opsiyon TALEBİ gönderir (beklemede) — doğrudan kilit YOK, müteahhit onayına düşer. */
+export async function opsiyonTalepGonder(
   birimId: string,
   projeId: string,
 ): Promise<{ ok: boolean; mesaj: string }> {
@@ -97,24 +63,60 @@ export async function opsiyonAlSessiz(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, mesaj: "Giriş gerekli" };
 
-  const kilit = new Date(Date.now() + 48 * 3600 * 1000).toISOString();
+  // Aynı birime zaten bekleyen talebin varsa tekrarlama
+  const { data: mevcut } = await supabase
+    .from("opsiyon_talep")
+    .select("id")
+    .eq("birim_id", b.data)
+    .eq("talep_eden_id", user.id)
+    .eq("durum", "beklemede")
+    .maybeSingle();
+  if (mevcut) return { ok: false, mesaj: "Bu daire için zaten bekleyen talebin var" };
+
   const { error } = await supabase
-    .from("opsiyon")
-    .insert({ birim_id: b.data, satici_id: user.id, durum: "opsiyonlu", kilit_bitis: kilit });
+    .from("opsiyon_talep")
+    .insert({ birim_id: b.data, talep_eden_id: user.id, durum: "beklemede" });
   if (!error) {
     await kayitYaz({
       tip: "opsiyon",
       profileId: user.id,
       projeId: p.data,
       birimId: b.data,
-      payload: { eylem: "al", kilit_bitis: kilit },
+      payload: { eylem: "talep" },
     });
   }
   revalidatePath(`/havuz/proje/${p.data}`);
   revalidatePath("/havuz");
+  revalidatePath("/havuz/opsiyonlarim");
   return error
-    ? { ok: false, mesaj: "Bu birim müsait değil veya başkası opsiyonladı" }
-    : { ok: true, mesaj: "48 saat opsiyon alındı" };
+    ? { ok: false, mesaj: "Talep gönderilemedi — daire müsait olmayabilir" }
+    : { ok: true, mesaj: "Opsiyon talebin gönderildi — müteahhit onayına düştü" };
+}
+
+/** Emlakçı kendi BEKLEYEN talebini geri çeker. */
+export async function talepGeriCek(
+  talepId: string,
+  projeId: string,
+): Promise<{ ok: boolean; mesaj: string }> {
+  const t = uuid.safeParse(talepId);
+  const p = uuid.safeParse(projeId);
+  if (!t.success || !p.success) return { ok: false, mesaj: "Geçersiz istek" };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, mesaj: "Giriş gerekli" };
+
+  const { error } = await supabase
+    .from("opsiyon_talep")
+    .delete()
+    .eq("id", t.data)
+    .eq("talep_eden_id", user.id)
+    .eq("durum", "beklemede");
+  revalidatePath(`/havuz/proje/${p.data}`);
+  revalidatePath("/havuz/opsiyonlarim");
+  return error ? { ok: false, mesaj: "Geri çekilemedi" } : { ok: true, mesaj: "Talep geri çekildi" };
 }
 
 export async function opsiyonBirakSessiz(

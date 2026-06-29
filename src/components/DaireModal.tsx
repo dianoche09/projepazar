@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { birimDurumGuncelle, birimGuncelle } from "@/app/uretici/actions";
-import { opsiyonAlSessiz, opsiyonBirakSessiz } from "@/app/havuz/actions";
+import { opsiyonTalepGonder, opsiyonBirakSessiz } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 import { KatPlani } from "@/components/KatPlani";
 import { useToast } from "@/components/ui/Toast";
@@ -332,15 +332,18 @@ export function DaireModal({
                   disabled={bekliyor}
                   onClick={() =>
                     basla(async () => {
-                      const r = await opsiyonAlSessiz(birim.id, projeId);
+                      const r = await opsiyonTalepGonder(birim.id, projeId);
                       toast.goster(r.mesaj, r.ok ? "basari" : "hata");
                       if (r.ok) onKapat();
                     })
                   }
                   className="w-full rounded-xl bg-teal font-bold py-3.5 text-xs text-white transition-all duration-300 hover:bg-teal-d disabled:opacity-50 shadow-[0_4px_12px_rgba(30,155,138,0.25)] cursor-pointer"
                 >
-                  {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48 Saat"}
+                  {bekliyor ? "Gönderiliyor…" : "Opsiyon Talebi Gönder"}
                 </button>
+                <p className="text-center text-[10px] leading-snug text-[var(--ink-faint)] font-bold">
+                  Müteahhit onayına düşer · doğrudan kilit yok
+                </p>
               </>
             ) : (
               <div className="rounded-xl border border-hair bg-soft p-4 text-center">
