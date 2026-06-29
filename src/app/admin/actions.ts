@@ -19,6 +19,7 @@ async function adminGuard() {
 
 /** Üretici doğrulama / güven rozeti (admin yetkisi — RLS is_admin owner). */
 export async function ureticiDogrula(formData: FormData) {
+  await adminGuard();
   const supabase = await createClient();
   const uretici_id = String(formData.get("uretici_id"));
   const dogrula = formData.get("dogrula") === "true";
@@ -36,6 +37,7 @@ const AtaSchema = z.object({
  * Önce mevcut aktif/deneme aboneliği iptal eder (unique partial index ihlalini önler).
  */
 export async function ofiseAbonelikAta(formData: FormData) {
+  await adminGuard();
   const parsed = AtaSchema.safeParse({
     ofis_id: formData.get("ofis_id"),
     paket_id: formData.get("paket_id") ?? "",
@@ -53,6 +55,39 @@ export async function ofiseAbonelikAta(formData: FormData) {
     await supabase.from("abonelik").insert({ ofis_id, paket_id, durum: "aktif" });
   }
   revalidatePath("/admin");
+}
+
+const UretAtaSchema = z.object({
+  uretici_id: z.string().uuid(),
+  paket_id: z.union([z.string().uuid(), z.literal("")]),
+});
+
+/**
+ * Üreticiye abonelik paketi ata (gelir modeli ANA ayağı: müteahhit anlaşması). Boş paket = kaldır.
+ * Tek aktif abonelik (abonelik_uretici_aktif unique index) — önce mevcut aktif/deneme iptal edilir.
+ */
+export async function ureticiyeAbonelikAta(formData: FormData) {
+  await adminGuard();
+  const parsed = UretAtaSchema.safeParse({
+    uretici_id: formData.get("uretici_id"),
+    paket_id: formData.get("paket_id") ?? "",
+  });
+  if (!parsed.success) return;
+  const { uretici_id, paket_id } = parsed.data;
+
+  const supabase = await createClient();
+  await supabase
+    .from("abonelik")
+    .update({ durum: "iptal" })
+    .eq("uretici_id", uretici_id)
+    .in("durum", ["deneme", "aktif"]);
+  if (paket_id) {
+    const { error } = await supabase.from("abonelik").insert({ uretici_id, paket_id, durum: "aktif" });
+    if (error) redirect(`/admin/ureticiler?hata=${encodeURIComponent(error.message)}`);
+  }
+  revalidatePath("/admin");
+  revalidatePath("/admin/ureticiler");
+  redirect(`/admin/ureticiler?mesaj=${encodeURIComponent(paket_id ? "Abonelik atandı" : "Abonelik kaldırıldı")}`);
 }
 
 // ── Üyelik paketi CRUD (tip/fiyat/kota %100 admin-kontrollü; üç hedef) ──

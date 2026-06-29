@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { ureticiDogrula, ureticiEkle } from "../actions";
+import { ureticiDogrula, ureticiEkle, ureticiyeAbonelikAta } from "../actions";
 import { Avatar, GeriLink, SayfaBaslik, Uyari } from "../_ortak";
 
 const inp = "rounded-lg border border-hair bg-soft px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-teal";
@@ -11,11 +11,18 @@ export default async function UreticilerSayfasi({
 }) {
   const { hata, mesaj } = await searchParams;
   const supabase = await createClient();
-  const [{ data: ureticiler }, { data: projeler }] = await Promise.all([
+  const [{ data: ureticiler }, { data: projeler }, { data: paketler }, { data: abonelikler }] = await Promise.all([
     supabase.from("uretici").select("id, ad, vergi_no, dogrulanmis, created_at").order("created_at", { ascending: false }),
     supabase.from("proje").select("uretici_id"),
+    supabase.from("abonelik_paketi").select("id, ad, fiyat_aylik, para_birimi").eq("hedef", "uretici").eq("aktif", true).order("siralama"),
+    supabase.from("abonelik").select("uretici_id, paket_id, durum").in("durum", ["deneme", "aktif"]),
   ]);
   const projeSay = (uid: string) => (projeler ?? []).filter((p) => p.uretici_id === uid).length;
+  const uretPaketler = (paketler ?? []) as { id: string; ad: string; fiyat_aylik: number | null; para_birimi: string | null }[];
+  const aboMap = new Map((abonelikler ?? []).filter((a) => a.uretici_id).map((a) => [a.uretici_id as string, a.paket_id as string]));
+  const PARA: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€" };
+  const paketEtiket = (p: { ad: string; fiyat_aylik: number | null; para_birimi: string | null }) =>
+    `${p.ad}${p.fiyat_aylik != null ? ` · ${Number(p.fiyat_aylik).toLocaleString("tr-TR")}${PARA[p.para_birimi ?? "TRY"] ?? "₺"}/ay` : ""}`;
   const liste = ureticiler ?? [];
   const dogrulanmamisSay = liste.filter((u) => !u.dogrulanmis).length;
 
@@ -80,6 +87,7 @@ export default async function UreticilerSayfasi({
                 <th>Vergi no</th>
                 <th>Proje</th>
                 <th>Doğrulama</th>
+                <th>Abonelik (ana gelir)</th>
                 <th className="!text-right">Aksiyon</th>
               </tr>
             </thead>
@@ -107,6 +115,24 @@ export default async function UreticilerSayfasi({
                     ) : (
                       <span className="rozet bg-amber-soft text-amber">Beklemede</span>
                     )}
+                  </td>
+                  <td>
+                    <form action={ureticiyeAbonelikAta} className="flex items-center gap-1.5">
+                      <input type="hidden" name="uretici_id" value={u.id} />
+                      <select
+                        name="paket_id"
+                        defaultValue={aboMap.get(u.id) ?? ""}
+                        className="rounded-lg border border-hair bg-soft px-2 py-1 text-xs text-ink outline-none focus:border-teal"
+                      >
+                        <option value="">— yok —</option>
+                        {uretPaketler.map((p) => (
+                          <option key={p.id} value={p.id}>{paketEtiket(p)}</option>
+                        ))}
+                      </select>
+                      <button className="rounded-lg border border-teal/40 bg-teal/10 px-2 py-1 text-xs font-semibold text-teal-d hover:bg-teal/20">
+                        Ata
+                      </button>
+                    </form>
                   </td>
                   <td className="!text-right">
                     <form action={ureticiDogrula} className="flex justify-end">
