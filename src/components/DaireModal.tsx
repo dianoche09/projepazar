@@ -305,6 +305,8 @@ export function DaireModal({
               <input name="brut_m2" type="number" defaultValue={birim.brut_m2 ?? ""} placeholder="Brüt m²" className={inp} />
               <input name="yon" defaultValue={birim.yon ?? ""} placeholder="Yön" className={inp} />
               <input name="manzara" defaultValue={birim.manzara ?? ""} placeholder="Manzara" className={`${inp} col-span-2`} />
+              <input name="serefiye_kat" type="number" step="0.5" defaultValue={birim.serefiye?.kat ?? ""} placeholder="Kat şerefiye %" className={inp} />
+              <input name="serefiye_manzara" type="number" step="0.5" defaultValue={birim.serefiye?.manzara ?? ""} placeholder="Manzara şerefiye %" className={inp} />
               <label className="col-span-2 flex items-center gap-2 text-xs font-bold text-slate-800 cursor-pointer py-1 select-none">
                 <input type="checkbox" name="satilabilir" defaultChecked={birim.satilabilir} className="size-4 rounded border-slate-200 bg-slate-50 text-teal focus:ring-0 focus:ring-offset-0" />
                 <span>Satılabilir (arsa payı değil)</span>

@@ -401,6 +401,8 @@ export async function birimGuncelle(formData: FormData) {
     return s === "" ? null : Number(s);
   };
 
+  const sKat = sayi(formData.get("serefiye_kat"));
+  const sManzara = sayi(formData.get("serefiye_manzara"));
   const guncelle: Record<string, unknown> = {
     daire_no: metin(formData.get("daire_no")),
     kat: sayi(formData.get("kat")),
@@ -409,6 +411,7 @@ export async function birimGuncelle(formData: FormData) {
     manzara: metin(formData.get("manzara")),
     net_m2: sayi(formData.get("net_m2")),
     brut_m2: sayi(formData.get("brut_m2")),
+    serefiye: sKat != null || sManzara != null ? { kat: sKat ?? undefined, manzara: sManzara ?? undefined } : null,
     satilabilir: formData.get("satilabilir") === "on",
     son_guncelleme: new Date().toISOString(),
   };
