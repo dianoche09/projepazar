@@ -3,30 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProjePazar — Canlı Konut Stoğu Dağıtım Ağı | B2B Güven Protokolü</title>
+  <title>ProjePazar B2B — Canlı Konut Dağıtım Platformu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --zemin: #eef1f6;
-      --zemin-2: #e7ebf2;
-      --ink: #10243a;
-      --ink-soft: #46586b;
-      --ink-faint: #7d8da0;
-      --navy: #13314b;
-      --teal: #1e9b8a;
-      --teal-d: #1a8676;
-      --musait: #2fb36b;
-      --opsiyon: #e3a12c;
-      --satildi: #d15a4e;
-      --kart: #ffffff;
-      --cizgi: rgba(16, 36, 58, 0.08);
-      --cizgi-2: rgba(16, 36, 58, 0.12);
-      --golge-1: 0 1px 2px rgba(16, 36, 58, 0.04), 0 2px 6px rgba(16, 36, 58, 0.05);
-      --golge-2: 0 2px 6px rgba(16, 36, 58, 0.05), 0 12px 28px rgba(16, 36, 58, 0.08);
-      --golge-3: 0 4px 12px rgba(16, 36, 58, 0.07), 0 24px 56px rgba(16, 36, 58, 0.12);
+      --zemin: #f8fafc;
+      --navy: #0f172a;
+      --teal: #0ea5e9;
+      --teal-d: #0284c7;
+      --emerald: #10b981;
+      --musait: #10b981;
+      --opsiyon: #f59e0b;
+      --satildi: #ef4444;
+      --kart: rgba(255, 255, 255, 0.75);
+      --cizgi: rgba(15, 23, 42, 0.05);
+      --cizgi-vurgu: rgba(14, 165, 233, 0.2);
     }
 
     * {
@@ -36,571 +30,400 @@
     }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(1200px 700px at 78% -8%, rgba(30, 155, 138, 0.15), transparent 60%),
-        radial-gradient(1000px 600px at -6% 8%, rgba(19, 49, 75, 0.09), transparent 55%),
-        linear-gradient(180deg, #eef1f6 0%, #e9edf4 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
+      font-family: 'Urbanist', sans-serif;
+      background-color: var(--zemin);
+      color: var(--navy);
+      overflow-x: hidden;
     }
 
-    .font-display {
-      font-family: 'Outfit', sans-serif;
+    .font-body {
+      font-family: 'Inter', sans-serif;
     }
 
     .mono {
-      font-family: 'Geist Mono', ui-monospace, monospace;
+      font-family: 'Geist Mono', monospace;
       font-variant-numeric: tabular-nums;
-      font-feature-settings: "tnum" 1;
     }
 
-    /* ---- custom styles ---- */
-    .izgara-doku {
+    /* Webflow-like mesh background background */
+    .mesh-bg {
       background-image:
-        linear-gradient(rgba(16, 36, 58, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16, 36, 58, 0.02) 1px, transparent 1px);
-      background-size: 28px 28px;
+        radial-gradient(at 10% 20%, rgba(14, 165, 233, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 10%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 80%, rgba(15, 23, 42, 0.03) 0px, transparent 50%);
     }
 
-    .kart {
-      background: var(--kart);
-      border: 1px solid var(--cizgi);
-      border-radius: 24px;
-      box-shadow: var(--golge-2);
-      transition: all 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* Grid layout pattern */
+    .grid-mesh {
+      background-image:
+        linear-gradient(var(--cizgi) 1px, transparent 1px),
+        linear-gradient(90deg, var(--cizgi) 1px, transparent 1px);
+      background-size: 40px 40px;
     }
 
-    .kart-hover:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--golge-3);
-      border-color: rgba(30, 155, 138, 0.22);
-    }
-
-    .glass-premium {
+    /* Frosted glass islands */
+    .glass-island {
       background: rgba(255, 255, 255, 0.75);
       backdrop-filter: blur(20px) saturate(1.6);
       -webkit-backdrop-filter: blur(20px) saturate(1.6);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, var(--golge-2);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02), 0 20px 40px rgba(15, 23, 42, 0.04);
+      border-radius: 28px;
     }
 
-    .glass-premium-dark {
-      background: rgba(13, 36, 58, 0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: var(--golge-3);
+    .glass-premium {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset, 0 10px 30px rgba(15, 23, 42, 0.03);
     }
 
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      border-radius: 16px;
-      font-weight: 600;
-      font-size: 13.5px;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      cursor: pointer;
-      white-space: nowrap;
+    /* Staggered layouts and lifting hover elements */
+    .lift-hover {
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .btn-primary {
-      background: var(--navy);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #081726;
-      transform: translateY(-1.5px);
-      box-shadow: var(--golge-2);
-    }
-
-    .btn-action {
-      background: var(--teal);
-      color: #fff;
-    }
-    .btn-action:hover {
-      background: var(--teal-d);
-      transform: translateY(-1.5px);
-      box-shadow: 0 8px 24px rgba(30, 155, 138, 0.3);
-    }
-
-    .btn-ghost {
-      background: #fff;
-      color: var(--ink);
-      border: 1px solid var(--cizgi-2);
-    }
-    .btn-ghost:hover {
-      background: rgba(16, 36, 58, 0.04);
-      border-color: rgba(16, 36, 58, 0.25);
-    }
-
-    .btn-wa {
-      background: #25D366;
-      color: #fff;
-    }
-    .btn-wa:hover {
-      background: #20ba5a;
-      transform: translateY(-1.5px);
-      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
-    }
-
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      height: 38px;
-      padding: 0 16px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid var(--cizgi-2);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--ink-soft);
-      transition: all 0.2s ease;
-    }
-    .chip:hover, .chip.active {
+    .lift-hover:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 30px 60px rgba(15, 23, 42, 0.08);
       border-color: var(--teal);
-      color: var(--teal-d);
-      background: var(--teal-soft);
     }
 
-    .hucre {
-      border-radius: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 4px;
-      min-height: 56px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #fff;
+    /* Building perspective styles */
+    .perspective-box {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+    }
+    .building-tilt {
+      transform: rotateX(24deg) rotateY(-24deg);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .building-tilt:hover {
+      transform: rotateX(28deg) rotateY(-18deg) scale(1.03);
+    }
+
+    .unit-flat {
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
     }
-    .hucre:hover {
-      transform: translateY(-3px) scale(1.04);
-      box-shadow: 0 8px 20px rgba(16, 36, 58, 0.22);
-      z-index: 10;
-    }
-    .h-musait { background: linear-gradient(145deg, #37c178, #2fb36b); }
-    .h-opsiyon { background: linear-gradient(145deg, #eab23f, #e3a12c); }
-    .h-satildi { background: linear-gradient(145deg, #dd6a5e, #d15a4e); }
-    .h-kilit {
-      background: repeating-linear-gradient(135deg, rgba(16, 36, 58, 0.04) 0 8px, rgba(16, 36, 58, 0.08) 8px 16px);
-      color: var(--ink-faint);
-      cursor: not-allowed;
-      border: 1px dashed rgba(16, 36, 58, 0.18);
+    .unit-flat:hover {
+      transform: translateZ(10px) scale(1.03);
+      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.15);
     }
 
-    .stokbar {
-      height: 10px;
-      border-radius: 6px;
-      overflow: hidden;
-      display: flex;
-      background: rgba(16, 36, 58, 0.06);
+    /* Slide-in drawer modal */
+    .drawer-overlay {
+      background: rgba(15, 23, 42, 0.3);
+      backdrop-filter: blur(8px);
+      transition: opacity 0.3s ease;
+    }
+    .drawer-panel {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .rozet {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 12px;
-      border-radius: 99px;
-      font-size: 11.5px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .nabiz {
+    /* Magnetic hover button */
+    .btn-magnetic {
       position: relative;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .nabiz::after {
-      content: "";
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      border: 2px solid currentColor;
-      opacity: 0.6;
-      animation: pulse 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+    .btn-magnetic:hover {
+      transform: scale(1.02);
     }
 
-    @keyframes pulse {
-      0% { transform: scale(0.65); opacity: 0.8; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    .floating-card {
-      animation: float 6s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(0.5deg); }
-    }
-
-    /* slider customization */
+    /* Custom range input */
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(16, 36, 58, 0.08);
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(15, 23, 42, 0.06);
       outline: none;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      background: var(--teal);
+      background: var(--navy);
       border: 2px solid #fff;
-      box-shadow: var(--golge-1);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.1);
       cursor: pointer;
       transition: transform 0.15s ease;
     }
     input[type="range"]::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-      background: var(--teal-d);
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    .anim-slide-up {
-      animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      transform: scale(1.2);
     }
   </style>
 </head>
-<body class="relative min-h-screen flex flex-col overflow-x-hidden">
+<body class="relative min-h-screen overflow-x-hidden mesh-bg flex flex-col">
 
-  <!-- Blueprint Background Grid -->
-  <div class="izgara-doku absolute inset-0 opacity-[0.8] pointer-events-none" aria-hidden="true"></div>
+  <!-- Interactive Grid Mesh Overlay -->
+  <div class="grid-mesh absolute inset-0 opacity-[0.6] pointer-events-none" aria-hidden="true"></div>
 
-  <!-- Sticky Glass Navbar -->
-  <header class="sticky top-0 z-50 border-b border-[var(--cizgi)] bg-white/75 backdrop-blur-xl">
-    <nav class="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-5 sm:px-6">
+  <!-- Dynamic Header -->
+  <header class="sticky top-0 z-40 w-full px-6 py-4">
+    <nav class="mx-auto flex h-20 max-w-6xl items-center justify-between px-6 glass-island">
+      <!-- Logo block -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-[14px] grid grid-cols-3 grid-rows-3 gap-[2.5px] p-[6px] shadow-sm"
-             style="background:linear-gradient(145deg,#13314b,#1e9b8a);">
-          <span class="rounded-[1.5px] bg-white/95"></span><span class="rounded-[1.5px] bg-white/55"></span><span class="rounded-[1.5px] bg-white/95"></span>
-          <span class="rounded-[1.5px] bg-white/55"></span><span class="rounded-[1.5px] bg-white/95"></span><span class="rounded-[1.5px] bg-white/55"></span>
-          <span class="rounded-[1.5px] bg-white/95"></span><span class="rounded-[1.5px] bg-white/55"></span><span class="rounded-[1.5px] bg-white/95"></span>
+        <div class="w-9 h-9 rounded-xl grid grid-cols-3 grid-rows-3 gap-[2px] p-[5px] shadow-sm"
+             style="background:linear-gradient(135deg, var(--navy), var(--teal));">
+          <span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/60"></span><span class="rounded-[1.2px] bg-white"></span>
+          <span class="rounded-[1.2px] bg-white/60"></span><span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/60"></span>
+          <span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/60"></span><span class="rounded-[1.2px] bg-white"></span>
         </div>
         <div>
-          <span class="font-display font-bold text-xl tracking-tight text-[var(--navy)] block leading-none">ProjePazar</span>
-          <span class="text-[9.5px] text-[var(--ink-faint)] font-bold tracking-widest uppercase">b2b network</span>
+          <span class="font-bold text-lg tracking-tight block leading-none text-[var(--navy)]">ProjePazar</span>
+          <span class="text-[8.5px] text-[var(--ink-faint)] font-bold tracking-widest uppercase block mt-1">b2b network</span>
         </div>
       </div>
 
-      <div class="hidden items-center gap-1.5 md:flex">
-        <a href="#nasil-calisir" class="rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition">Nasıl Çalışır</a>
-        <a href="#canli-demo" class="rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition">Canlı Demo</a>
-        <a href="#kar-hesaplayici" class="rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition">Etki Hesaplayıcı</a>
-        <a href="#sss" class="rounded-xl px-4 py-2.5 text-[13.5px] font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-900 transition">Sık Sorulanlar</a>
+      <!-- Navigation links -->
+      <div class="hidden items-center gap-1 md:flex text-sm font-semibold">
+        <a href="#nasil-calisir" class="rounded-xl px-4 py-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">Nasıl Çalışır</a>
+        <a href="#canli-havuz" class="rounded-xl px-4 py-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">Canlı Havuz</a>
+        <a href="#analiz" class="rounded-xl px-4 py-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">Tasarruf Analizi</a>
+        <a href="#sss" class="rounded-xl px-4 py-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition">SSS</a>
       </div>
 
+      <!-- Actions -->
       <div class="flex items-center gap-3">
-        <button onclick="openAuthModal('login')" class="btn btn-ghost h-[42px] px-5 rounded-xl text-xs font-bold shadow-sm">Giriş yap</button>
-        <button onclick="openAuthModal('register')" class="btn btn-action h-[42px] px-5 rounded-xl text-xs font-bold">Ağa Katıl</button>
+        <button onclick="toggleDrawer('login')" class="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100/50 transition">Giriş Yap</button>
+        <button onclick="toggleDrawer('register')" class="btn-magnetic bg-slate-950 text-white rounded-xl px-5 py-2.5 text-sm font-bold shadow-md hover:bg-slate-900 transition">Ağa Katıl</button>
       </div>
     </nav>
   </header>
 
-  <!-- ============ HERO SECTION ============ -->
-  <section class="relative px-5 pt-16 pb-20 sm:px-6 sm:pt-24 sm:pb-28 max-w-6xl mx-auto w-full">
+  <!-- ============ HERO BLOCK (STAGGERED TYPOGRAPHY) ============ -->
+  <section class="relative px-6 pt-16 pb-20 sm:pt-20 sm:pb-28 max-w-6xl mx-auto w-full">
     <div class="grid lg:grid-cols-12 gap-16 items-center">
-      <!-- Left Side -->
-      <div class="lg:col-span-7 space-y-7 anim-slide-up">
-        <span class="inline-flex items-center gap-2 rounded-full border border-[rgba(30,155,138,0.22)] bg-[var(--color-teal-soft)] px-4 py-2 font-mono text-[11px] font-bold text-[var(--color-teal-d)] tracking-wider">
-          <span class="size-2 rounded-full bg-[#2fb36b] nabiz text-[#2fb36b]" aria-hidden="true"></span>
-          B2B TAHSİSLİ KONUT STOĞU VE GÜVEN PLATFORMU
+      
+      <!-- Text details -->
+      <div class="lg:col-span-7 space-y-8">
+        <span class="inline-flex items-center gap-2 rounded-full border border-sky-200/50 bg-sky-50 px-4 py-2 text-[11px] font-bold text-sky-700 tracking-wider font-body">
+          <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          B2B TAHSİSLİ KONUT STOĞU PAYLAŞIM ALTYAPISI
         </span>
-        
-        <h1 class="font-display text-[44px] sm:text-[62px] font-extrabold leading-[1.02] tracking-tight text-[var(--navy)]">
-          Tüm projeler tek havuzda.<br />
-          <span class="text-[var(--teal)]">Sıfır komisyon. Canlı veri.</span>
+
+        <h1 class="text-[52px] sm:text-[76px] font-black leading-[0.98] tracking-tighter text-[var(--navy)]">
+          Canlı konut stoğu.<br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-500 via-sky-600 to-indigo-600">Tek doğru veri.</span>
         </h1>
-        
-        <p class="text-[15.5px] sm:text-[17px] leading-relaxed text-slate-500 font-medium max-w-xl">
-          Eski PDF broşürleri, güncel olmayan Excel dosyalarını ve çift satış risklerini geride bırakın. Proje sahipleri stoğunu tek elden kontrol eder; yetkili danışmanlar doğru fiyatla WhatsApp üzerinden satar.
+
+        <p class="font-body text-[16px] sm:text-[18px] leading-relaxed text-slate-500 font-medium max-w-xl">
+          Eski PDF broşürleri, statik fiyat listelerini ve çift-satış risklerini ortadan kaldırın. Proje sahibi stoğu tek noktadan yönetir; yetkili danışmanlar anında fiyattan WhatsApp ile paylaşır.
         </p>
 
-        <!-- Dynamic Tabs -->
-        <div class="rounded-2xl border border-[var(--cizgi)] p-1.5 bg-white/60 backdrop-blur-sm max-w-lg flex gap-2">
-          <button onclick="setHeroTab('uretici')" id="btn-tab-uretici" class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 bg-[var(--navy)] text-white shadow-sm">
-            Müteahhit / Geliştirici
-          </button>
-          <button onclick="setHeroTab('emlakci')" id="btn-tab-emlakci" class="flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800">
-            Gayrimenkul Danışmanı
-          </button>
-        </div>
-
-        <!-- Prop list reflecting tabs -->
-        <div id="prop-uretici-list" class="space-y-3 max-w-md">
-          <div class="flex items-start gap-3 text-[13.5px]">
-            <span class="w-5 h-5 rounded-md bg-[var(--color-navy-soft)] flex items-center justify-center font-bold text-[var(--navy)]">✓</span>
-            <p class="text-slate-600 font-medium"><strong>Tek Panelden Dağıtım:</strong> Fiyat and durum bilgilerini güncelleyin, ağdaki tüm danışmanlar anında görsün.</p>
+        <!-- Staggered Layout Action Cards -->
+        <div class="grid sm:grid-cols-2 gap-4 max-w-lg">
+          <div class="glass-premium p-5 rounded-2xl flex flex-col justify-between h-[150px] border border-slate-100/80 hover:border-sky-300/60 transition duration-300">
+            <div>
+              <span class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">PROJE GELİŞTİRİCİ</span>
+              <h3 class="font-bold text-[15px] mt-1">Stoğumu Dağıtmak İstiyorum</h3>
+            </div>
+            <button onclick="toggleDrawer('register')" class="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1">Projemi Kaydet →</button>
           </div>
-          <div class="flex items-start gap-3 text-[13.5px]">
-            <span class="w-5 h-5 rounded-md bg-[var(--color-navy-soft)] flex items-center justify-center font-bold text-[var(--navy)]">✓</span>
-            <p class="text-slate-600 font-medium"><strong>Kapsamlı Tahsis Yetkileri:</strong> Belirli blokları veya daireleri sadece seçtiğiniz yetkili ofis/kişilere açın.</p>
-          </div>
-        </div>
-
-        <div id="prop-emlakci-list" class="space-y-3 max-w-md hidden">
-          <div class="flex items-start gap-3 text-[13.5px]">
-            <span class="w-5 h-5 rounded-md bg-[var(--color-teal-soft)] flex items-center justify-center font-bold text-[var(--teal-d)]">✓</span>
-            <p class="text-slate-600 font-medium"><strong>Doğru Fiyat Garantisi:</strong> Paylaşım anındaki veriler tek doğru kaynaktan canlı beslenir; hata riski yoktur.</p>
-          </div>
-          <div class="flex items-start gap-3 text-[13.5px]">
-            <span class="w-5 h-5 rounded-md bg-[var(--color-teal-soft)] flex items-center justify-center font-bold text-[var(--teal-d)]">✓</span>
-            <p class="text-slate-600 font-medium"><strong>Ücretsiz Danışman Erişimi:</strong> Kayıt olun, size tahsisli projeleri görün. Satışlardan komisyon alınmaz.</p>
+          
+          <div class="glass-premium p-5 rounded-2xl flex flex-col justify-between h-[150px] border border-slate-100/80 hover:border-emerald-300/60 transition duration-300">
+            <div>
+              <span class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">GAYRİMENKUL DANIŞMANI</span>
+              <h3 class="font-bold text-[15px] mt-1">Projeleri Paylaşmak İstiyorum</h3>
+            </div>
+            <button onclick="toggleDrawer('register')" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">Ağa Katıl →</button>
           </div>
         </div>
       </div>
 
-      <!-- Right Side (High-Fidelity Dashboard Mockup Card) -->
+      <!-- Interactive 3D Mockup Block -->
       <div class="lg:col-span-5 flex justify-center lg:justify-end">
-        <div class="kart p-6 w-full max-w-[450px] relative shadow-card floating-card bg-white border border-[var(--cizgi-2)]">
-          <div class="absolute -left-3 -top-3 bg-[var(--color-navy-soft)] border border-navy/10 rounded-2xl px-4 py-2 font-mono text-[10px] font-bold text-navy shadow-sm">
-            ▲ KOKPİT ÖNİZLEME
+        <div class="glass-island p-6 w-full max-w-[430px] border border-slate-100/85 relative shadow-2xl">
+          <div class="absolute -right-3 -top-3 bg-slate-900 text-white rounded-xl px-3.5 py-1.5 font-mono text-[9px] font-bold shadow-md">
+            ▲ WORKSPACE PANEL
           </div>
 
           <div class="flex items-center justify-between mb-5">
             <div>
-              <div class="font-display text-[15px] font-bold text-slate-800">Mesa Panorama Vadi</div>
-              <div class="text-[10px] text-slate-400 font-semibold font-mono">Çankaya, Ankara</div>
+              <div class="font-bold text-[15px] text-slate-800">Çankaya Loft Konutları</div>
+              <div class="text-[10px] text-slate-400 font-semibold font-mono mt-0.5">Mesa Panorama · A Blok</div>
             </div>
-            <span class="rozet" style="background:rgba(47,179,107,0.12); color:#1f7d4c;">
-              <span class="freshdot nabiz" style="background:var(--musait); color:var(--musait);"></span> Canlı
+            <span class="rozet" style="background:rgba(16,185,129,0.1); color:#10b981;">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Canlı
             </span>
           </div>
 
-          <!-- mini charts -->
-          <div class="grid grid-cols-3 gap-3 mb-5">
-            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center">
-              <span class="text-[9px] font-bold text-slate-400 uppercase block font-mono">toplam stok</span>
-              <span class="text-xl font-extrabold text-slate-900 block mt-1 font-mono">48</span>
+          <!-- Quick statistics -->
+          <div class="grid grid-cols-3 gap-3 mb-5 text-center">
+            <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <span class="text-[8.5px] font-bold text-slate-400 uppercase block font-mono">birim</span>
+              <span class="text-[16px] font-extrabold text-slate-800 block mt-0.5 font-mono">54</span>
             </div>
-            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center">
-              <span class="text-[9px] font-bold text-slate-400 uppercase block font-mono">MÜSAİT</span>
-              <span class="text-xl font-extrabold text-green block mt-1 font-mono">26</span>
+            <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <span class="text-[8.5px] font-bold text-slate-400 uppercase block font-mono">müsait</span>
+              <span class="text-[16px] font-extrabold text-emerald-500 block mt-0.5 font-mono">22</span>
             </div>
-            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl text-center">
-              <span class="text-[9px] font-bold text-slate-400 uppercase block font-mono">opsiyonlu</span>
-              <span class="text-xl font-extrabold text-amber block mt-1 font-mono">8</span>
+            <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+              <span class="text-[8.5px] font-bold text-slate-400 uppercase block font-mono">opsiyon</span>
+              <span class="text-[16px] font-extrabold text-amber-500 block mt-0.5 font-mono">8</span>
             </div>
           </div>
 
-          <!-- real-time updates -->
+          <!-- mini interactive table representation -->
           <div class="space-y-2 mb-5">
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest font-mono">Canlı İşlem Akışı</div>
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-2.5 flex items-center justify-between gap-3 text-xs font-semibold">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-amber"></span>
-                <span class="text-slate-800">A-43 Nolu Daire</span>
-              </div>
-              <span class="text-[10px] text-slate-400">12 sn önce opsiyonlandı</span>
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <span class="font-bold">Daire A-43</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] bg-amber-50 text-amber-700 font-bold border border-amber-200/50">Opsiyonlandı</span>
+              <span class="font-mono">12 saniye önce</span>
             </div>
-            <div class="rounded-xl border border-slate-100 bg-slate-50 p-2.5 flex items-center justify-between gap-3 text-xs font-semibold">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-red"></span>
-                <span class="text-slate-800">B-12 Nolu Daire</span>
-              </div>
-              <span class="text-[10px] text-slate-400">1 dk önce satıldı</span>
+            <div class="flex items-center justify-between text-xs font-semibold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+              <span class="font-bold">Daire B-12</span>
+              <span class="px-2 py-0.5 rounded-full text-[9px] bg-red-50 text-red-700 font-bold border border-red-200/50">Satıldı</span>
+              <span class="font-mono">1 dakika önce</span>
             </div>
           </div>
 
-          <button onclick="openAuthModal('register')" class="btn btn-action w-full justify-center text-xs py-3">
-            Ağa Katıl ve Projeleri Gör
+          <button onclick="toggleDrawer('register')" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl transition">
+            Ağ Yetkilerini Al ve İncele
           </button>
         </div>
       </div>
+
     </div>
   </section>
 
-  <!-- ============ INTERACTIVE CANLI DEMO ============ -->
-  <section id="canli-demo" class="scroll-mt-20 border-y border-[var(--cizgi)] bg-white/55 px-5 py-20 sm:px-6 sm:py-24">
-    <div class="max-w-6xl mx-auto w-full">
-      <div class="mx-auto max-w-2xl text-center mb-14">
-        <p class="font-display text-xs font-bold uppercase tracking-[0.16em] text-[var(--teal)]">CANLI DENEYİM</p>
-        <h2 class="mt-3 font-display text-4xl font-extrabold tracking-tight text-[var(--navy)] sm:text-5xl">Bina Kesiti &amp; Daire Detay Modülü</h2>
-        <p class="mt-3 text-slate-500 text-sm font-medium">Hücrelerin üzerine dokunun, detay panelindeki verilerin saniyeler içinde senkronize oluşunu test edin.</p>
-      </div>
+  <!-- ============ INTERACTIVE 3D PERSPECTIVE HAVUZ ============ -->
+  <section id="canli-havuz" class="scroll-mt-24 px-6 py-20 sm:py-24 max-w-6xl mx-auto w-full">
+    <div class="mx-auto max-w-2xl text-center mb-16">
+      <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-600">3D HAVUZ MODÜLÜ</p>
+      <h2 class="mt-3 text-4xl font-extrabold tracking-tight text-[var(--navy)] sm:text-5xl">Bina Kat Kesitleri</h2>
+      <p class="mt-3 text-slate-500 font-body text-sm font-medium">Bina bloklarını 3D perspektifte inceleyin. Dairelere tıklayarak sağdaki detayları güncelleyin.</p>
+    </div>
 
-      <div class="grid lg:grid-cols-12 gap-8 items-start">
-        <!-- Left: Kesit Grid -->
-        <div class="lg:col-span-8 kart p-6 bg-white">
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div>
-              <h3 class="font-display font-bold text-base text-slate-800">Mesa Panorama · A Blok</h3>
-              <p class="text-[11px] text-slate-400 font-semibold mt-0.5">Sanal daireler üzerine dokunarak işlem yapın.</p>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="setDemoView('kesit')" id="view-tab-kesit" class="chip active font-bold">Bina Kesiti</button>
-              <button onclick="setDemoView('tablo')" id="view-tab-tablo" class="chip font-bold">Stok Listesi</button>
-            </div>
+    <!-- 3D Perspective layout -->
+    <div class="grid lg:grid-cols-12 gap-8 items-start">
+      <!-- Left: 3D perspective display -->
+      <div class="lg:col-span-8 glass-island p-6 bg-white flex flex-col justify-between min-h-[460px] relative overflow-hidden">
+        <div class="flex justify-between items-center z-10 mb-6">
+          <span class="text-xs font-bold text-slate-500">Mesa Vadi Konakları · İzometrik Blok Görünümü</span>
+          <div class="flex gap-2">
+            <button onclick="setBinaView('kesit')" id="btn-view-kesit" class="chip active font-bold text-xs">3D Kesit</button>
+            <button onclick="setBinaView('tablo')" id="btn-view-tablo" class="chip font-bold text-xs">Tablo Listesi</button>
           </div>
+        </div>
 
-          <!-- Bina Kesit Render -->
-          <div id="demo-view-kesit-container" class="space-y-3">
+        <!-- Bina 3D Perspective -->
+        <div id="perspective-kesit-viewport" class="flex-1 flex items-center justify-center perspective-box my-4 select-none">
+          <div class="building-tilt space-y-4 w-[280px]">
             <!-- Kat 4 -->
-            <div class="flex items-center gap-3">
-              <span class="w-8 font-mono text-[10px] text-slate-400 font-bold text-right">K4</span>
-              <div class="grid grid-cols-4 gap-2 flex-1">
-                <div onclick="clickDemoUnit('A-41', '3+1', '142 m²', 'Müsait', '₺10,400,000', 'h-musait')" class="hucre h-musait" id="cell-A-41">
-                  <span>A-41</span><span class="opacity-80">3+1</span><span>₺10.4M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-42', '3+1', '142 m²', 'Müsait', '₺10,200,000', 'h-musait')" class="hucre h-musait" id="cell-A-42">
-                  <span>A-42</span><span class="opacity-80">3+1</span><span>₺10.2M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-43', '2+1', '98 m²', 'Opsiyonlu', '₺7,800,000', 'h-opsiyon')" class="hucre h-opsiyon" id="cell-A-43">
-                  <span>A-43</span><span class="opacity-80">2+1</span><span>Opsiyon</span>
-                </div>
-                <div class="hucre h-kilit">
-                  <span>A-44</span><span class="opacity-70 text-[8px]">Tahsis Dışı</span>
-                </div>
+            <div class="kat-plak pb-2">
+              <div class="text-[8.5px] font-bold text-slate-400 font-mono mb-1">KAT 4</div>
+              <div class="grid grid-cols-3 gap-2">
+                <div onclick="selectUnitFlat('A-41', '3+1', '142 m²', 'Müsait', '₺10,400,000', 'h-musait')" class="hucre h-musait unit-flat" id="flat-A-41">A-41</div>
+                <div onclick="selectUnitFlat('A-42', '2+1', '98 m²', 'Opsiyonlu', '₺7,800,000', 'h-opsiyon')" class="hucre h-opsiyon unit-flat" id="flat-A-42">A-42</div>
+                <div onclick="selectUnitFlat('A-43', '3+1', '142 m²', 'Müsait', '₺10,200,000', 'h-musait')" class="hucre h-musait unit-flat" id="flat-A-43">A-43</div>
               </div>
             </div>
             <!-- Kat 3 -->
-            <div class="flex items-center gap-3">
-              <span class="w-8 font-mono text-[10px] text-slate-400 font-bold text-right">K3</span>
-              <div class="grid grid-cols-4 gap-2 flex-1">
-                <div onclick="clickDemoUnit('A-31', '3+1', '142 m²', 'Müsait', '₺9,800,000', 'h-musait')" class="hucre h-musait" id="cell-A-31">
-                  <span>A-31</span><span class="opacity-80">3+1</span><span>₺9.8M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-32', '3+1', '142 m²', 'Satıldı', '₺9,600,000', 'h-satildi')" class="hucre h-satildi" id="cell-A-32">
-                  <span>A-32</span><span class="opacity-80">3+1</span><span>Satıldı</span>
-                </div>
-                <div onclick="clickDemoUnit('A-33', '2+1', '98 m²', 'Müsait', '₺7,200,000', 'h-musait')" class="hucre h-musait" id="cell-A-33">
-                  <span>A-33</span><span class="opacity-80">2+1</span><span>₺7.2M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-34', '2+1', '98 m²', 'Müsait', '₺7,000,000', 'h-musait')" class="hucre h-musait" id="cell-A-34">
-                  <span>A-34</span><span class="opacity-80">2+1</span><span>₺7.0M</span>
-                </div>
+            <div class="kat-plak pb-2">
+              <div class="text-[8.5px] font-bold text-slate-400 font-mono mb-1">KAT 3</div>
+              <div class="grid grid-cols-3 gap-2">
+                <div onclick="selectUnitFlat('A-31', '3+1', '142 m²', 'Müsait', '₺9,800,000', 'h-musait')" class="hucre h-musait unit-flat" id="flat-A-31">A-31</div>
+                <div onclick="selectUnitFlat('A-32', '3+1', '142 m²', 'Satıldı', '₺9,600,000', 'h-satildi')" class="hucre h-satildi unit-flat" id="flat-A-32">A-32</div>
+                <div onclick="selectUnitFlat('A-33', '2+1', '98 m²', 'Müsait', '₺7,200,000', 'h-musait')" class="hucre h-musait unit-flat" id="flat-A-33">A-33</div>
               </div>
             </div>
-            <!-- Kat 2 -->
-            <div class="flex items-center gap-3">
-              <span class="w-8 font-mono text-[10px] text-slate-400 font-bold text-right">K2</span>
-              <div class="grid grid-cols-4 gap-2 flex-1">
-                <div onclick="clickDemoUnit('A-21', '3+1', '142 m²', 'Müsait', '₺8,800,000', 'h-musait')" class="hucre h-musait" id="cell-A-21">
-                  <span>A-21</span><span class="opacity-80">3+1</span><span>₺8.8M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-22', '3+1', '142 m²', 'Müsait', '₺8,750,000', 'h-musait')" class="hucre h-musait" id="cell-A-22">
-                  <span>A-22</span><span class="opacity-80">3+1</span><span>₺8.75M</span>
-                </div>
-                <div onclick="clickDemoUnit('A-23', '2+1', '98 m²', 'Satıldı', '₺6,500,000', 'h-satildi')" class="hucre h-satildi" id="cell-A-23">
-                  <span>A-23</span><span class="opacity-80">2+1</span><span>Satıldı</span>
-                </div>
-                <div class="hucre h-kilit">
-                  <span>A-24</span><span class="opacity-70 text-[8px]">Tahsis Dışı</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tablo Görünümü -->
-          <div id="demo-view-tablo-container" class="hidden overflow-x-auto">
-            <table class="w-full text-xs font-semibold text-left text-slate-800">
-              <thead>
-                <tr class="text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                  <th class="pb-2.5">Birim No</th>
-                  <th class="pb-2.5">Layout</th>
-                  <th class="pb-2.5">Alan</th>
-                  <th class="pb-2.5 text-right">Fiyat</th>
-                  <th class="pb-2.5">Durum</th>
-                  <th class="pb-2.5 text-right">İşlem</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                <tr class="hover:bg-slate-50 cursor-pointer" onclick="clickDemoUnit('A-41', '3+1', '142 m²', 'Müsait', '₺10,400,000', 'h-musait')">
-                  <td class="py-3 font-bold">A-41</td>
-                  <td class="py-3 text-slate-500">3+1 Konut</td>
-                  <td class="py-3 text-slate-500 mono">142 m²</td>
-                  <td class="py-3 text-right mono">₺10,400,000</td>
-                  <td class="py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e5f5ec] text-[#1f7d4c]">Müsait</span></td>
-                  <td class="py-3 text-right text-[var(--teal)] font-bold">Seç</td>
-                </tr>
-                <tr class="hover:bg-slate-50 cursor-pointer" onclick="clickDemoUnit('A-42', '3+1', '142 m²', 'Müsait', '₺10,200,000', 'h-musait')">
-                  <td class="py-3 font-bold">A-42</td>
-                  <td class="py-3 text-slate-500">3+1 Konut</td>
-                  <td class="py-3 text-slate-500 mono">142 m²</td>
-                  <td class="py-3 text-right mono">₺10,200,000</td>
-                  <td class="py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#e5f5ec] text-[#1f7d4c]">Müsait</span></td>
-                  <td class="py-3 text-right text-[var(--teal)] font-bold">Seç</td>
-                </tr>
-                <tr class="hover:bg-slate-50 cursor-pointer" onclick="clickDemoUnit('A-43', '2+1', '98 m²', 'Opsiyonlu', '₺7,800,000', 'h-opsiyon')">
-                  <td class="py-3 font-bold">A-43</td>
-                  <td class="py-3 text-slate-500">2+1 Konut</td>
-                  <td class="py-3 text-slate-500 mono">98 m²</td>
-                  <td class="py-3 text-right mono">₺7,800,000</td>
-                  <td class="py-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#fbf0da] text-[#9a6a12]">Opsiyon</span></td>
-                  <td class="py-3 text-right text-[var(--teal)] font-bold">Seç</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </div>
 
-        <!-- Right: Unit Details Interactive Card -->
-        <div class="lg:col-span-4 space-y-4">
-          <div class="kart p-6" id="demo-detail-panel">
-            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-4 border-b border-slate-100 pb-3">Daire Detay Kartı</h4>
-            
-            <div class="space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider font-mono">Birim No</p>
-                  <h5 class="text-2xl font-extrabold text-slate-900" id="u-detail-no">A-22</h5>
-                </div>
-                <span class="rozet" id="u-detail-badge" style="background:rgba(47,179,107,0.12); color:#1f7d4c;">Müsait</span>
-              </div>
+        <!-- Table Viewport -->
+        <div id="perspective-tablo-viewport" class="hidden overflow-x-auto my-4 font-body">
+          <table class="w-full text-xs font-semibold text-left text-slate-800">
+            <thead>
+              <tr class="text-[10px] text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                <th class="pb-2.5">Birim No</th>
+                <th class="pb-2.5">Oda Tipi</th>
+                <th class="pb-2.5">Alan</th>
+                <th class="pb-2.5 text-right">Liste Fiyatı</th>
+                <th class="pb-2.5">Durum</th>
+                <th class="pb-2.5 text-right">İşlem</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr class="hover:bg-slate-50 cursor-pointer" onclick="selectUnitFlat('A-41', '3+1', '142 m²', 'Müsait', '₺10,400,000', 'h-musait')">
+                <td class="py-3.5 font-bold">A-41</td>
+                <td class="py-3.5 text-slate-500">3+1 Daire</td>
+                <td class="py-3.5 text-slate-500 mono">142 m²</td>
+                <td class="py-3.5 text-right mono">₺10,400,000</td>
+                <td class="py-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700">Müsait</span></td>
+                <td class="py-3.5 text-right text-sky-600 font-bold">Detay Gör</td>
+              </tr>
+              <tr class="hover:bg-slate-50 cursor-pointer" onclick="selectUnitFlat('A-42', '2+1', '98 m²', 'Opsiyonlu', '₺7,800,000', 'h-opsiyon')">
+                <td class="py-3.5 font-bold">A-42</td>
+                <td class="py-3.5 text-slate-500">2+1 Daire</td>
+                <td class="py-3.5 text-slate-500 mono">98 m²</td>
+                <td class="py-3.5 text-right mono">₺7,800,000</td>
+                <td class="py-3.5"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700">Opsiyonlu</span></td>
+                <td class="py-3.5 text-right text-sky-600 font-bold">Detay Gör</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-              <div class="grid grid-cols-2 gap-3 text-xs font-semibold">
-                <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
-                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Layout</span>
-                  <span class="text-slate-800 mt-1 block" id="u-detail-layout">3+1 Konut</span>
-                </div>
-                <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
-                  <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Net m²</span>
-                  <span class="text-slate-800 mt-1 block mono" id="u-detail-area">142 m²</span>
-                </div>
-              </div>
+        <div class="flex items-center gap-4 text-[10px] font-bold text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-[4px] bg-[#10b981]"></span> Müsait</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-[4px] bg-[#f59e0b]"></span> Opsiyonlu</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-[4px] bg-[#ef4444]"></span> Satıldı</span>
+        </div>
+      </div>
 
+      <!-- Right: interactive side panel -->
+      <div class="lg:col-span-4 space-y-4">
+        <div class="glass-island p-6 bg-white" id="details-side-panel">
+          <h4 class="text-[9.5px] font-bold text-slate-400 uppercase font-mono mb-4 border-b border-slate-100 pb-2">BİRİM DETAY KARTI</h4>
+          
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
               <div>
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Liste Fiyatı</span>
-                <span class="text-2xl font-extrabold text-[var(--navy)] mt-0.5 block mono" id="u-detail-price">₺8,750,000</span>
+                <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Daire No</span>
+                <h5 class="text-2xl font-black text-slate-900" id="unit-detail-no">A-41</h5>
               </div>
+              <span class="rozet" id="unit-detail-status" style="background:rgba(16,185,129,0.12); color:#10b981;">Müsait</span>
+            </div>
 
-              <div class="space-y-2 pt-2">
-                <button onclick="triggerWhatsAppShare()" class="btn btn-wa w-full justify-center text-xs py-2.5">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.01 2.01c-5.52 0-10 4.48-10 10 0 1.76.46 3.41 1.27 4.86l-1.35 4.96 5.09-1.33c1.4.77 2.99 1.21 4.69 1.21 5.52 0 10-4.48 10-10s-4.48-10-10-10zm5.49 14.2c-.28.79-1.42 1.48-2.15 1.57-.68.08-1.57.14-4.52-1.07-3.76-1.54-6.17-5.38-6.36-5.63-.19-.25-1.45-1.93-1.45-3.69 0-1.76.92-2.63 1.25-2.98.33-.35.73-.44.97-.44h.63c.22 0 .52.01.76.57.25.58.85 2.08.92 2.23.07.15.12.33.02.53-.1.2-.21.33-.37.52l-.46.54c-.16.18-.33.38-.14.7.19.32.86 1.42 1.84 2.29.98.87 2.11 1.21 2.44 1.34.33.13.52.11.72-.11.2-.22.86-1 .99-1.34.13-.34.26-.29.46-.22l2 1c.2.07.39.18.49.24.1.06.1.55-.18 1.34z"/></svg>
-                  WhatsApp Paylaşım Hazırla
-                </button>
-                <button onclick="triggerOptionReserve()" id="btn-opsiyon-action" class="btn btn-primary w-full justify-center text-xs py-2.5">
-                  Opsiyon Al (48 saat kilit)
-                </button>
+            <div class="grid grid-cols-2 gap-3 text-xs font-semibold">
+              <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+                <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Plan tipi</span>
+                <span class="text-slate-800 mt-1 block" id="unit-detail-layout">3+1 Daire</span>
+              </div>
+              <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+                <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Net Alan</span>
+                <span class="text-slate-800 mt-1 block mono" id="unit-detail-area">142 m²</span>
               </div>
             </div>
-          </div>
 
-          <!-- Live Event Feed -->
-          <div class="glass-premium-dark p-5 rounded-[24px] text-white font-mono text-[11px] h-[154px] flex flex-col justify-between shadow-lg relative overflow-hidden">
-            <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[var(--teal)] to-transparent opacity-60"></div>
             <div>
-              <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
-                <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Ağ İşlemleri</span>
-                <span class="size-2 rounded-full bg-[#2fb36b] nabiz"></span>
-              </div>
-              <div class="space-y-1.5 max-h-[90px] overflow-y-auto pr-1" id="live-logs-box">
-                <div class="olay-anim text-emerald-400">&gt; A-22 seçildi. Satışa hazır.</div>
-                <div class="olay-anim text-slate-400">&gt; RLS güvenlik kuralları devrede.</div>
-              </div>
+              <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Liste Fiyatı</span>
+              <span class="text-2xl font-black text-slate-900 block font-mono mt-0.5" id="unit-detail-price">₺10,400,000</span>
+            </div>
+
+            <div class="space-y-2 pt-2">
+              <button onclick="simulateB2BShare()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-1.5 transition">
+                📲 WhatsApp Paylaşım Hazırla
+              </button>
+              <button onclick="simulateB2BReserve()" id="btn-action-reserve" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition">
+                Opsiyon Al (48 saat kilit)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mock system connection stream -->
+        <div class="glass-island p-5 bg-[#0b1329] border-none text-white font-mono text-[11px] h-[150px] flex flex-col justify-between relative overflow-hidden">
+          <div class="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-60"></div>
+          <div>
+            <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mb-2">
+              <span class="text-slate-400 font-bold uppercase tracking-wider text-[9px]">SİSTEM LOGLARI</span>
+              <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <div class="space-y-1.5 max-h-[85px] overflow-y-auto pr-1" id="terminal-logs">
+              <div class="text-emerald-400">&gt; A-41 nolu birim paylaşıma hazır.</div>
+              <div class="text-slate-400">&gt; B2B ağ geçidi bağlantısı kuruldu.</div>
             </div>
           </div>
         </div>
@@ -608,138 +431,104 @@
     </div>
   </section>
 
-  <!-- ============ NETWORK PROFIT / SCALE CALCULATOR ============ -->
-  <section id="kar-hesaplayici" class="px-5 py-20 sm:px-6 sm:py-24 max-w-4xl mx-auto w-full">
+  <!-- ============ INTERACTIVE SAVINGS CALCULATOR ============ -->
+  <section id="analiz" class="scroll-mt-24 px-6 py-20 sm:py-24 max-w-4xl mx-auto w-full">
     <div class="mx-auto max-w-2xl text-center mb-12">
-      <p class="font-display text-xs font-bold uppercase tracking-[0.16em] text-[var(--teal)]">AĞ VERİMLİLİĞİ</p>
-      <h2 class="mt-3 font-display text-4xl font-extrabold tracking-tight text-[var(--navy)] sm:text-5xl">Dağıtım Gücü Hesaplayıcı</h2>
-      <p class="mt-3 text-slate-500 text-sm font-medium">Stok hacminize ve ofis ağınıza göre komisyonsuz satış potansiyelinizi simüle edin.</p>
+      <p class="text-xs font-bold uppercase tracking-[0.16em] text-sky-600">MALİYET &amp; TASARRUF ANALİZİ</p>
+      <h2 class="mt-3 text-4xl font-extrabold tracking-tight text-[var(--navy)] sm:text-5xl">Geleneksel Portallar vs ProjePazar</h2>
+      <p class="mt-3 text-slate-500 font-body text-sm font-medium">B2B ağındaki ücretsiz dağıtımın firmanıza sağladığı finansal faydaları hesaplayın.</p>
     </div>
 
-    <div class="kart p-8 bg-white grid md:grid-cols-12 gap-8 items-center">
+    <div class="glass-island p-8 bg-white grid md:grid-cols-12 gap-8 items-center border border-slate-100">
       <!-- Sliders -->
       <div class="md:col-span-7 space-y-6">
         <div class="space-y-2">
           <div class="flex justify-between text-xs font-bold text-slate-700">
-            <span>YETKİLİ DANIŞMAN/OFİS SAYISI</span>
-            <span class="text-[var(--teal-d)]" id="lbl-val-danisman">150</span>
+            <span>AĞDAKİ DANIŞMAN/OFİS SAYISI</span>
+            <span class="text-sky-600 font-mono" id="slider-val-agents">120 Ofis</span>
           </div>
-          <input type="range" id="rng-danisman" min="20" max="500" value="150" oninput="updateCalculator()">
+          <input type="range" id="range-agents" min="20" max="500" value="120" oninput="calculateSavings()">
         </div>
 
         <div class="space-y-2">
           <div class="flex justify-between text-xs font-bold text-slate-700">
-            <span>DAİRE STOK ADEDİ</span>
-            <span class="text-[var(--teal-d)]" id="lbl-val-daire">80</span>
+            <span>TOPLAM DAİRE STOĞU</span>
+            <span class="text-sky-600 font-mono" id="slider-val-units">80 Daire</span>
           </div>
-          <input type="range" id="rng-daire" min="10" max="300" value="80" oninput="updateCalculator()">
+          <input type="range" id="range-units" min="10" max="300" value="80" oninput="calculateSavings()">
         </div>
       </div>
 
-      <!-- Calculations output -->
-      <div class="md:col-span-5 bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-5 text-center md:text-left">
+      <!-- Output display metrics -->
+      <div class="md:col-span-5 bg-slate-50 border border-slate-100 rounded-2xl p-6 space-y-5">
         <div>
-          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Potansiyel Aylık Gösterim</span>
-          <span class="text-3xl font-extrabold text-[var(--navy)] tracking-tight block mono mt-1" id="out-sales-view">4,500</span>
+          <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Aylık Müşteri Etkileşimi</span>
+          <span class="text-3xl font-black text-slate-900 block font-mono mt-0.5" id="out-views-calc">9,600 Gösterim</span>
         </div>
         <div>
-          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Simüle Edilen Satış Hızı</span>
-          <span class="text-2xl font-extrabold text-[#2fb36b] block mt-1" id="out-sales-speed">3.2x Daha Hızlı</span>
-        </div>
-        <div>
-          <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-mono">Tahmini Tasarruf (Portal İlan Bedelleri)</span>
-          <span class="text-2xl font-extrabold text-[var(--teal-d)] tracking-tight block mono mt-1" id="out-savings">₺120K / Ay</span>
+          <span class="text-[9px] text-slate-400 font-bold uppercase font-mono block">Portal İlan Maliyet Tasarrufu</span>
+          <span class="text-2xl font-black text-emerald-500 block font-mono mt-0.5" id="out-savings-calc">₺96,000 / Ay</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ BENTO GRID: GÜVEN PROTOKOLÜ ============ -->
-  <section class="px-5 py-20 sm:px-6 sm:py-24 max-w-6xl mx-auto w-full border-t border-[var(--cizgi)]">
-    <div class="mx-auto max-w-2xl text-center mb-16">
-      <p class="font-display text-xs font-bold uppercase tracking-[0.16em] text-[var(--teal)]">MİMARİ GÜVENLİK</p>
-      <h2 class="mt-3 font-display text-4xl font-extrabold tracking-tight text-[var(--navy)] sm:text-5xl">B2B Güven Standartları</h2>
-      <p class="mt-3 text-slate-500 text-sm font-medium">B2B ağında güvenlik sözleşmelerle değil, veritabanı kurallarıyla garanti altındadır.</p>
-    </div>
-
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <!-- Bento 1 -->
-      <div class="kart kart-hover p-6 flex flex-col justify-between">
-        <div class="space-y-4">
-          <span class="w-10 h-10 rounded-xl bg-[var(--teal-soft)] flex items-center justify-center font-bold text-[var(--teal-d)] text-base">🛡</span>
-          <h3 class="font-display font-bold text-[15px] tracking-tight text-slate-800">Çift-Satış Kalkanı</h3>
-          <p class="text-xs leading-relaxed text-slate-500 font-medium">Opsiyonlama anında veritabanında geçici kilit oluşturularak, aynı dairenin iki kez satılması engellenir.</p>
-        </div>
-      </div>
-      <!-- Bento 2 -->
-      <div class="kart kart-hover p-6 flex flex-col justify-between">
-        <div class="space-y-4">
-          <span class="w-10 h-10 rounded-xl bg-[var(--teal-soft)] flex items-center justify-center font-bold text-[var(--teal-d)] text-base">🔑</span>
-          <h3 class="font-display font-bold text-[15px] tracking-tight text-slate-800">RLS Veri Güvenliği</h3>
-          <p class="text-xs leading-relaxed text-slate-500 font-medium">Satıcılar yalnız kendi yetkilerine açık dairelerin detayını görür. Veri sızıntısı engellenir.</p>
-        </div>
-      </div>
-      <!-- Bento 3 -->
-      <div class="kart kart-hover p-6 flex flex-col justify-between">
-        <div class="space-y-4">
-          <span class="w-10 h-10 rounded-xl bg-[var(--teal-soft)] flex items-center justify-center font-bold text-[var(--teal-d)] text-base">✓</span>
-          <h3 class="font-display font-bold text-[15px] tracking-tight text-slate-800">Doğrulanmış Belgeler</h3>
-          <p class="text-xs leading-relaxed text-slate-500 font-medium">Her proje, sahiplik belgesi doğrulandıktan sonra ağa dahil edilir; sahte ilanların önüne geçilir.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ AUTH MODAL (LOGIN & SIGNUP INTERACTIVE SIMULATION) ============ -->
-  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md hidden transition-all duration-300">
-    <div class="kart w-full max-w-[420px] p-6 bg-white relative shadow-card anim-slide-up">
-      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
-      
-      <!-- Modal Header -->
-      <div class="text-center mb-6">
-        <h3 class="font-display text-xl font-extrabold text-slate-900" id="auth-modal-title">Ağa Katıl</h3>
-        <p class="text-xs text-slate-500 mt-1 font-medium" id="auth-modal-desc">B2B konut stoğu paylaşım ağına dahil olun.</p>
-      </div>
-
-      <!-- Auth Tabs -->
-      <div class="rounded-xl border border-slate-100 p-1 bg-slate-50 flex gap-1 mb-5">
-        <button onclick="setAuthTab('login')" id="btn-auth-login" class="flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150">Giriş Yap</button>
-        <button onclick="setAuthTab('register')" id="btn-auth-register" class="flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150">Kayıt Ol</button>
-      </div>
-
-      <!-- Form Inputs -->
-      <div class="space-y-4" id="auth-form-fields">
-        <!-- register specific fields -->
-        <div id="reg-name-field" class="space-y-1 hidden">
-          <label class="text-[10px] font-bold text-slate-400 uppercase font-mono">Ad Soyad</label>
-          <input type="text" placeholder="Ahmet Yılmaz" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
+  <!-- ============ GLIDE-IN SIDE DRAWER (AUTH SIMULATION) ============ -->
+  <div id="drawer-auth" class="fixed inset-0 z-50 flex justify-end hidden">
+    <!-- Overlay backdrop -->
+    <div onclick="toggleDrawer(null)" class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm"></div>
+    
+    <!-- Drawer content panel -->
+    <div class="relative w-full max-w-[440px] h-full bg-white shadow-2xl flex flex-col justify-between p-8 z-10 border-l border-slate-100 drawer-panel translate-x-full">
+      <div class="space-y-8">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+          <div>
+            <h3 class="font-bold text-lg text-slate-900" id="drawer-title">Ağa Katıl</h3>
+            <p class="text-xs text-slate-400 mt-1 font-body">Üyelik başvurunuz onaylandıktan sonra canlı havuz aktif olur.</p>
+          </div>
+          <button onclick="toggleDrawer(null)" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
         </div>
 
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase font-mono">E-POSTA ADRESİ</label>
-          <input type="email" placeholder="ahmet@firma.com" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
+        <!-- Login / Register tabs -->
+        <div class="rounded-xl border border-slate-100 p-1 bg-slate-50 flex gap-1">
+          <button onclick="setDrawerTab('login')" id="btn-tab-login" class="flex-1 py-2 text-xs font-bold text-center rounded-lg transition duration-150">Giriş Yap</button>
+          <button onclick="setDrawerTab('register')" id="btn-tab-register" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-white text-slate-800 shadow-sm transition duration-150">Kayıt Ol</button>
         </div>
 
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase font-mono">ŞİFRE</label>
-          <input type="password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-3 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
-        </div>
+        <!-- Form fields -->
+        <div class="space-y-4 font-body">
+          <div class="space-y-1" id="field-name-block">
+            <label class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Ad Soyad</label>
+            <input type="text" placeholder="Ahmet Yılmaz" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
+          </div>
+          
+          <div class="space-y-1">
+            <label class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">E-posta adresi</label>
+            <input type="email" placeholder="ahmet@firma.com" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
+          </div>
 
-        <!-- register role selector -->
-        <div id="reg-role-field" class="space-y-1.5 hidden">
-          <label class="text-[10px] font-bold text-slate-400 uppercase font-mono">PLATFORM ROLÜ</label>
-          <div class="grid grid-cols-2 gap-2">
-            <label class="border border-slate-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer hover:bg-slate-50 text-xs font-bold">
-              <input type="radio" name="auth-role" value="emlakci" checked> Danışman
-            </label>
-            <label class="border border-slate-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer hover:bg-slate-50 text-xs font-bold">
-              <input type="radio" name="auth-role" value="uretici"> Üretici
-            </label>
+          <div class="space-y-1">
+            <label class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Şifre</label>
+            <input type="password" placeholder="••••••••" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3.5 py-2.5 text-xs font-semibold outline-none focus:border-[var(--teal)] focus:bg-white transition">
+          </div>
+
+          <div class="space-y-1.5" id="field-role-block">
+            <label class="text-[9.5px] font-bold text-slate-400 uppercase font-mono">Platform Rolü</label>
+            <div class="grid grid-cols-2 gap-2">
+              <label class="border border-slate-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer hover:bg-slate-50 text-xs font-bold text-slate-700">
+                <input type="radio" name="auth-role-select" checked> Danışman
+              </label>
+              <label class="border border-slate-200 rounded-xl p-2.5 flex items-center gap-2 cursor-pointer hover:bg-slate-50 text-xs font-bold text-slate-700">
+                <input type="radio" name="auth-role-select"> Proje Sahibi
+              </label>
+            </div>
           </div>
         </div>
+      </div>
 
-        <button onclick="simulateAuthSubmit()" class="btn btn-action w-full justify-center text-xs py-3.5 mt-2" id="btn-auth-submit-action">
-          Devam Et
+      <div class="space-y-3 font-body">
+        <button onclick="submitDrawerForm()" class="btn-magnetic bg-slate-900 hover:bg-slate-800 text-white w-full py-3.5 rounded-xl text-xs font-bold">
+          İşlemi Tamamla
         </button>
       </div>
     </div>
@@ -749,218 +538,188 @@
   <footer class="mt-auto border-t border-[var(--cizgi)] bg-white/60 backdrop-blur-md text-xs text-slate-500 font-medium">
     <div class="mx-auto flex w-full max-w-6xl flex-col items-center gap-6 px-5 py-10 sm:px-6 md:flex-row md:justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-6 h-6 rounded-[8px] grid grid-cols-3 grid-rows-3 gap-[2px] p-[4px]" style="background:linear-gradient(145deg,#13314b,#1e9b8a);">
+        <div class="w-6 h-6 rounded-[8px] grid grid-cols-3 grid-rows-3 gap-[2px] p-[4px]" style="background:linear-gradient(135deg,var(--navy),var(--teal));">
           <span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/50"></span><span class="rounded-[1.2px] bg-white"></span>
           <span class="rounded-[1.2px] bg-white/50"></span><span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/50"></span>
           <span class="rounded-[1.2px] bg-white"></span><span class="rounded-[1.2px] bg-white/50"></span><span class="rounded-[1.2px] bg-white"></span>
         </div>
-        <span class="font-display font-bold text-slate-800">ProjePazar</span>
+        <span class="font-bold text-slate-800">ProjePazar</span>
       </div>
-
-      <nav aria-label="Yasal" class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-slate-400">
-        <a href="/kullanim-kosullari" class="hover:text-slate-800 transition hover:underline">Kullanım Koşulları</a>
-        <a href="/gizlilik" class="hover:text-slate-800 transition hover:underline">Gizlilik Sözleşmesi</a>
-        <a href="/kvkk-aydinlatma" class="hover:text-slate-800 transition hover:underline">KVKK Bilgilendirme</a>
-      </nav>
-    </div>
-    <div class="border-t border-[var(--cizgi)] px-5 py-4 text-center text-[11px] text-slate-400">
-      © 2026 ProjePazar · Tüm hakları saklıdır.
+      <div class="text-slate-400">© 2026 ProjePazar. Tüm hakları saklıdır.</div>
     </div>
   </footer>
 
   <!-- ============ SCRIPTS ============ -->
   <script>
-    // Demo Verisi
-    const unitsData = {
-      'A-41': { type: '3+1 Konut', area: '142 m²', status: 'Müsait', price: '₺10,400,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-42': { type: '3+1 Konut', area: '142 m²', status: 'Müsait', price: '₺10,200,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-43': { type: '2+1 Konut', area: '98 m²', status: 'Opsiyonlu', price: '₺7,800,000', badgeStyle: 'background:rgba(227,161,44,0.14); color:#9a6a12;' },
-      'A-31': { type: '3+1 Konut', area: '142 m²', status: 'Müsait', price: '₺9,800,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-32': { type: '3+1 Konut', area: '142 m²', status: 'Satıldı', price: '₺9,600,000', badgeStyle: 'background:rgba(209,90,78,0.12); color:#a23f34;' },
-      'A-33': { type: '2+1 Konut', area: '98 m²', status: 'Müsait', price: '₺7,200,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-34': { type: '2+1 Konut', area: '98 m²', status: 'Müsait', price: '₺7,000,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-21': { type: '3+1 Konut', area: '142 m²', status: 'Müsait', price: '₺8,800,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-22': { type: '3+1 Konut', area: '142 m²', status: 'Müsait', price: '₺8,750,000', badgeStyle: 'background:rgba(47,179,107,0.12); color:#1f7d4c;' },
-      'A-23': { type: '2+1 Konut', area: '98 m²', status: 'Satıldı', price: '₺6,500,000', badgeStyle: 'background:rgba(209,90,78,0.12); color:#a23f34;' }
+    const unitsList = {
+      'A-41': { type: '3+1 Daire', area: '142 m²', status: 'Müsait', price: '₺10,400,000' },
+      'A-42': { type: '2+1 Daire', area: '98 m²', status: 'Opsiyonlu', price: '₺7,800,000' },
+      'A-43': { type: '3+1 Daire', area: '142 m²', status: 'Müsait', price: '₺10,200,000' },
+      'A-31': { type: '3+1 Daire', area: '142 m²', status: 'Müsait', price: '₺9,800,000' },
+      'A-32': { type: '3+1 Daire', area: '142 m²', status: 'Satıldı', price: '₺9,600,000' },
+      'A-33': { type: '2+1 Daire', area: '98 m²', status: 'Müsait', price: '₺7,200,000' }
     };
 
-    let activeUnitId = 'A-22';
+    let selectedUnitId = 'A-41';
 
-    // Hero Tab Seçici
-    function setHeroTab(tab) {
-      const ureticiBtn = document.getElementById('btn-tab-uretici');
-      const emlakciBtn = document.getElementById('btn-tab-emlakci');
-      const ureticiList = document.getElementById('prop-uretici-list');
-      const emlakciList = document.getElementById('prop-emlakci-list');
+    function selectUnitFlat(id, type, area, status, price, classBg) {
+      selectedUnitId = id;
+      document.getElementById('unit-detail-no').innerText = id;
+      document.getElementById('unit-detail-layout').innerText = type + ' Daire';
+      document.getElementById('unit-detail-area').innerText = area;
+      document.getElementById('unit-detail-price').innerText = price;
 
-      if (tab === 'uretici') {
-        ureticiBtn.className = 'flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 bg-[var(--navy)] text-white shadow-sm';
-        emlakciBtn.className = 'flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800';
-        ureticiList.classList.remove('hidden');
-        emlakciList.classList.add('hidden');
-      } else {
-        emlakciBtn.className = 'flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 bg-[var(--navy)] text-white shadow-sm';
-        ureticiBtn.className = 'flex-1 text-center py-2.5 rounded-xl text-xs font-bold transition duration-200 text-slate-500 hover:text-slate-800';
-        emlakciList.classList.remove('hidden');
-        ureticiList.classList.add('hidden');
-      }
-    }
-
-    // Canlı Demo Daire Seçimi
-    function clickDemoUnit(id, type, area, status, price, classBg) {
-      activeUnitId = id;
-      document.getElementById('u-detail-no').innerText = id;
-      document.getElementById('u-detail-layout').innerText = type + ' Konut';
-      document.getElementById('u-detail-area').innerText = area;
-      document.getElementById('u-detail-price').innerText = price;
-      
-      const badge = document.getElementById('u-detail-badge');
+      const badge = document.getElementById('unit-detail-status');
       badge.innerText = status;
+
+      const reserveBtn = document.getElementById('btn-action-reserve');
+
       if (status === 'Müsait') {
-        badge.style = 'background:rgba(47,179,107,0.12); color:#1f7d4c;';
-        document.getElementById('btn-opsiyon-action').disabled = false;
-        document.getElementById('btn-opsiyon-action').innerText = 'Opsiyon Al (48 saat kilit)';
-        document.getElementById('btn-opsiyon-action').className = 'btn btn-primary w-full justify-center text-xs py-2.5';
+        badge.style = "background:rgba(16,185,129,0.12); color:#10b981;";
+        reserveBtn.disabled = false;
+        reserveBtn.innerText = "Opsiyon Al (48 saat kilit)";
+        reserveBtn.className = "w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 rounded-xl transition";
       } else if (status === 'Opsiyonlu') {
-        badge.style = 'background:rgba(227,161,44,0.14); color:#9a6a12;';
-        document.getElementById('btn-opsiyon-action').disabled = true;
-        document.getElementById('btn-opsiyon-action').innerText = 'Rezerve Edilmiş';
-        document.getElementById('btn-opsiyon-action').className = 'btn btn-ghost w-full justify-center text-xs py-2.5 cursor-not-allowed opacity-50';
+        badge.style = "background:rgba(245,158,11,0.12); color:#f59e0b;";
+        reserveBtn.disabled = true;
+        reserveBtn.innerText = "Daire Rezerve Edilmiş";
+        reserveBtn.className = "w-full bg-slate-100 text-slate-400 text-xs font-bold py-2.5 rounded-xl cursor-not-allowed opacity-60";
       } else {
-        badge.style = 'background:rgba(209,90,78,0.12); color:#a23f34;';
-        document.getElementById('btn-opsiyon-action').disabled = true;
-        document.getElementById('btn-opsiyon-action').innerText = 'Satıldı';
-        document.getElementById('btn-opsiyon-action').className = 'btn btn-ghost w-full justify-center text-xs py-2.5 cursor-not-allowed opacity-50';
+        badge.style = "background:rgba(239,68,68,0.12); color:#ef4444;";
+        reserveBtn.disabled = true;
+        reserveBtn.innerText = "Satış Kilitli (Satıldı)";
+        reserveBtn.className = "w-full bg-slate-100 text-slate-400 text-xs font-bold py-2.5 rounded-xl cursor-not-allowed opacity-60";
       }
 
-      addLiveLog(`Birim ${id} detayları yüklendi.`);
-
-      // Outline temizle
-      document.querySelectorAll('.hucre').forEach(el => {
+      // style selected unit
+      document.querySelectorAll('.unit-flat').forEach(el => {
         el.style.outline = 'none';
-        el.style.boxShadow = 'none';
+        el.style.transform = 'none';
       });
 
-      const cell = document.getElementById('cell-' + id);
-      if (cell) {
-        cell.style.outline = '2px solid #fff';
-        cell.style.boxShadow = '0 0 0 3px rgba(30,155,138,0.5), 0 8px 20px rgba(16,36,58,0.22)';
+      const node = document.getElementById('flat-' + id);
+      if (node) {
+        node.style.outline = "2px solid var(--teal)";
+        node.style.transform = "translateZ(10px) scale(1.03)";
+      }
+
+      addTerminalLog(`Birim ${id} detayları yüklendi. Durum: ${status}`);
+    }
+
+    function addTerminalLog(text) {
+      const box = document.getElementById('terminal-logs');
+      const time = new Date().toTimeString().split(' ')[0];
+      const log = document.createElement('div');
+      log.className = "olay-anim text-slate-300";
+      log.innerHTML = `<span class="text-slate-500">[${time}]</span> ${text}`;
+      box.prepend(log);
+
+      while (box.children.length > 5) {
+        box.removeChild(box.lastChild);
       }
     }
 
-    // Görünüm Değiştirici
-    function setDemoView(view) {
-      const kesitBtn = document.getElementById('view-tab-kesit');
-      const tabloBtn = document.getElementById('view-tab-tablo');
-      const kesitDiv = document.getElementById('demo-view-kesit-container');
-      const tabloDiv = document.getElementById('demo-view-tablo-container');
+    function simulateB2BShare() {
+      alert(`Canlı B2B mikrosite linki kopyalandı:\nprojepazar.app/p/eml102/${selectedUnitId}`);
+      addTerminalLog(`WhatsApp paylaşım linki hazırlandı: ${selectedUnitId}`);
+    }
+
+    function simulateB2BReserve() {
+      const unit = unitsList[selectedUnitId];
+      if (unit && unit.status === 'Müsait') {
+        unit.status = 'Opsiyonlu';
+        const node = document.getElementById('flat-' + selectedUnitId);
+        if (node) {
+          node.className = "hucre h-opsiyon unit-flat";
+        }
+        selectUnitFlat(selectedUnitId, unit.type.split(' ')[0], unit.area, 'Opsiyonlu', unit.price);
+        addTerminalLog(`Daire ${selectedUnitId} veritabanında kilitlendi.`);
+      }
+    }
+
+    function setBinaView(view) {
+      const kesitBtn = document.getElementById('btn-view-kesit');
+      const tabloBtn = document.getElementById('btn-view-tablo');
+      const kesitDiv = document.getElementById('perspective-kesit-viewport');
+      const tabloDiv = document.getElementById('perspective-tablo-viewport');
 
       if (view === 'kesit') {
-        kesitBtn.className = 'chip active font-bold';
-        tabloBtn.className = 'chip font-bold';
+        kesitBtn.className = 'chip active font-bold text-xs';
+        tabloBtn.className = 'chip font-bold text-xs';
         kesitDiv.classList.remove('hidden');
         tabloDiv.classList.add('hidden');
       } else {
-        tabloBtn.className = 'chip active font-bold';
-        kesitBtn.className = 'chip font-bold';
+        tabloBtn.className = 'chip active font-bold text-xs';
+        kesitBtn.className = 'chip font-bold text-xs';
         tabloDiv.classList.remove('hidden');
         kesitDiv.classList.add('hidden');
       }
-      addLiveLog(`Görünüm modu değiştirildi: ${view}`);
     }
 
-    function addLiveLog(text) {
-      const logsBox = document.getElementById('live-logs-box');
-      const log = document.createElement('div');
-      log.className = 'olay-anim text-slate-300';
-      log.innerText = `> ${text}`;
-      logsBox.prepend(log);
-      
-      while (logsBox.children.length > 4) {
-        logsBox.removeChild(logsBox.lastChild);
+    // Calculator calculations
+    function calculateSavings() {
+      const agents = parseInt(document.getElementById('range-agents').value);
+      const units = parseInt(document.getElementById('range-units').value);
+
+      document.getElementById('slider-val-agents').innerText = `${agents} Ofis/Danışman`;
+      document.getElementById('slider-val-units').innerText = `${units} Daire`;
+
+      const views = agents * units * 1.5;
+      const savings = agents * units * 10;
+
+      document.getElementById('out-views-calc').innerText = `${Math.round(views).toLocaleString('tr-TR')} Erişim`;
+      document.getElementById('out-savings-calc').innerText = `₺${Math.round(savings).toLocaleString('tr-TR')} / Ay`;
+    }
+
+    // Drawer toggler
+    function toggleDrawer(mode) {
+      const drawer = document.getElementById('drawer-auth');
+      const panel = drawer.querySelector('.drawer-panel');
+
+      if (mode) {
+        drawer.classList.remove('hidden');
+        setTimeout(() => {
+          panel.classList.remove('translate-x-full');
+        }, 50);
+        setDrawerTab(mode);
+      } else {
+        panel.classList.add('translate-x-full');
+        setTimeout(() => {
+          drawer.classList.add('hidden');
+        }, 300);
       }
     }
 
-    function triggerWhatsAppShare() {
-      alert(`[B2B Paylaşım Hazır]\n${activeUnitId} nolu dairenin canlı mikrosite linki oluşturuldu: projepazar.app/p/eml102/${activeUnitId}\n WhatsApp ile yönlendirme simüle edildi.`);
-      addLiveLog(`WhatsApp paylaşımı simüle edildi: ${activeUnitId}`);
-    }
-
-    function triggerOptionReserve() {
-      const unit = unitsData[activeUnitId];
-      if (unit && unit.status === 'Müsait') {
-        unit.status = 'Opsiyonlu';
-        unit.badgeStyle = 'background:rgba(227,161,44,0.14); color:#9a6a12;';
-        
-        const cell = document.getElementById('cell-' + activeUnitId);
-        if (cell) {
-          cell.className = 'hucre h-opsiyon';
-          cell.querySelector('span:last-child').innerText = 'Opsiyon';
-        }
-
-        clickDemoUnit(activeUnitId, unit.type.split(' ')[0], unit.area, 'Opsiyonlu', unit.price, 'h-opsiyon');
-        addLiveLog(`Birim ${activeUnitId} veritabanında kilitlendi.`);
-      }
-    }
-
-    // Kar Hesaplayıcı
-    function updateCalculator() {
-      const danisman = parseInt(document.getElementById('rng-danisman').value);
-      const daire = parseInt(document.getElementById('rng-daire').value);
-
-      document.getElementById('lbl-val-danisman').innerText = danisman;
-      document.getElementById('lbl-val-daire').innerText = daire;
-
-      const gosterim = danisman * daire * 1.5;
-      const hiz = (danisman / 50 + 1).toFixed(1);
-      const tasarruf = Math.round(danisman * 800);
-
-      document.getElementById('out-sales-view').innerText = gosterim.toLocaleString('tr-TR');
-      document.getElementById('out-sales-speed').innerText = `${hiz}x Daha Hızlı`;
-      document.getElementById('out-savings').innerText = `₺${Math.round(tasarruf / 1000)}K / Ay`;
-    }
-
-    // Auth Modal
-    function openAuthModal(mode) {
-      document.getElementById('auth-modal').classList.remove('hidden');
-      setAuthTab(mode);
-    }
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.add('hidden');
-    }
-    function setAuthTab(mode) {
-      const loginBtn = document.getElementById('btn-auth-login');
-      const registerBtn = document.getElementById('btn-auth-register');
-      const nameField = document.getElementById('reg-name-field');
-      const roleField = document.getElementById('reg-role-field');
-      const title = document.getElementById('auth-modal-title');
-      const submitBtn = document.getElementById('btn-auth-submit-action');
+    function setDrawerTab(mode) {
+      const loginBtn = document.getElementById('btn-tab-login');
+      const registerBtn = document.getElementById('btn-tab-register');
+      const nameBlock = document.getElementById('field-name-block');
+      const roleBlock = document.getElementById('field-role-block');
+      const title = document.getElementById('drawer-title');
 
       if (mode === 'login') {
-        loginBtn.className = 'flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150 bg-white text-slate-800 shadow-sm';
-        registerBtn.className = 'flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150 text-slate-500 hover:text-slate-800';
-        nameField.classList.add('hidden');
-        roleField.classList.add('hidden');
+        loginBtn.className = 'flex-1 py-2 text-xs font-bold text-center rounded-lg bg-white text-slate-800 shadow-sm transition duration-150';
+        registerBtn.className = 'flex-1 py-2 text-xs font-bold text-center rounded-lg text-slate-500 hover:text-slate-800 transition duration-150';
+        nameBlock.classList.add('hidden');
+        roleBlock.classList.add('hidden');
         title.innerText = 'Ağa Giriş Yap';
-        submitBtn.innerText = 'Giriş Yap';
       } else {
-        registerBtn.className = 'flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150 bg-white text-slate-800 shadow-sm';
-        loginBtn.className = 'flex-1 text-center py-2 rounded-lg text-xs font-bold transition duration-150 text-slate-500 hover:text-slate-800';
-        nameField.classList.remove('hidden');
-        roleField.classList.remove('hidden');
-        title.innerText = 'Hesap Oluştur';
-        submitBtn.innerText = 'Ağa Katıl';
+        registerBtn.className = 'flex-1 py-2 text-xs font-bold text-center rounded-lg bg-white text-slate-800 shadow-sm transition duration-150';
+        loginBtn.className = 'flex-1 py-2 text-xs font-bold text-center rounded-lg text-slate-500 hover:text-slate-800 transition duration-150';
+        nameBlock.classList.remove('hidden');
+        roleBlock.classList.remove('hidden');
+        title.innerText = 'Kayıt Ol';
       }
     }
 
-    function simulateAuthSubmit() {
-      alert('Tebrikler! Simülasyon başarılı. B2B ağına davetiniz alındı.');
-      closeAuthModal();
+    function submitDrawerForm() {
+      alert('Başvurunuz alındı. B2B onay süreci tetiklendi.');
+      toggleDrawer(null);
     }
 
-    // Initial load
-    clickDemoUnit('A-22', '3+1', '142 m%', 'Müsait', '₺8,750,000', 'h-musait');
-    updateCalculator();
+    // Default load
+    selectUnitFlat('A-41', '3+1', '142 m²', 'Müsait', '₺10,400,000');
+    calculateSavings();
   </script>
 </body>
 </html>
