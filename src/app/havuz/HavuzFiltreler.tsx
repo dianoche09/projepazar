@@ -9,17 +9,11 @@ const TUR_FILTRE: [string, string][] = [
   ["depo", "Depo"],
   ["otopark", "Otopark"],
 ];
-const PARA_FILTRE: [string, string][] = [
-  ["", "Tümü"],
-  ["TRY", "₺ TRY"],
-  ["USD", "$ USD"],
-  ["EUR", "€ EUR"],
-  ["GBP", "£ GBP"],
-  ["AED", "AED"],
-];
 
 type Durum = "" | "musait" | "opsiyon";
 
+// Faz 1 = YURTİÇİ: para birimi (döviz) / golden vize / oturum filtreleri YOK (yabancı modülü Faz 2).
+// Kira getirisi yurtiçi yatırımcı için kalır.
 export function HavuzFiltreler({
   il,
   setIl,
@@ -33,16 +27,10 @@ export function HavuzFiltreler({
   ilceler,
   tur,
   turAcKapa,
-  paraBirimi,
-  setParaBirimi,
   fiyatMin,
   setFiyatMin,
   fiyatMax,
   setFiyatMax,
-  goldenViza,
-  setGoldenViza,
-  oturum,
-  setOturum,
   minKira,
   setMinKira,
 }: {
@@ -58,32 +46,26 @@ export function HavuzFiltreler({
   ilceler: string[];
   tur: string[];
   turAcKapa: (t: string) => void;
-  paraBirimi: string;
-  setParaBirimi: (v: string) => void;
   fiyatMin: string;
   setFiyatMin: (v: string) => void;
   fiyatMax: string;
   setFiyatMax: (v: string) => void;
-  goldenViza: boolean;
-  setGoldenViza: (v: boolean) => void;
-  oturum: boolean;
-  setOturum: (v: boolean) => void;
   minKira: string;
   setMinKira: (v: string) => void;
 }) {
   const inp =
-    "w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 font-sans text-xs text-slate-800 outline-none transition-all focus:border-teal focus:bg-white";
+    "w-full rounded-xl border border-hair bg-soft px-3.5 py-2.5 font-sans text-xs text-ink outline-none transition-all focus:border-teal focus:bg-card";
   const cip = (aktif: boolean) =>
     `rounded-xl border px-3 py-2 text-[12px] font-bold transition-all duration-200 ${
       aktif
         ? "border-teal bg-teal text-white shadow-sm"
-        : "border-slate-200 bg-white text-slate-600 hover:border-teal/30 hover:bg-slate-50"
+        : "border-hair bg-card text-ink-soft hover:border-teal/30 hover:bg-soft"
     }`;
-  const baslik = "mt-5 text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono";
+  const baslik = "mt-5 font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--ink-faint)]";
 
   return (
     <div>
-      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Konum</h4>
+      <h4 className="font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--ink-faint)]">Konum</h4>
       <select
         value={il}
         onChange={(e) => {
@@ -139,7 +121,7 @@ export function HavuzFiltreler({
         ))}
       </div>
 
-      <h4 className={baslik}>Fiyat Aralığı</h4>
+      <h4 className={baslik}>Fiyat Aralığı (₺)</h4>
       <div className="mt-2 flex gap-2">
         <input
           type="number"
@@ -159,24 +141,7 @@ export function HavuzFiltreler({
         />
       </div>
 
-      <h4 className={baslik}>Para Birimi</h4>
-      <select value={paraBirimi} onChange={(e) => setParaBirimi(e.target.value)} className={`mt-2 ${inp}`}>
-        {PARA_FILTRE.map(([v, et]) => (
-          <option key={v} value={v}>
-            {et}
-          </option>
-        ))}
-      </select>
-
-      <h4 className={baslik}>Yatırım & Yabancı Alıcı</h4>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        <button onClick={() => setGoldenViza(!goldenViza)} className={cip(goldenViza)}>
-          Golden Vize
-        </button>
-        <button onClick={() => setOturum(!oturum)} className={cip(oturum)}>
-          Oturum İzni
-        </button>
-      </div>
+      <h4 className={baslik}>Yatırım</h4>
       <input
         type="number"
         inputMode="numeric"

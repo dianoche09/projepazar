@@ -59,11 +59,8 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
   const [tip, setTip] = useState<string[]>([]);
   const [durum, setDurum] = useState<"" | "musait" | "opsiyon">("");
   const [tur, setTur] = useState<string[]>([]);
-  const [paraBirimi, setParaBirimi] = useState("");
   const [fiyatMin, setFiyatMin] = useState("");
   const [fiyatMax, setFiyatMax] = useState("");
-  const [goldenViza, setGoldenViza] = useState(false);
-  const [oturum, setOturum] = useState(false);
   const [minKira, setMinKira] = useState("");
   const [sirala, setSirala] = useState<"taze" | "ucuz" | "musait">("taze");
 
@@ -81,11 +78,8 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
         (!tip.length || tip.some((t) => p.tipler.some((pt) => pt.startsWith(t)))) &&
         (durum === "" || (durum === "musait" ? p.musait > 0 : p.opsiyon > 0)) &&
         (!tur.length || tur.some((t) => p.turler.includes(t))) &&
-        (!paraBirimi || p.para_birimi === paraBirimi) &&
         (!fiyatMin || (p.max != null && p.max >= Number(fiyatMin))) &&
         (!fiyatMax || (p.min != null && p.min <= Number(fiyatMax))) &&
-        (!goldenViza || p.golden_visa) &&
-        (!oturum || p.oturum_uygun) &&
         (!minKira || (p.kira_getirisi != null && p.kira_getirisi >= Number(minKira))),
     );
     return [...l].sort((a, b) => {
@@ -93,7 +87,7 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
       if (sirala === "musait") return b.musait - a.musait;
       return b.son_guncelleme.localeCompare(a.son_guncelleme);
     });
-  }, [projeler, il, ilce, tip, durum, tur, paraBirimi, fiyatMin, fiyatMax, goldenViza, oturum, minKira, sirala]);
+  }, [projeler, il, ilce, tip, durum, tur, fiyatMin, fiyatMax, minKira, sirala]);
 
   // KPI — GERÇEK değerlerden hesap (tahsisli RLS havuzundan).
   const toplamBirim = projeler.reduce((t, p) => t + p.toplam, 0);
@@ -110,21 +104,16 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
     setTip([]);
     setDurum("");
     setTur([]);
-    setParaBirimi("");
     setFiyatMin("");
     setFiyatMax("");
-    setGoldenViza(false);
-    setOturum(false);
     setMinKira("");
   };
   const aktifSayi =
     (il ? 1 : 0) + (ilce ? 1 : 0) + tip.length + (durum ? 1 : 0) + tur.length +
-    (paraBirimi ? 1 : 0) + (fiyatMin ? 1 : 0) + (fiyatMax ? 1 : 0) +
-    (goldenViza ? 1 : 0) + (oturum ? 1 : 0) + (minKira ? 1 : 0);
+    (fiyatMin ? 1 : 0) + (fiyatMax ? 1 : 0) + (minKira ? 1 : 0);
   const filtreProps = {
     il, setIl, ilce, setIlce, tip, tipAcKapa, durum, setDurum, iller, ilceler,
-    tur, turAcKapa, paraBirimi, setParaBirimi, fiyatMin, setFiyatMin, fiyatMax, setFiyatMax,
-    goldenViza, setGoldenViza, oturum, setOturum, minKira, setMinKira,
+    tur, turAcKapa, fiyatMin, setFiyatMin, fiyatMax, setFiyatMax, minKira, setMinKira,
   };
 
   const okChevron = (
