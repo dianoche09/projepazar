@@ -24,12 +24,14 @@ export function BirimHucre({
   mod = "uretici",
   projeAd = "",
   shareUrl = "",
+  benimOpsiyon = false,
 }: {
   birim: ModalBirim;
   projeId: string;
   mod?: "uretici" | "emlakci";
   projeAd?: string;
   shareUrl?: string;
+  benimOpsiyon?: boolean;
 }) {
   const [acik, setAcik] = useState(false);
   const secim = useSecim();
@@ -66,6 +68,7 @@ export function BirimHucre({
           mod={mod}
           projeAd={projeAd}
           shareUrl={shareUrl}
+          benimOpsiyon={benimOpsiyon}
           onKapat={() => setAcik(false)}
         />
       ) : null}

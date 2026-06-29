@@ -43,6 +43,7 @@ export function EmlakciStok({
   tipler,
   baslangic,
   shareUrlMap,
+  benimOpsiyonlar,
 }: {
   projeId: string;
   projeAd: string;
@@ -50,6 +51,8 @@ export function EmlakciStok({
   tipler: Tip[];
   baslangic: BinaBirim[];
   shareUrlMap: Record<string, string>;
+  /** Bu emlakçıya ait opsiyonlu birim id'leri (bırak butonu için). */
+  benimOpsiyonlar?: string[];
 }) {
   const [birimler, setBirimler] = useState<BinaBirim[]>(baslangic);
   const [canli, setCanli] = useState(false);
@@ -190,6 +193,7 @@ export function EmlakciStok({
             projeId={projeId}
             projeAd={projeAd}
             shareUrlMap={shareUrlMap}
+            benimOpsiyonlar={benimOpsiyonlar}
           />
         </div>
       ) : null}
@@ -258,6 +262,7 @@ export function EmlakciStok({
           mod="emlakci"
           projeAd={projeAd}
           shareUrl={shareUrlMap[secili.id] ?? ""}
+          benimOpsiyon={benimOpsiyonlar?.includes(secili.id) ?? false}
           onKapat={() => setSecili(null)}
         />
       ) : null}

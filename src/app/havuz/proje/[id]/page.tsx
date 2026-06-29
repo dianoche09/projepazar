@@ -119,6 +119,14 @@ export default async function HavuzProjeDetay({
     stok.map((b) => [b.id, `${appUrl}/p/${emlakciId}/${b.id}/${generateShareToken(emlakciId, b.id)}`]),
   );
 
+  // Bu emlakçının KENDİ opsiyonladığı birimler (DaireModal'da "Opsiyonu bırak" yalnız bunlarda)
+  const { data: benimOps } = await supabase
+    .from("opsiyon")
+    .select("birim_id")
+    .eq("satici_id", emlakciId)
+    .in("durum", ["opsiyonlu", "satis_beklemede"]);
+  const benimOpsiyonlar = (benimOps ?? []).map((o) => o.birim_id as string);
+
   // WhatsApp paylaşım — public microsite varsa onu, yoksa proje konum/aşama özeti
   const paylasimMetni = `${proje.ad} · ${konum}\nİnşaat: ${ASAMA_ETIKET[proje.insaat_asamasi as InsaatAsama]} (%${proje.ilerleme_yuzde})${
     proje.public_slug ? `\n${appUrl}/proje/${proje.public_slug}` : ""
@@ -449,6 +457,7 @@ export default async function HavuzProjeDetay({
               tipler={tipler ?? []}
               baslangic={stok as never}
               shareUrlMap={shareUrlMap}
+              benimOpsiyonlar={benimOpsiyonlar}
             />
           )}
         </div>

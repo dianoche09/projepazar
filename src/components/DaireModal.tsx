@@ -74,6 +74,7 @@ export function DaireModal({
   mod = "uretici",
   projeAd = "",
   shareUrl = "",
+  benimOpsiyon = false,
 }: {
   birim: ModalBirim;
   projeId: string;
@@ -81,6 +82,8 @@ export function DaireModal({
   mod?: "uretici" | "emlakci";
   projeAd?: string;
   shareUrl?: string;
+  /** Emlakçı modu: bu opsiyon bu emlakçıya mı ait (bırak butonu yalnız o zaman). */
+  benimOpsiyon?: boolean;
 }) {
   const [durum, setDurum] = useState<BirimDurum>(birim.durum);
   const [bekliyor, basla] = useTransition();
@@ -359,10 +362,12 @@ export function DaireModal({
                   {birim.durum === "satildi"
                     ? "Bu daire satıldı — paylaşım ve opsiyon kapalı."
                     : birim.durum === "opsiyonlu" || birim.durum === "satis_beklemede"
-                      ? "Bu daire opsiyonlu — üzerinde işlem yapamazsın. Kendi opsiyonunsa bırakabilirsin."
+                      ? benimOpsiyon
+                        ? "Senin opsiyonunda — aşağıdan bırakabilirsin."
+                        : "Başka danışmanda opsiyonlu — üzerinde işlem yapamazsın."
                       : "Bu daire şu an satışa/paylaşıma kapalı."}
                 </p>
-                {birim.durum === "opsiyonlu" ? (
+                {(birim.durum === "opsiyonlu" || birim.durum === "satis_beklemede") && benimOpsiyon ? (
                   <button
                     type="button"
                     disabled={bekliyor}
@@ -375,7 +380,7 @@ export function DaireModal({
                     }
                     className="mt-3 text-[11.5px] font-bold text-amber hover:underline disabled:opacity-50"
                   >
-                    {bekliyor ? "İşleniyor…" : "Kendi opsiyonum — bırak"}
+                    {bekliyor ? "İşleniyor…" : "Opsiyonu bırak"}
                   </button>
                 ) : null}
               </div>
