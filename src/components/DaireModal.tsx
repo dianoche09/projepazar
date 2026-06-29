@@ -311,55 +311,70 @@ export function DaireModal({
           </>
         ) : (
           <div className="mt-5 space-y-3">
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#10b981] hover:bg-[#059669] py-3.5 text-xs font-bold text-white transition-all duration-300 shadow-[0_4px_12px_rgba(16,185,129,0.2)]"
-            >
-              <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.859 4.373-9.864 9.803-.002 1.757.475 3.468 1.385 4.988L2.082 21.82l6.565-1.666zM17.29 14.7c-.283-.143-1.67-.82-1.929-.915-.258-.094-.446-.142-.634.143-.188.283-.729.915-.892 1.102-.163.189-.327.213-.61.072-2.046-1.023-3.4-1.918-4.755-4.249-.356-.61.356-.566 1.02-1.888.106-.212.053-.399-.026-.541-.079-.142-.633-1.526-.867-2.09-.228-.548-.46-.473-.633-.482-.164-.008-.352-.01-.54-.01s-.494.07-.753.353c-.259.283-.988.962-.988 2.348s1.009 2.72 1.15 2.908c.141.189 1.984 3.01 4.806 4.217.672.287 1.196.459 1.603.589.675.215 1.29.185 1.776.113.541-.08 1.67-.68 1.905-1.339.235-.66.235-1.226.165-1.343-.07-.118-.282-.189-.564-.332z"/>
-              </svg>
-              WhatsApp ile Paylaş
-            </a>
-            <p className="text-center text-[10.5px] leading-snug text-slate-500 font-bold">
-              Müşterinizle birebir paylaşın — yetkisiz ilan yasal risk taşımaktadır.
-            </p>
-
             {birim.durum === "musait" && birim.satilabilir ? (
-              <button
-                type="button"
-                disabled={bekliyor}
-                onClick={() =>
-                  basla(async () => {
-                    const r = await opsiyonAlSessiz(birim.id, projeId);
-                    toast.goster(r.mesaj, r.ok ? "basari" : "hata");
-                    if (r.ok) onKapat();
-                  })
-                }
-                className="w-full rounded-xl bg-teal font-bold py-3.5 text-xs text-white transition-all duration-300 hover:bg-teal-d disabled:opacity-50 shadow-[0_4px_12px_rgba(37,99,235,0.2)] cursor-pointer"
-              >
-                {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48 Saat"}
-              </button>
-            ) : birim.durum === "opsiyonlu" ? (
-              <button
-                type="button"
-                disabled={bekliyor}
-                onClick={() =>
-                  basla(async () => {
-                    const r = await opsiyonBirakSessiz(birim.id, projeId);
-                    toast.goster(r.mesaj, r.ok ? "basari" : "hata");
-                    if (r.ok) onKapat();
-                  })
-                }
-                className="w-full rounded-xl border border-slate-200 bg-white py-3.5 text-xs font-bold text-amber transition-all duration-300 hover:bg-slate-50 disabled:opacity-50 cursor-pointer"
-              >
-                {bekliyor ? "İşleniyor…" : "Opsiyonu Bırak"}
-              </button>
+              <>
+                <a
+                  href={waLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[#1faa5b] hover:bg-[#178c4a] py-3.5 text-xs font-bold text-white transition-all duration-300 shadow-[0_4px_12px_rgba(31,170,91,0.25)]"
+                >
+                  <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.859 4.373-9.864 9.803-.002 1.757.475 3.468 1.385 4.988L2.082 21.82l6.565-1.666zM17.29 14.7c-.283-.143-1.67-.82-1.929-.915-.258-.094-.446-.142-.634.143-.188.283-.729.915-.892 1.102-.163.189-.327.213-.61.072-2.046-1.023-3.4-1.918-4.755-4.249-.356-.61.356-.566 1.02-1.888.106-.212.053-.399-.026-.541-.079-.142-.633-1.526-.867-2.09-.228-.548-.46-.473-.633-.482-.164-.008-.352-.01-.54-.01s-.494.07-.753.353c-.259.283-.988.962-.988 2.348s1.009 2.72 1.15 2.908c.141.189 1.984 3.01 4.806 4.217.672.287 1.196.459 1.603.589.675.215 1.29.185 1.776.113.541-.08 1.67-.68 1.905-1.339.235-.66.235-1.226.165-1.343-.07-.118-.282-.189-.564-.332z"/>
+                  </svg>
+                  WhatsApp ile Paylaş
+                </a>
+                <p className="text-center text-[10.5px] leading-snug text-[var(--ink-faint)] font-bold">
+                  Müşterinizle birebir paylaşın — yetkisiz ilan yasal risk taşımaktadır.
+                </p>
+                <button
+                  type="button"
+                  disabled={bekliyor}
+                  onClick={() =>
+                    basla(async () => {
+                      const r = await opsiyonAlSessiz(birim.id, projeId);
+                      toast.goster(r.mesaj, r.ok ? "basari" : "hata");
+                      if (r.ok) onKapat();
+                    })
+                  }
+                  className="w-full rounded-xl bg-teal font-bold py-3.5 text-xs text-white transition-all duration-300 hover:bg-teal-d disabled:opacity-50 shadow-[0_4px_12px_rgba(30,155,138,0.25)] cursor-pointer"
+                >
+                  {bekliyor ? "İşleniyor…" : "Opsiyon Al · 48 Saat"}
+                </button>
+              </>
             ) : (
-              <button disabled className="w-full rounded-xl border border-slate-100 bg-slate-50/50 py-3.5 text-xs font-bold text-slate-400">
-                {DURUM_ETIKET[birim.durum]} — opsiyon alınamaz
-              </button>
+              <div className="rounded-xl border border-hair bg-soft p-4 text-center">
+                <div className="flex items-center justify-center gap-1.5 text-sm font-bold text-ink-soft">
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  {DURUM_ETIKET[birim.durum]} — kilitli
+                </div>
+                <p className="mt-1.5 text-[11.5px] leading-snug text-[var(--ink-faint)] font-medium">
+                  {birim.durum === "satildi"
+                    ? "Bu daire satıldı — paylaşım ve opsiyon kapalı."
+                    : birim.durum === "opsiyonlu" || birim.durum === "satis_beklemede"
+                      ? "Bu daire opsiyonlu — üzerinde işlem yapamazsın. Kendi opsiyonunsa bırakabilirsin."
+                      : "Bu daire şu an satışa/paylaşıma kapalı."}
+                </p>
+                {birim.durum === "opsiyonlu" ? (
+                  <button
+                    type="button"
+                    disabled={bekliyor}
+                    onClick={() =>
+                      basla(async () => {
+                        const r = await opsiyonBirakSessiz(birim.id, projeId);
+                        toast.goster(r.mesaj, r.ok ? "basari" : "hata");
+                        if (r.ok) onKapat();
+                      })
+                    }
+                    className="mt-3 text-[11.5px] font-bold text-amber hover:underline disabled:opacity-50"
+                  >
+                    {bekliyor ? "İşleniyor…" : "Kendi opsiyonum — bırak"}
+                  </button>
+                ) : null}
+              </div>
             )}
 
             <div className="flex justify-between items-center pt-2.5 font-mono text-[10px] text-slate-400 font-bold border-t border-slate-100">
