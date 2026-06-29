@@ -5,7 +5,7 @@ import { normalizeTelefon } from "@/lib/telefon";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { projeId, birimId, emlakciId, ad, telefon, kvkk } = body;
+    const { projeId, birimId, emlakciId, ad, telefon, kvkk, niyet } = body;
 
     if (!ad || !telefon) {
       return NextResponse.json(
@@ -59,6 +59,7 @@ export async function POST(request: Request) {
           lead_id: leadData.id,
           ad,
           telefon: telNorm,
+          niyet: typeof niyet === "string" ? niyet : "bilgi",
         },
       });
 

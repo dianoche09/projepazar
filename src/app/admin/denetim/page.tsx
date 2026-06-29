@@ -14,6 +14,7 @@ const TIP_RENK: Record<string, { ad: string; dot: string; rozet: string; baslik:
   lead: { ad: "lead", dot: "#13314b", rozet: "bg-navy/10 text-navy", baslik: "Lead düştü" },
   paylasim: { ad: "paylaşım", dot: "#1e9b8a", rozet: "bg-teal/12 text-teal-d", baslik: "Paylaşıldı" },
   goruntuleme: { ad: "görüntüleme", dot: "#98a2b3", rozet: "bg-gray/12 text-gray", baslik: "Görüntülendi" },
+  favori: { ad: "favori", dot: "#d15a4e", rozet: "bg-red/12 text-red", baslik: "Favorilendi" },
   onay: { ad: "onay", dot: "#2fb36b", rozet: "bg-green-soft text-teal-d", baslik: "Hesap onay/red/durum" },
   dogrulama: { ad: "doğrulama", dot: "#1e9b8a", rozet: "bg-teal/12 text-teal-d", baslik: "Üretici doğrulama" },
   abonelik: { ad: "abonelik", dot: "#13314b", rozet: "bg-navy/10 text-navy", baslik: "Abonelik atandı" },

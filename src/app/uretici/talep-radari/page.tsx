@@ -22,11 +22,11 @@ type EventRaw = {
 type BirimRaw = { proje_id: string; durum: string; son_guncelleme: string | null };
 
 const OLAY_ETIKET: Record<string, string> = {
-  paylasim: "Paylaşım", goruntuleme: "Görüntüleme", lead: "Lead",
+  paylasim: "Paylaşım", goruntuleme: "Görüntüleme", lead: "Lead", favori: "Favori",
   satis: "Satış", opsiyon: "Opsiyon talebi", durum: "Durum değişimi",
 };
 const OLAY_RENK: Record<string, string> = {
-  satis: "var(--color-red)", opsiyon: "var(--color-amber)", lead: "var(--color-green)",
+  satis: "var(--color-red)", opsiyon: "var(--color-amber)", lead: "var(--color-green)", favori: "var(--color-red)",
   paylasim: "var(--color-navy)", goruntuleme: "var(--color-ink-soft)", durum: "var(--color-ink-soft)",
 };
 const KANAL_ETIKET: Record<string, string> = {

@@ -1,12 +1,13 @@
 import { notFound } from "next/navigation";
 import { after } from "next/server";
-import { verifyShareToken } from "@/lib/sharing";
+import { verifyShareToken, generateShareToken } from "@/lib/sharing";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz } from "@/lib/events";
 import { DURUM_BG, DURUM_ETIKET, ASAMA_ETIKET, zamanOnce, type BirimDurum, type InsaatAsama } from "@/lib/types";
 import LeadForm from "./LeadForm";
 import { GridMark } from "@/components/GridMark";
 import { YazdirButonu } from "./YazdirButonu";
+import { FavoriButton } from "./FavoriButton";
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
 const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
@@ -69,6 +70,28 @@ export default async function PublicBirimPage({
   const t = birimData.tip as any;
   /* eslint-enable @typescript-eslint/no-explicit-any */
   const b = birimData;
+
+  // Benzer birimler — aynı projede müsait diğer daireler (imzalı link ile funnel'da tut + görüntüleme üret)
+  const { data: benzerRaw } = await supabase
+    .from("birim")
+    .select("id, daire_no, kat, liste_fiyati, para_birimi, tip:tip_id(oda, plan_url)")
+    .eq("proje_id", p?.id)
+    .eq("durum", "musait")
+    .eq("satilabilir", true)
+    .neq("id", birim)
+    .limit(3);
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const benzer = ((benzerRaw ?? []) as any[]).map((x) => ({
+    id: x.id as string,
+    daire_no: x.daire_no as string | null,
+    kat: x.kat as number | null,
+    liste_fiyati: x.liste_fiyati as number | null,
+    para_birimi: x.para_birimi as string | null,
+    oda: (x.tip?.oda as string | null) ?? null,
+    plan_url: (x.tip?.plan_url as string | null) ?? null,
+    link: `/p/${emlakci}/${x.id}/${generateShareToken(emlakci, x.id)}`,
+  }));
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   const { data: kapakBelge } = await supabase
     .from("proje_belge")
@@ -309,6 +332,13 @@ export default async function PublicBirimPage({
               </div>
             </div>
 
+            {/* Favori — anonim sinyal (PDF'te gizli) */}
+            {b.satilabilir ? (
+              <div className="print:hidden">
+                <FavoriButton emlakci={emlakci} birim={birim} proje={p?.id ?? ""} token={token} />
+              </div>
+            ) : null}
+
             {/* Lead Formu — baskıda gizli (müşteriye PDF'te gerekmez) */}
             <div className="print:hidden">
               {b.satilabilir && bDurum === "musait" ? (
@@ -323,6 +353,36 @@ export default async function PublicBirimPage({
             </div>
           </div>
         </div>
+
+        {benzer.length > 0 ? (
+          <section className="mt-8 print:hidden">
+            <h2 className="font-display text-lg font-semibold text-ink">Bu projede benzer daireler</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+              {benzer.map((x) => (
+                <a key={x.id} href={x.link} className="kart group block overflow-hidden">
+                  <div className="flex aspect-video items-center justify-center overflow-hidden bg-paper">
+                    {x.plan_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={x.plan_url} alt="Daire planı" className="max-h-full max-w-full object-contain p-3 transition-transform group-hover:scale-105" />
+                    ) : (
+                      <span className="text-xs text-gray">Plan yok</span>
+                    )}
+                  </div>
+                  <div className="p-3.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-display text-sm font-bold text-ink">Daire {x.daire_no ?? "—"}</span>
+                      <span className="rounded-md bg-green/10 px-2 py-0.5 text-[10px] font-semibold text-green">Müsait</span>
+                    </div>
+                    <p className="mt-0.5 text-xs text-gray">{x.oda ?? "—"}{x.kat != null ? ` · ${x.kat}. kat` : ""}</p>
+                    {x.liste_fiyati != null ? (
+                      <p className="mt-2 font-mono text-sm font-bold text-teal-d">{Number(x.liste_fiyati).toLocaleString("tr-TR")} {PARA_SIMGE[x.para_birimi ?? "TRY"] ?? "₺"}</p>
+                    ) : null}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
     </div>
   );

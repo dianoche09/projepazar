@@ -17,6 +17,7 @@ export default function LeadForm({
   const [yukleniyor, setYukleniyor] = useState(false);
   const [hata, setHata] = useState<string | null>(null);
   const [basarili, setBasarili] = useState(false);
+  const [niyet, setNiyet] = useState<"bilgi" | "randevu" | "on_rezervasyon">("bilgi");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +40,7 @@ export default function LeadForm({
           ad,
           telefon,
           kvkk,
+          niyet,
         }),
       });
 
@@ -68,9 +70,33 @@ export default function LeadForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-hair bg-card p-5 shadow-sm">
-      <h4 className="font-display text-base font-semibold text-ink">Bilgi Almak İstiyorum</h4>
+      <div className="flex flex-wrap gap-1.5">
+        {([
+          ["bilgi", "Bilgi al"],
+          ["randevu", "Randevu / görüşme"],
+          ["on_rezervasyon", "Ön rezervasyon"],
+        ] as const).map(([n, et]) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setNiyet(n)}
+            className={`rounded-lg border px-2.5 py-1.5 text-xs font-semibold transition-colors ${
+              niyet === n ? "border-teal bg-teal/10 text-teal-d" : "border-hair text-gray hover:bg-paper"
+            }`}
+          >
+            {et}
+          </button>
+        ))}
+      </div>
+      <h4 className="font-display text-base font-semibold text-ink">
+        {niyet === "randevu" ? "Randevu / Görüşme Talebi" : niyet === "on_rezervasyon" ? "Ön Rezervasyon Talebi" : "Bilgi Almak İstiyorum"}
+      </h4>
       <p className="text-xs text-gray">
-        Bu daire veya proje hakkında detaylı bilgi ve ödeme planı almak için formu doldurun.
+        {niyet === "on_rezervasyon"
+          ? "Bu daireyi sizin için tutmamızı talep edin — danışmanınız hızla dönecek."
+          : niyet === "randevu"
+            ? "Danışmanınızla görüşme/randevu için bilgilerinizi bırakın."
+            : "Bu daire veya proje hakkında detaylı bilgi ve ödeme planı için formu doldurun."}
       </p>
 
       {hata ? (
@@ -141,7 +167,13 @@ export default function LeadForm({
         disabled={yukleniyor}
         className="w-full rounded-lg bg-navy py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
       >
-        {yukleniyor ? "Gönderiliyor…" : "Detaylı Bilgi Gönder"}
+        {yukleniyor
+          ? "Gönderiliyor…"
+          : niyet === "on_rezervasyon"
+            ? "Ön Rezervasyon Talep Et"
+            : niyet === "randevu"
+              ? "Randevu Talep Et"
+              : "Detaylı Bilgi Gönder"}
       </button>
     </form>
   );

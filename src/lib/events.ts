@@ -14,7 +14,8 @@ export type OlayTip =
   | "lead"
   | "onay" // admin: hesap onay/red/durum
   | "dogrulama" // admin: üretici güven rozeti
-  | "abonelik"; // admin: paket atama
+  | "abonelik" // admin: paket atama
+  | "favori"; // mikrosite: müşteri favoriledi (anonim sinyal)
 
 export type OlayGirdi = {
   tip: OlayTip;
