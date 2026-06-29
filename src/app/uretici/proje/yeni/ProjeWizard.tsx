@@ -103,6 +103,7 @@ export function ProjeWizard({
   birimSayisi,
   belgeler,
   ofisler,
+  emlakcilar,
   hata,
   mesaj,
 }: {
@@ -113,6 +114,7 @@ export function ProjeWizard({
   birimSayisi: number;
   belgeler: WizardBelge[];
   ofisler: WizardOfis[];
+  emlakcilar: { id: string; ad: string | null; ofis: string | null }[];
   hata?: string;
   mesaj?: string;
 }) {
@@ -445,7 +447,7 @@ export function ProjeWizard({
       {adim === 6 && proje ? (
         <AdimKart
           baslik="Tahsis & Kurallar"
-          aciklama="Kim görür (herkes / belirli ofis), komisyon (% / sabit / yok), münhasır, kontenjan, fiyat görünür mü."
+          aciklama="Kim görür (belirli danışman / ofis / herkes), komisyon (% / sabit / yok), münhasır, kontenjan, fiyat görünür mü."
         >
           <TahsisForm
             projeId={proje.id}
@@ -453,6 +455,7 @@ export function ProjeWizard({
             katlar={katlar}
             tipler={tipler.map((t) => ({ id: t.id, ad: t.ad, oda: t.oda }))}
             ofisler={ofisler}
+            emlakcilar={emlakcilar}
             geriYol={geriYol(6)}
           />
           <p className="mt-3 text-xs text-gray">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { tahsisEmlakcilari } from "@/lib/tahsis";
 
 /* =========================================================
    TAHSİS — dağıtım ağı (MOAT). Hangi kapsam kime açık, komisyon ne.
@@ -29,7 +30,7 @@ function komisyonMetin(t: TahsisRaw): string {
 export default async function UreticiTahsis() {
   const supabase = await createClient();
 
-  const [{ data: projeler }, { data: tahsisRaw }, { data: ofisler }, { data: bloklar }, { data: profiller }] =
+  const [{ data: projeler }, { data: tahsisRaw }, { data: ofisler }, { data: bloklar }] =
     await Promise.all([
       supabase.from("proje").select("id, ad, il, ilce").order("created_at", { ascending: false }),
       supabase
@@ -39,13 +40,14 @@ export default async function UreticiTahsis() {
         ),
       supabase.from("ofis").select("id, ad"),
       supabase.from("blok").select("id, ad"),
-      supabase.from("profiles").select("id, ad").eq("rol", "emlakci"),
     ]);
+  // Danışman adları: profiles_self RLS engeli → admin client (server-only)
+  const emlakcilar = await tahsisEmlakcilari();
 
   const tahsisler = (tahsisRaw ?? []) as TahsisRaw[];
   const ofisAd = new Map((ofisler ?? []).map((o) => [o.id, o.ad as string]));
   const blokAd = new Map((bloklar ?? []).map((b) => [b.id, b.ad as string | null]));
-  const danismanAd = new Map((profiller ?? []).map((p) => [p.id, p.ad as string | null]));
+  const danismanAd = new Map(emlakcilar.map((e) => [e.id, e.ad]));
 
   // proje_id → tahsis listesi
   const projeTahsis = new Map<string, TahsisRaw[]>();

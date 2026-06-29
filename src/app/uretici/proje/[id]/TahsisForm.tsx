@@ -45,6 +45,7 @@ export function TahsisForm({
   katlar,
   tipler,
   ofisler,
+  emlakcilar,
   geriYol,
 }: {
   projeId: string;
@@ -52,10 +53,11 @@ export function TahsisForm({
   katlar: number[];
   tipler: { id: string; ad: string | null; oda: string | null }[];
   ofisler: { id: string; ad: string }[];
+  emlakcilar: { id: string; ad: string | null; ofis: string | null }[];
   /** Wizard akışı: doluysa tahsis sonrası bu yola döner (yoksa proje ekranına). */
   geriYol?: string;
 }) {
-  const [hedef, setHedef] = useState<"herkes" | "ofis">("herkes");
+  const [hedef, setHedef] = useState<"danisman" | "ofis" | "herkes">("danisman");
   const [komisyon, setKomisyon] = useState<"yuzde" | "sabit" | "yok">("yuzde");
   const [munhasir, setMunhasir] = useState(false);
 
@@ -64,11 +66,15 @@ export function TahsisForm({
       <input type="hidden" name="proje_id" value={projeId} />
       {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
-      {/* HEDEF */}
+      {/* HEDEF — kapalı-devre: belirli danışman / ofis / herkes (yayın) */}
       <div>
-        <p className="text-xs font-semibold text-ink">Kime</p>
-        <div className="mt-1.5 flex gap-2">
-          {(["herkes", "ofis"] as const).map((h) => (
+        <p className="text-xs font-semibold text-ink">Kime tahsis</p>
+        <div className="mt-1.5 flex flex-wrap gap-2">
+          {([
+            ["danisman", "Belirli danışman"],
+            ["ofis", "Bir ofisin tamamı"],
+            ["herkes", "Tüm danışmanlar (yayın)"],
+          ] as const).map(([h, et]) => (
             <label
               key={h}
               className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm transition-colors ${
@@ -76,18 +82,32 @@ export function TahsisForm({
               }`}
             >
               <input type="radio" name="hedef_tip" value={h} checked={hedef === h} onChange={() => setHedef(h)} className="sr-only" />
-              {h === "herkes" ? "Herkese açık" : "Yalnız seçili ofis"}
+              {et}
             </label>
           ))}
         </div>
-        {hedef === "ofis" ? (
+        {hedef === "danisman" ? (
+          <select name="hedef_id" className={`${inp} mt-2 w-full`}>
+            <option value="">— danışman seç —</option>
+            {emlakcilar.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.ad}
+                {e.ofis ? ` · ${e.ofis}` : ""}
+              </option>
+            ))}
+          </select>
+        ) : hedef === "ofis" ? (
           <select name="hedef_id" className={`${inp} mt-2 w-full`}>
             <option value="">— ofis seç —</option>
             {ofisler.map((o) => (
               <option key={o.id} value={o.id}>{o.ad}</option>
             ))}
           </select>
-        ) : null}
+        ) : (
+          <p className="mt-2 text-xs text-gray">
+            Tüm doğrulanmış danışmanlar görür (yayın). Kapalı-devre için belirli danışman/ofis seç.
+          </p>
+        )}
       </div>
 
       {/* KAPSAM — blok × kat × tip × tür */}

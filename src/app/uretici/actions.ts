@@ -603,7 +603,7 @@ export async function excelImport(formData: FormData) {
 // ── Tahsis (MOAT — granüler dağıtım: kim hangi kapsamı görür/satar) ──
 const tahsisSemasi = z.object({
   proje_id: z.string().uuid(),
-  hedef_tip: z.enum(["herkes", "ofis"]),
+  hedef_tip: z.enum(["herkes", "ofis", "danisman"]),
   hedef_id: z.union([z.string().uuid(), z.literal("")]),
   komisyon_tip: z.enum(["yuzde", "sabit", "yok"]),
   komisyon_deger: z.coerce.number().nonnegative().nullable(),
@@ -628,8 +628,11 @@ export async function tahsisEkle(formData: FormData) {
   });
   if (!parsed.success) hataya(`/uretici/proje/${proje_id}`, "Geçersiz tahsis bilgisi");
   const d = parsed.data;
-  if (d.hedef_tip === "ofis" && !d.hedef_id) {
-    hataya(`/uretici/proje/${proje_id}`, "Ofis tahsisinde ofis seçilmeli");
+  if ((d.hedef_tip === "ofis" || d.hedef_tip === "danisman") && !d.hedef_id) {
+    hataya(
+      `/uretici/proje/${proje_id}`,
+      d.hedef_tip === "ofis" ? "Ofis tahsisinde ofis seçilmeli" : "Danışman tahsisinde danışman seçilmeli",
+    );
   }
 
   // Granüler kapsam: blok × kat × tip × tür (boş = tüm proje). RLS emlakci_birim_gorebilir kontrol eder.
@@ -652,7 +655,7 @@ export async function tahsisEkle(formData: FormData) {
   const { error } = await supabase.from("tahsis").insert({
     proje_id: d.proje_id,
     hedef_tip: d.hedef_tip,
-    hedef_id: d.hedef_tip === "ofis" ? d.hedef_id || null : null,
+    hedef_id: d.hedef_tip === "herkes" ? null : d.hedef_id || null,
     kapsam,
     komisyon_tip: d.komisyon_tip,
     komisyon_deger: d.komisyon_deger,

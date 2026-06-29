@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { tahsisSil } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
+import { tahsisEmlakcilari } from "@/lib/tahsis";
 import { BinaKesiti } from "@/components/BinaKesiti";
 import { SecimDuzenle } from "@/components/SecimDuzenle";
 import { ProjeKomutBari } from "@/components/ProjeKomutBari";
@@ -53,6 +54,7 @@ export default async function ProjeDetay({
     .select("id, hedef_tip, hedef_id, kapsam, komisyon_tip, komisyon_deger, munhasir, kontenjan, fiyat_gorunur")
     .eq("proje_id", id);
   const { data: ofisler } = await supabase.from("ofis").select("id, ad").order("ad");
+  const emlakcilar = await tahsisEmlakcilari();
   const { data: belgeler } = await supabase
     .from("proje_belge")
     .select("id, tip, ad, url, dogrulandi")
@@ -69,6 +71,7 @@ export default async function ProjeDetay({
   ].sort((a, b) => a - b);
   const blokMap = new Map((bloklar ?? []).map((b) => [b.id, b.ad]));
   const ofisMap = new Map((ofisler ?? []).map((o) => [o.id, o.ad]));
+  const emlakciMap = new Map(emlakcilar.map((e) => [e.id, e.ad]));
   const toplam = birimler?.length ?? 0;
   const stats = {
     toplam,
@@ -202,7 +205,11 @@ export default async function ProjeDetay({
             return (
               <div key={t.id} className="kart flex flex-wrap items-center gap-3 p-3.5">
                 <span className="rozet bg-teal-soft text-teal-d">
-                  {t.hedef_tip === "herkes" ? "Herkese açık" : ofisMap.get(t.hedef_id) ?? "Ofis"}
+                  {t.hedef_tip === "herkes"
+                    ? "Herkese açık (yayın)"
+                    : t.hedef_tip === "danisman"
+                      ? `Danışman: ${emlakciMap.get(t.hedef_id) ?? "?"}`
+                      : `Ofis: ${ofisMap.get(t.hedef_id) ?? "?"}`}
                 </span>
                 <span className="text-sm text-ink-soft">{bloklarKapsam || "tüm proje"}</span>
                 <span className="mono text-xs text-[var(--ink-faint)]">
@@ -237,6 +244,7 @@ export default async function ProjeDetay({
             katlar={tahsisKatlar}
             tipler={tipler ?? []}
             ofisler={ofisler ?? []}
+            emlakcilar={emlakcilar}
           />
         </div>
       </section>

@@ -7,6 +7,7 @@ import {
   type WizardBelge,
   type WizardOfis,
 } from "./ProjeWizard";
+import { tahsisEmlakcilari } from "@/lib/tahsis";
 
 /**
  * Müteahhit yeni-proje SİHİRBAZI (7 adım). Tek route, ?id + ?adim query ile state.
@@ -24,7 +25,7 @@ export default async function YeniProje({
 
   // Proje yoksa boş wizard (adım 1 = projeOlustur).
   if (!id) {
-    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} hata={hata} mesaj={mesaj} />;
+    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} emlakcilar={[]} hata={hata} mesaj={mesaj} />;
   }
 
   const supabase = await createClient();
@@ -32,7 +33,7 @@ export default async function YeniProje({
 
   // Proje bulunamadı (silinmiş / yetkisiz) → adım 1'e düş.
   if (!projeRaw) {
-    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} hata="Proje bulunamadı." mesaj={undefined} />;
+    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} emlakcilar={[]} hata="Proje bulunamadı." mesaj={undefined} />;
   }
 
   const [{ data: bloklar }, { data: tipler }, { count: birimSayisi }, { data: belgeler }, { data: ofisler }] =
@@ -71,6 +72,8 @@ export default async function YeniProje({
     kunye: (projeRaw.kunye ?? {}) as Record<string, unknown>,
   };
 
+  const emlakcilar = await tahsisEmlakcilari();
+
   return (
     <ProjeWizard
       adim={adimNo}
@@ -80,6 +83,7 @@ export default async function YeniProje({
       birimSayisi={birimSayisi ?? 0}
       belgeler={(belgeler ?? []) as WizardBelge[]}
       ofisler={(ofisler ?? []) as WizardOfis[]}
+      emlakcilar={emlakcilar}
       hata={hata}
       mesaj={mesaj}
     />
