@@ -70,7 +70,12 @@ type Olay = {
 
 export default async function AdminPanel() {
   const supabase = await createClient();
-  const admin = createAdminClient();
+  let admin: ReturnType<typeof createAdminClient> | null = null;
+  try {
+    admin = createAdminClient();
+  } catch {
+    admin = null; // servis anahtarı yoksa panel çökmez; denetim bloğu boş gelir (DEĞİŞMEZ #6 graceful)
+  }
 
   const [
     { data: ureticiler },
@@ -102,21 +107,26 @@ export default async function AdminPanel() {
     supabase.from("ofis").select("id, ad, marka").order("ad").limit(4),
   ]);
 
-  // Denetim — son 5 olay (service-role, admin-gated)
-  const { data: olaylarRaw } = await admin
-    .from("events")
-    .select("id, tip, profile_id, proje_id, payload, created_at")
-    .order("created_at", { ascending: false })
-    .limit(5);
-  const olaylar = (olaylarRaw ?? []) as Olay[];
-  const olayProfilIds = [...new Set(olaylar.map((o) => o.profile_id).filter(Boolean))] as string[];
-  const olayProjeIds = [...new Set(olaylar.map((o) => o.proje_id).filter(Boolean))] as string[];
-  const olayProfiller = olayProfilIds.length
-    ? (await admin.from("profiles").select("id, ad").in("id", olayProfilIds)).data ?? []
-    : [];
-  const olayProjeler = olayProjeIds.length
-    ? (await admin.from("proje").select("id, ad").in("id", olayProjeIds)).data ?? []
-    : [];
+  // Denetim — son 5 olay (service-role; servis anahtarı yoksa boş)
+  let olaylar: Olay[] = [];
+  let olayProfiller: { id: string; ad: string | null }[] = [];
+  let olayProjeler: { id: string; ad: string }[] = [];
+  if (admin) {
+    const { data: olaylarRaw } = await admin
+      .from("events")
+      .select("id, tip, profile_id, proje_id, payload, created_at")
+      .order("created_at", { ascending: false })
+      .limit(5);
+    olaylar = (olaylarRaw ?? []) as Olay[];
+    const olayProfilIds = [...new Set(olaylar.map((o) => o.profile_id).filter(Boolean))] as string[];
+    const olayProjeIds = [...new Set(olaylar.map((o) => o.proje_id).filter(Boolean))] as string[];
+    olayProfiller = olayProfilIds.length
+      ? (((await admin.from("profiles").select("id, ad").in("id", olayProfilIds)).data ?? []) as { id: string; ad: string | null }[])
+      : [];
+    olayProjeler = olayProjeIds.length
+      ? (((await admin.from("proje").select("id, ad").in("id", olayProjeIds)).data ?? []) as { id: string; ad: string }[])
+      : [];
+  }
   const opMap = new Map(olayProfiller.map((p) => [p.id, p.ad as string | null]));
   const oprMap = new Map(olayProjeler.map((p) => [p.id, p.ad as string]));
 

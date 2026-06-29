@@ -14,14 +14,20 @@ const TIP_RENK: Record<string, { ad: string; dot: string; rozet: string; baslik:
   lead: { ad: "lead", dot: "#13314b", rozet: "bg-navy/10 text-navy", baslik: "Lead düştü" },
   paylasim: { ad: "paylaşım", dot: "#1e9b8a", rozet: "bg-teal/12 text-teal-d", baslik: "Paylaşıldı" },
   goruntuleme: { ad: "görüntüleme", dot: "#98a2b3", rozet: "bg-gray/12 text-gray", baslik: "Görüntülendi" },
+  onay: { ad: "onay", dot: "#2fb36b", rozet: "bg-green-soft text-teal-d", baslik: "Hesap onay/red/durum" },
+  dogrulama: { ad: "doğrulama", dot: "#1e9b8a", rozet: "bg-teal/12 text-teal-d", baslik: "Üretici doğrulama" },
+  abonelik: { ad: "abonelik", dot: "#13314b", rozet: "bg-navy/10 text-navy", baslik: "Abonelik atandı" },
 };
-const FILTRELER = ["opsiyon", "satis", "durum", "lead", "paylasim"];
+const FILTRELER = ["opsiyon", "satis", "durum", "lead", "paylasim", "onay", "dogrulama", "abonelik"];
 const FILTRE_ETIKET: Record<string, string> = {
   opsiyon: "Opsiyon",
   satis: "Satış",
   durum: "Durum",
   lead: "Lead",
   paylasim: "Paylaşım",
+  onay: "Onay",
+  dogrulama: "Doğrulama",
+  abonelik: "Abonelik",
 };
 
 type Olay = {
@@ -50,7 +56,18 @@ export default async function Denetim({
   searchParams: Promise<{ tip?: string }>;
 }) {
   const { tip } = await searchParams;
-  const admin = createAdminClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return (
+      <div className="mx-auto max-w-[1100px] space-y-4 px-4 py-6 sm:px-6">
+        <GeriLink href="/admin" etiket="Genel Bakış" />
+        <SayfaBaslik baslik="Denetim" altEtiket={<span className="text-gray">İz zinciri</span>} />
+        <div className="kart p-8 text-center text-sm text-gray">Denetim günlüğü şu an okunamıyor — servis anahtarı tanımlı değil.</div>
+      </div>
+    );
+  }
   let q = admin
     .from("events")
     .select("id, tip, profile_id, proje_id, birim_id, payload, created_at")

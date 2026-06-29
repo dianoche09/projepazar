@@ -5,7 +5,16 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * events tablosunda INSERT RLS politikası yoktur (yazma server-side) → service-role.
  * Fire-and-forget: audit yazımı user akışını ASLA bozmaz (hata yalnız loglanır).
  */
-export type OlayTip = "opsiyon" | "satis" | "durum" | "paylasim" | "goruntuleme" | "lead";
+export type OlayTip =
+  | "opsiyon"
+  | "satis"
+  | "durum"
+  | "paylasim"
+  | "goruntuleme"
+  | "lead"
+  | "onay" // admin: hesap onay/red/durum
+  | "dogrulama" // admin: üretici güven rozeti
+  | "abonelik"; // admin: paket atama
 
 export type OlayGirdi = {
   tip: OlayTip;

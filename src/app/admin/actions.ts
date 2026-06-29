@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { kayitYaz } from "@/lib/events";
 
-/** Çağıran oturumun admin olduğunu doğrula (service-role işlemleri öncesi şart). */
-async function adminGuard() {
+/** Çağıran oturumun admin olduğunu doğrula (service-role işlemleri öncesi şart). Admin id döner. */
+async function adminGuard(): Promise<string> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -15,16 +16,19 @@ async function adminGuard() {
   if (!user) redirect("/login");
   const { data: profil } = await supabase.from("profiles").select("rol").eq("id", user.id).single();
   if (profil?.rol !== "admin") redirect("/");
+  return user.id;
 }
 
 /** Üretici doğrulama / güven rozeti (admin yetkisi — RLS is_admin owner). */
 export async function ureticiDogrula(formData: FormData) {
-  await adminGuard();
+  const adminId = await adminGuard();
   const supabase = await createClient();
   const uretici_id = String(formData.get("uretici_id"));
   const dogrula = formData.get("dogrula") === "true";
   await supabase.from("uretici").update({ dogrulanmis: dogrula }).eq("id", uretici_id);
+  await kayitYaz({ tip: "dogrulama", profileId: adminId, payload: { uretici_id, dogrula } });
   revalidatePath("/admin");
+  revalidatePath("/admin/ureticiler");
 }
 
 const AtaSchema = z.object({
@@ -37,7 +41,7 @@ const AtaSchema = z.object({
  * Önce mevcut aktif/deneme aboneliği iptal eder (unique partial index ihlalini önler).
  */
 export async function ofiseAbonelikAta(formData: FormData) {
-  await adminGuard();
+  const adminId = await adminGuard();
   const parsed = AtaSchema.safeParse({
     ofis_id: formData.get("ofis_id"),
     paket_id: formData.get("paket_id") ?? "",
@@ -54,6 +58,7 @@ export async function ofiseAbonelikAta(formData: FormData) {
   if (paket_id) {
     await supabase.from("abonelik").insert({ ofis_id, paket_id, durum: "aktif" });
   }
+  await kayitYaz({ tip: "abonelik", profileId: adminId, payload: { ofis_id, paket_id: paket_id || null } });
   revalidatePath("/admin");
 }
 
@@ -67,7 +72,7 @@ const UretAtaSchema = z.object({
  * Tek aktif abonelik (abonelik_uretici_aktif unique index) — önce mevcut aktif/deneme iptal edilir.
  */
 export async function ureticiyeAbonelikAta(formData: FormData) {
-  await adminGuard();
+  const adminId = await adminGuard();
   const parsed = UretAtaSchema.safeParse({
     uretici_id: formData.get("uretici_id"),
     paket_id: formData.get("paket_id") ?? "",
@@ -85,6 +90,7 @@ export async function ureticiyeAbonelikAta(formData: FormData) {
     const { error } = await supabase.from("abonelik").insert({ uretici_id, paket_id, durum: "aktif" });
     if (error) redirect(`/admin/ureticiler?hata=${encodeURIComponent(error.message)}`);
   }
+  await kayitYaz({ tip: "abonelik", profileId: adminId, payload: { uretici_id, paket_id: paket_id || null } });
   revalidatePath("/admin");
   revalidatePath("/admin/ureticiler");
   redirect(`/admin/ureticiler?mesaj=${encodeURIComponent(paket_id ? "Abonelik atandı" : "Abonelik kaldırıldı")}`);
@@ -124,6 +130,7 @@ function paketGirdi(formData: FormData) {
 
 /** Yeni üyelik paketi tanımla — ad/fiyat/kota tamamen admin girer (hardcode yok). */
 export async function paketEkle(formData: FormData) {
+  await adminGuard();
   const parsed = paketGirdi(formData);
   if (!parsed.success) return;
   const supabase = await createClient();
@@ -133,6 +140,7 @@ export async function paketEkle(formData: FormData) {
 
 /** Mevcut paketi düzenle (fiyat/kota/özellik/aktiflik). */
 export async function paketDuzenle(formData: FormData) {
+  await adminGuard();
   const id = z.string().uuid().safeParse(formData.get("id"));
   const parsed = paketGirdi(formData);
   if (!id.success || !parsed.success) return;
@@ -143,6 +151,7 @@ export async function paketDuzenle(formData: FormData) {
 
 /** Paketi sil — atanmış aktif abonelik varsa silmek yerine pasifleştirir. */
 export async function paketSil(formData: FormData) {
+  await adminGuard();
   const id = z.string().uuid().safeParse(formData.get("id"));
   if (!id.success) return;
   const supabase = await createClient();
@@ -168,6 +177,7 @@ const OnaySchema = z.object({
 
 /** Bekleyen kaydı onayla: rol + ofis ata, durum=aktif, onay izini bırak. */
 export async function kullaniciOnayla(formData: FormData) {
+  const adminId = await adminGuard();
   const parsed = OnaySchema.safeParse({
     kullanici_id: formData.get("kullanici_id"),
     rol: formData.get("rol"),
@@ -176,33 +186,34 @@ export async function kullaniciOnayla(formData: FormData) {
   if (!parsed.success) return;
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   await supabase
     .from("profiles")
     .update({
       rol: parsed.data.rol,
       ofis_id: parsed.data.ofis_id || null,
       durum: "aktif",
-      onaylayan_id: user?.id ?? null,
+      onaylayan_id: adminId,
       onay_tarihi: new Date().toISOString(),
     })
     .eq("id", parsed.data.kullanici_id);
+  await kayitYaz({ tip: "onay", profileId: adminId, payload: { kullanici_id: parsed.data.kullanici_id, rol: parsed.data.rol, eylem: "onay" } });
   revalidatePath("/admin");
 }
 
 /** Bekleyen kaydı reddet → durum=pasif (soft; iz kalır, silinmez). */
 export async function kullaniciReddet(formData: FormData) {
+  const adminId = await adminGuard();
   const id = z.string().uuid().safeParse(formData.get("kullanici_id"));
   if (!id.success) return;
   const supabase = await createClient();
   await supabase.from("profiles").update({ durum: "pasif" }).eq("id", id.data);
+  await kayitYaz({ tip: "onay", profileId: adminId, payload: { kullanici_id: id.data, eylem: "red" } });
   revalidatePath("/admin");
 }
 
 /** Hesap durumu değiştir (aktif/pasif/askıya/arşiv) — kullanıcı yaşam döngüsü. */
 export async function hesapDurumDegistir(formData: FormData) {
+  const adminId = await adminGuard();
   const parsed = z
     .object({
       kullanici_id: z.string().uuid(),
@@ -213,11 +224,15 @@ export async function hesapDurumDegistir(formData: FormData) {
       durum: formData.get("durum"),
     });
   if (!parsed.success) return;
+  if (parsed.data.kullanici_id === adminId && parsed.data.durum !== "aktif") {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent("Kendi hesabını devre dışı bırakamazsın")}`);
+  }
   const supabase = await createClient();
   await supabase
     .from("profiles")
     .update({ durum: parsed.data.durum })
     .eq("id", parsed.data.kullanici_id);
+  await kayitYaz({ tip: "onay", profileId: adminId, payload: { kullanici_id: parsed.data.kullanici_id, eylem: "durum", durum: parsed.data.durum } });
   revalidatePath("/admin");
   revalidatePath("/admin/kullanicilar", "layout");
 }
@@ -232,6 +247,7 @@ const KullaniciSchema = z.object({
 
 /** Kullanıcıyı düzenle (rol/ofis/durum) — admin user yönetimi. */
 export async function kullaniciGuncelle(formData: FormData) {
+  const adminId = await adminGuard();
   const parsed = KullaniciSchema.safeParse({
     kullanici_id: formData.get("kullanici_id"),
     rol: formData.get("rol"),
@@ -239,6 +255,9 @@ export async function kullaniciGuncelle(formData: FormData) {
     durum: formData.get("durum"),
   });
   if (!parsed.success) return;
+  if (parsed.data.kullanici_id === adminId && (parsed.data.rol !== "admin" || parsed.data.durum !== "aktif")) {
+    redirect(`/admin/kullanicilar?hata=${encodeURIComponent("Kendi rol/durumunu düşüremezsin")}`);
+  }
 
   const supabase = await createClient();
   await supabase
