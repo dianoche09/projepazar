@@ -66,28 +66,30 @@ export function TahsisForm({
       <input type="hidden" name="proje_id" value={projeId} />
       {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
-      {/* HEDEF — kapalı-devre: belirli danışman / ofis / herkes (yayın) */}
+      {/* HEDEF — kapalı-devre tahsis = ürünün YILDIZI (görünürlük = tahsis) */}
       <div>
-        <p className="text-xs font-semibold text-ink">Kime tahsis</p>
-        <div className="mt-1.5 flex flex-wrap gap-2">
+        <p className="text-[13px] font-bold text-ink">Bu projeyi kime açıyorsun?</p>
+        <p className="mt-0.5 text-[11.5px] text-gray">Yalnız tahsis ettiğin görebilir — kapalı-devre. <span className="font-medium text-teal-d">Görünürlük = tahsis.</span></p>
+        <div className="mt-2.5 grid gap-2 sm:grid-cols-3">
           {([
-            ["danisman", "Belirli danışman"],
-            ["ofis", "Bir ofisin tamamı"],
-            ["herkes", "Tüm danışmanlar (yayın)"],
-          ] as const).map(([h, et]) => (
+            ["danisman", "Belirli danışman", "Tek danışmana özel — en sıkı kapalı-devre"],
+            ["ofis", "Bir ofisin tamamı", "Seçili ofisteki tüm danışmanlar"],
+            ["herkes", "Tüm ağ (yayın)", "Tüm doğrulanmış danışmanlar görür"],
+          ] as const).map(([h, et, aciklama]) => (
             <label
               key={h}
-              className={`cursor-pointer rounded-lg border px-3 py-1.5 text-sm transition-colors ${
-                hedef === h ? "border-teal bg-teal/5 text-ink" : "border-hair text-gray"
+              className={`cursor-pointer rounded-xl border p-3 transition-all ${
+                hedef === h ? "border-teal bg-teal/5 shadow-sm" : "border-hair bg-card hover:border-teal/30"
               }`}
             >
               <input type="radio" name="hedef_tip" value={h} checked={hedef === h} onChange={() => setHedef(h)} className="sr-only" />
-              {et}
+              <span className={`block text-[13px] font-bold ${hedef === h ? "text-teal-d" : "text-ink"}`}>{et}</span>
+              <span className="mt-0.5 block text-[11px] leading-snug text-gray">{aciklama}</span>
             </label>
           ))}
         </div>
         {hedef === "danisman" ? (
-          <select name="hedef_id" className={`${inp} mt-2 w-full`}>
+          <select name="hedef_id" className={`${inp} mt-2.5 w-full`}>
             <option value="">— danışman seç —</option>
             {emlakcilar.map((e) => (
               <option key={e.id} value={e.id}>
@@ -97,17 +99,13 @@ export function TahsisForm({
             ))}
           </select>
         ) : hedef === "ofis" ? (
-          <select name="hedef_id" className={`${inp} mt-2 w-full`}>
+          <select name="hedef_id" className={`${inp} mt-2.5 w-full`}>
             <option value="">— ofis seç —</option>
             {ofisler.map((o) => (
               <option key={o.id} value={o.id}>{o.ad}</option>
             ))}
           </select>
-        ) : (
-          <p className="mt-2 text-xs text-gray">
-            Tüm doğrulanmış danışmanlar görür (yayın). Kapalı-devre için belirli danışman/ofis seç.
-          </p>
-        )}
+        ) : null}
       </div>
 
       {/* KAPSAM — blok × kat × tip × tür */}
@@ -166,12 +164,10 @@ export function TahsisForm({
             <input type="checkbox" name="munhasir" checked={munhasir} onChange={(e) => setMunhasir(e.target.checked)} className="size-4" />
             Münhasır
           </label>
-          {munhasir ? (
-            <label className="flex flex-col gap-1 text-xs text-gray">
-              Süre (gün)
-              <input name="munhasir_sure" type="number" min={1} placeholder="30" className={`${inp} w-24`} />
-            </label>
-          ) : null}
+          <label className="flex flex-col gap-1 text-xs text-gray">
+            Erişim süresi <span className="font-normal">(gün)</span>
+            <input name="bitis_gun" type="number" min={1} placeholder="süresiz" className={`${inp} w-28`} />
+          </label>
           <label className="flex items-center gap-2 pb-1 text-sm text-ink">
             <input type="checkbox" name="fiyat_gorunur" defaultChecked className="size-4" /> Fiyat görünür
           </label>

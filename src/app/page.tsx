@@ -182,30 +182,30 @@ export default async function Home() {
         <div className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-16 sm:px-6 lg:pb-28 lg:pt-28">
           <div className="max-w-xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(30,155,138,0.22)] bg-[var(--color-teal-soft)] px-3.5 py-1.5 font-mono text-[11.5px] font-semibold text-[var(--color-teal-d)]">
-              <span className="size-2 rounded-full bg-green nabiz" /> CANLI PROJE HAVUZU
+              <span className="size-2 rounded-full bg-green nabiz" /> TAHSİSLİ CANLI SATIŞ AĞI
             </span>
             <h1 className="mt-5 font-display text-[40px] font-extrabold leading-[1.02] tracking-tight text-ink sm:text-[56px]">
-              Tüm projeler, canlı.
+              Canlı stok. Yetkili ağ.
               <br />
               <span className="text-teal">Tek doğru kaynak.</span>
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-[15px] leading-relaxed text-ink-soft sm:text-base">
-              İlan portalı değiliz. <strong className="font-semibold text-ink">Proje sahibi</strong> stoğunu ve fiyatını tek noktadan kontrol eder; <strong className="font-semibold text-ink">gayrimenkul danışmanı</strong> canlı havuzdaki projeleri görür ve tek dokunuşla müşterisine paylaşır. Proje sahibi isterse belirli daireleri yalnız seçtiği danışmanlara açar. <strong className="font-semibold text-ink">Yanlış fiyat yok, eksik bilgi yok, çift satış yok.</strong>
+<strong className="font-semibold text-ink">Geliştirici firmalar için canlı proje satış ağı.</strong> Projenizi seçili danışman ve ofislere <strong className="font-semibold text-ink">tahsis edin</strong>; stok, fiyat, opsiyon ve talep hareketlerini tek merkezden yönetin. İlan portalı değil, <strong className="font-semibold text-ink">komisyonsuz</strong> altyapı — yanlış fiyat yok, çift satış yok.
             </p>
             <div className="mt-7 grid max-w-xl gap-3 sm:grid-cols-2">
               <Link href="/kayit?rol=uretici" className="group flex flex-col gap-0.5 rounded-[15px] bg-navy p-4 text-white transition-all hover:-translate-y-0.5 hover:shadow-[var(--golge-3)]">
                 <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[#7fd9c8]">Proje sahibiyim</span>
-                <span className="font-display text-[15px] font-bold">Projemi yönetmeye başla →</span>
-                <span className="text-[11px] leading-snug text-white/80">Fiyatı, daireleri ve kimin göreceğini tek panelden yönet.</span>
+                <span className="font-display text-[15px] font-bold">Projemi ağa aç →</span>
+                <span className="text-[11px] leading-snug text-white/80">Stoğu, fiyatı ve kimin göreceğini tahsisle yönet.</span>
               </Link>
               <Link href="/kayit?rol=emlakci" className="group flex flex-col gap-0.5 rounded-[15px] border border-[var(--cizgi-2)] bg-white p-4 text-ink transition-all hover:-translate-y-0.5 hover:border-teal hover:shadow-[var(--golge-3)]">
                 <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--color-teal-d)]">Gayrimenkul danışmanıyım</span>
-                <span className="font-display text-[15px] font-bold">Projeleri keşfet →</span>
-                <span className="text-[11px] leading-snug text-ink-soft">Canlı projeleri gör, doğru fiyatla paylaş. Ücretsiz.</span>
+                <span className="font-display text-[15px] font-bold">Yetkili projelerimi gör →</span>
+                <span className="text-[11px] leading-snug text-ink-soft">Sana tahsisli projeleri canlı gör, paylaş, opsiyon al. Ücretsiz.</span>
               </Link>
             </div>
             <div className="mt-5 flex flex-wrap gap-2">
-              {["Komisyon yok", "Danışmana ücretsiz", "Çift-satış kalkanı"].map((t) => (
+              {["Komisyonsuz", "Tahsisli görünürlük", "Çift-satış kalkanı"].map((t) => (
                 <span key={t} className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cizgi-2)] bg-white/70 px-3 py-1.5 text-xs font-medium text-ink-soft backdrop-blur-sm">
                   <span className="size-[5px] rounded-full bg-teal" /> {t}
                 </span>

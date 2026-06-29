@@ -649,10 +649,9 @@ export async function tahsisEkle(formData: FormData) {
   if (tipler.length) kapsam.tipler = tipler;
   if (turler.length) kapsam.turler = turler;
 
-  // Münhasırlık süresi (gün) → bitiş tarihi
-  const sureRaw = String(formData.get("munhasir_sure") ?? "").trim();
-  const bitis =
-    d.munhasir && sureRaw ? new Date(Date.now() + Number(sureRaw) * 86_400_000).toISOString() : null;
+  // Erişim süresi (gün) → bitiş tarihi (boş = süresiz). Münhasır ayrı flag.
+  const sureRaw = String(formData.get("bitis_gun") ?? formData.get("munhasir_sure") ?? "").trim();
+  const bitis = sureRaw ? new Date(Date.now() + Number(sureRaw) * 86_400_000).toISOString() : null;
 
   const supabase = await createClient();
   const { error } = await supabase.from("tahsis").insert({
