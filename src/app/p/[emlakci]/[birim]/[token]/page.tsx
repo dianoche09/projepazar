@@ -159,17 +159,10 @@ export default async function PublicBirimPage({
                   </span>
                 ) : null}
               </div>
-              {p?.kira_getirisi_pct != null || p?.oturum_uygun || p?.golden_visa_esik != null ? (
+              {/* Faz-1 yurtiçi: yalnız kira getirisi (oturum/golden vize Faz-2'de) */}
+              {p?.kira_getirisi_pct != null ? (
                 <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-medium">
-                  {p.kira_getirisi_pct != null ? (
-                    <span className="rounded-md bg-teal-soft px-2 py-0.5 text-teal-d">%{p.kira_getirisi_pct} yıllık kira getirisi</span>
-                  ) : null}
-                  {p.oturum_uygun ? (
-                    <span className="rounded-md bg-navy-soft px-2 py-0.5 text-navy">Oturum izni uygun</span>
-                  ) : null}
-                  {p.golden_visa_esik != null ? (
-                    <span className="rounded-md bg-amber/15 px-2 py-0.5 text-amber">Golden Vize</span>
-                  ) : null}
+                  <span className="rounded-md bg-teal-soft px-2 py-0.5 text-teal-d">%{p.kira_getirisi_pct} yıllık kira getirisi</span>
                 </div>
               ) : null}
 
