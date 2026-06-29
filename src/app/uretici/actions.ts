@@ -387,6 +387,7 @@ export async function birimDurumGuncelle(formData: FormData) {
   });
 
   revalidatePath(`/uretici/proje/${proje_id}`);
+  revalidatePath("/uretici/stok");
 }
 
 // ---- Tek daire tam düzenle (ızgaradan modal) ----
@@ -419,6 +420,7 @@ export async function birimGuncelle(formData: FormData) {
     .eq("proje_id", proje_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
+  revalidatePath("/uretici/stok");
 }
 
 // ---- Çoklu seçim: toplu durum/fiyat güncelle ----

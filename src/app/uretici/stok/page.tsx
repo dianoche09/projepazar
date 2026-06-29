@@ -4,7 +4,8 @@ import { StokTablo, type StokSatir } from "./StokTablo";
 
 /* =========================================================
    STOK / FİYAT LİSTESİ — tüm birimlerin tek canlı tablosu (üretici).
-   KPI + proje/durum filtreleri (client alt-bileşen). Her satır → /uretici/proje/[id].
+   KPI + proje/durum filtreleri (client alt-bileşen). Her satır → "Yönet" → DaireModal (popup).
+   Daire tek noktadan yönetilir; tüm bloklara/proje sayfasına gitmeye gerek yok.
    ========================================================= */
 
 type BirimRaw = {
@@ -20,6 +21,12 @@ type BirimRaw = {
   para_birimi: string | null;
   net_m2: number | null;
   brut_m2: number | null;
+  satilabilir: boolean | null;
+  yon: string | null;
+  manzara: string | null;
+  serefiye: unknown;
+  odeme_plani: unknown;
+  durum_notu: string | null;
   son_guncelleme: string | null;
 };
 
@@ -32,10 +39,10 @@ export default async function UreticiStok() {
       supabase
         .from("birim")
         .select(
-          "id, proje_id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, kira_bedeli, para_birimi, net_m2, brut_m2, son_guncelleme",
+          "id, proje_id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, kira_bedeli, para_birimi, net_m2, brut_m2, satilabilir, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
         ),
       supabase.from("blok").select("id, ad"),
-      supabase.from("daire_tipi").select("id, ad, oda, net_m2"),
+      supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, plan_url"),
     ]);
 
   const birimler = (birimRaw ?? []) as BirimRaw[];
@@ -44,6 +51,11 @@ export default async function UreticiStok() {
     (tipler ?? []).map((t) => [t.id, (t.oda as string | null) ?? (t.ad as string | null)]),
   );
   const tipNet = new Map((tipler ?? []).map((t) => [t.id, t.net_m2 as number | null]));
+  // Modal künyesi için tip lookup'ları (taban fiyat / oda / ad / plan görseli)
+  const tipTaban = new Map((tipler ?? []).map((t) => [t.id, (t.taban_fiyat as number | null) ?? null]));
+  const tipOda = new Map((tipler ?? []).map((t) => [t.id, (t.oda as string | null) ?? null]));
+  const tipTamAd = new Map((tipler ?? []).map((t) => [t.id, (t.ad as string | null) ?? null]));
+  const tipPlan = new Map((tipler ?? []).map((t) => [t.id, (t.plan_url as string | null) ?? null]));
   const projeAd = new Map((projeler ?? []).map((p) => [p.id, p.ad as string]));
 
   // KPI
@@ -78,6 +90,17 @@ export default async function UreticiStok() {
       para_birimi: b.para_birimi,
       durum: b.durum,
       son_guncelleme: b.son_guncelleme,
+      // DaireModal künyesi (üretici modu — popup ile tek tek yönet)
+      satilabilir: b.satilabilir ?? true,
+      yon: b.yon,
+      manzara: b.manzara,
+      serefiye: (b.serefiye as { kat?: number; manzara?: number } | null) ?? null,
+      odeme_plani: (b.odeme_plani as StokSatir["odeme_plani"]) ?? null,
+      durum_notu: b.durum_notu,
+      taban_fiyat: tipTaban.get(b.tip_id ?? "") ?? null,
+      tip_tam_ad: tipTamAd.get(b.tip_id ?? "") ?? null,
+      oda: tipOda.get(b.tip_id ?? "") ?? null,
+      plan_url: tipPlan.get(b.tip_id ?? "") ?? null,
     }));
 
   const projeFiltre = (projeler ?? []).map((p) => ({ id: p.id, ad: p.ad as string }));

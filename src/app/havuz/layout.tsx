@@ -33,8 +33,12 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
   return (
     <ToastSaglayici>
       <div className="flex min-h-screen bg-paper text-slate-800">
-        {/* Masaüstü sidebar — v2-emlakci (spatial 258px) */}
-        <aside className="sticky top-0 hidden h-screen w-[258px] shrink-0 flex-col gap-2 px-4 py-6 md:flex">
+        {/* Masaüstü sidebar — v2-emlakci (spatial 258px), üretici ile aynı yüzey:
+            yarı-saydam beyaz panel + sağ ayraç + blur → içerikten (paper) net ayrışır. */}
+        <aside
+          className="sticky top-0 hidden h-screen w-[258px] shrink-0 flex-col gap-2 border-r border-[var(--cizgi)] px-4 py-6 backdrop-blur-xl md:flex"
+          style={{ background: "rgba(255,255,255,.72)" }}
+        >
           {/* Marka */}
           <div className="mb-7 flex items-center gap-3 px-3">
             <Link href="/havuz" className="inline-flex">

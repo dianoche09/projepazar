@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { kova, DURUM_AD, DURUM_SINIF, paraKisa, tazelik, type DurumKova } from "@/lib/stok";
+import { DaireModal, type ModalBirim } from "@/components/DaireModal";
+import type { BirimDurum } from "@/lib/types";
 
 export type StokSatir = {
   id: string;
@@ -19,7 +21,48 @@ export type StokSatir = {
   para_birimi: string | null;
   durum: string;
   son_guncelleme: string | null;
+  // DaireModal künyesi (üretici modu — "Yönet" popup)
+  satilabilir: boolean;
+  yon: string | null;
+  manzara: string | null;
+  serefiye: { kat?: number; manzara?: number } | null;
+  odeme_plani: {
+    pesinat_pct?: number | null;
+    taksit_sayisi?: number | null;
+    vade_farki_pct?: number | null;
+    ara_odemeler?: { ay: number; pct: number }[] | null;
+  } | null;
+  durum_notu: string | null;
+  taban_fiyat: number | null;
+  tip_tam_ad: string | null;
+  oda: string | null;
+  plan_url: string | null;
 };
+
+/** Stok satırını DaireModal'ın beklediği künyeye çevirir (üretici modu). */
+function satirToModalBirim(s: StokSatir): ModalBirim {
+  return {
+    id: s.id,
+    daire_no: s.daire_no,
+    kat: s.kat,
+    durum: s.durum as BirimDurum,
+    satilabilir: s.satilabilir,
+    liste_fiyati: s.liste_fiyati,
+    para_birimi: s.para_birimi ?? "TRY",
+    net_m2: s.net_m2,
+    brut_m2: s.brut_m2,
+    yon: s.yon,
+    manzara: s.manzara,
+    durum_notu: s.durum_notu,
+    son_guncelleme: s.son_guncelleme ?? new Date().toISOString(),
+    serefiye: s.serefiye,
+    taban_fiyat: s.taban_fiyat,
+    tip_ad: s.tip_tam_ad ?? s.tip_ad,
+    oda: s.oda,
+    plan_url: s.plan_url,
+    odeme_plani: s.odeme_plani,
+  };
+}
 
 type ProjeFiltre = { id: string; ad: string };
 
@@ -46,8 +89,11 @@ export function StokTablo({
   projeler: ProjeFiltre[];
   kiraVar: boolean;
 }) {
+  const router = useRouter();
   const [projeId, setProjeId] = useState<string>("tumu");
   const [durum, setDurum] = useState<DurumKova | "tumu">("tumu");
+  // "Yönet" → açık daire modalı (satır + projesi). null = kapalı.
+  const [acikSatir, setAcikSatir] = useState<StokSatir | null>(null);
 
   const gosterilen = useMemo(() => {
     return satirlar.filter((s) => {
@@ -175,12 +221,13 @@ export function StokTablo({
                       </span>
                     </td>
                     <td>
-                      <Link
-                        href={`/uretici/proje/${s.proje_id}`}
+                      <button
+                        type="button"
+                        onClick={() => setAcikSatir(s)}
                         className="btn-action h-auto min-h-0 px-2.5 py-[5px] text-[11px]"
                       >
                         Yönet
-                      </Link>
+                      </button>
                     </td>
                   </tr>
                 );
@@ -221,6 +268,22 @@ export function StokTablo({
             Sonraki ›
           </button>
         </div>
+      ) : null}
+
+      {/* "Yönet" → ilgili dairenin DaireModal'ı (üretici modu): durum/not + bilgi düzenle.
+          Tüm bloklara/proje sayfasına gitmeden, doğrudan bu daire yönetilir. */}
+      {acikSatir ? (
+        <DaireModal
+          birim={satirToModalBirim(acikSatir)}
+          projeId={acikSatir.proje_id}
+          mod="uretici"
+          projeAd={acikSatir.proje_ad}
+          onKapat={() => {
+            setAcikSatir(null);
+            // Güncellenen durum/fiyat canlı stok tablosuna yansısın (server action revalidate'i tamamlar).
+            router.refresh();
+          }}
+        />
       ) : null}
     </>
   );
