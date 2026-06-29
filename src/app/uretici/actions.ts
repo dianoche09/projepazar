@@ -848,8 +848,8 @@ export async function projeKunyeGuncelle(formData: FormData) {
   basariya(`/uretici/proje/${proje_id}/kurulum`, formData, "Künye güncellendi");
 }
 
-// ── Yatırım & Yabancı Alıcı (Connject paritesi: para birimi + golden vize/oturum + kira getirisi/amortisman) ──
-// Alanlar şemada zaten var (proje.*); yabancı yatırımcı havuz filtresi bunları kullanır.
+// ── Yatırım (Faz-1 yurtiçi: kira getirisi + geri dönüş süresi; para_birimi TRY sabit) ──
+// golden_visa_esik / oturum_uygun = Faz-2 (yurtdışı) → bu kolonlara DOKUNMA (sessiz ezme yok).
 export async function projeYatirimGuncelle(formData: FormData) {
   const proje_id = String(formData.get("proje_id"));
   const sayi = (v: FormDataEntryValue | null) => {
@@ -860,9 +860,7 @@ export async function projeYatirimGuncelle(formData: FormData) {
   const { error } = await supabase
     .from("proje")
     .update({
-      para_birimi: String(formData.get("para_birimi") ?? "TRY"),
-      oturum_uygun: formData.get("oturum_uygun") === "on",
-      golden_visa_esik: sayi(formData.get("golden_visa_esik")),
+      para_birimi: "TRY",
       kira_getirisi_pct: sayi(formData.get("kira_getirisi_pct")),
       amortisman_yil: sayi(formData.get("amortisman_yil")),
       son_guncelleme: new Date().toISOString(),

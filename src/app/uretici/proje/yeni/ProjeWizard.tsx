@@ -415,16 +415,12 @@ export function ProjeWizard({
 
           <AdimKart
             baslik="Yatırım Bilgileri"
-            aciklama="Para birimi ve yıllık kira getirisi — yatırımcı havuzunda filtrelenir. (Yurtiçi: golden vize / oturum yok.)"
+            aciklama="Yıllık kira getirisi ve geri dönüş süresi — yurtiçi yatırımcı havuzunda gösterilir. (Faz-1: TRY; döviz/golden vize/oturum Faz-2.)"
           >
             <form action={projeYatirimGuncelle} className="grid gap-3 sm:grid-cols-2">
               <input type="hidden" name="proje_id" value={proje.id} />
               <input type="hidden" name="geri_yol" value={geriYol(4)} />
-              <select name="para_birimi" defaultValue={proje.para_birimi ?? "TRY"} className={inpCls}>
-                <option value="TRY">₺ Türk Lirası</option>
-                <option value="USD">$ Amerikan Doları</option>
-                <option value="EUR">€ Euro</option>
-              </select>
+              <input type="hidden" name="para_birimi" value="TRY" />
               <input name="kira_getirisi_pct" type="number" step="0.1" defaultValue={proje.kira_getirisi_pct ?? ""} placeholder="Yıllık kira getirisi %" className={inpCls} />
               <input name="amortisman_yil" type="number" step="0.1" defaultValue={proje.amortisman_yil ?? ""} placeholder="Geri dönüş süresi (yıl)" className={`${inpCls} sm:col-span-2`} />
               <div className="sm:col-span-2"><SubmitButton varyant="outline">Yatırım bilgilerini kaydet</SubmitButton></div>

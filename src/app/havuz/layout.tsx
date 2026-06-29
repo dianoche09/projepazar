@@ -16,8 +16,10 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Havuz: emlakçı + admin + (Faz-1'de ayrı paneli olmayan) ofis/marka/arsa rolleri tahsisli stok görür.
+  const HAVUZ_ROL = ["emlakci", "admin", "ofis_yetkili", "marka_yetkili", "arsa_sahibi"];
   const { data: profil } = await supabase.from("profiles").select("ad, rol").eq("id", user.id).single();
-  if (!profil || (profil.rol !== "emlakci" && profil.rol !== "admin")) {
+  if (!profil || !HAVUZ_ROL.includes(profil.rol)) {
     redirect(profil ? panelYolu(profil.rol) : "/");
   }
   const adminMi = profil.rol === "admin";

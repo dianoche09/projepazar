@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -15,38 +14,6 @@ const uuid = z.string().uuid();
  * Tahsisli + müsait birime "opsiyon talebi" (beklemede) açar; müteahhit onaylarsa
  * opsiyon doğar (kilit) — çift-satış kalkanı (unique index + trigger) onay anında devreye girer.
  */
-
-/** Emlakçı kendi opsiyonunu bırakır → birim müsait (trigger). */
-export async function opsiyonBirak(formData: FormData) {
-  const birim = uuid.safeParse(formData.get("birim_id"));
-  const proje = uuid.safeParse(formData.get("proje_id"));
-  if (!birim.success || !proje.success) return;
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { error } = await supabase
-    .from("opsiyon")
-    .delete()
-    .eq("birim_id", birim.data)
-    .eq("satici_id", user.id)
-    .in("durum", ["opsiyonlu", "satis_beklemede"]);
-  if (!error) {
-    await kayitYaz({
-      tip: "opsiyon",
-      profileId: user.id,
-      projeId: proje.data,
-      birimId: birim.data,
-      payload: { eylem: "iptal" },
-    });
-  }
-  revalidatePath(`/havuz/proje/${proje.data}`);
-  revalidatePath("/havuz");
-  redirect(`/havuz/proje/${proje.data}?mesaj=${encodeURIComponent("Opsiyon bırakıldı")}`);
-}
 
 /** Emlakçı opsiyon TALEBİ gönderir (beklemede) — doğrudan kilit YOK, müteahhit onayına düşer. */
 export async function opsiyonTalepGonder(
