@@ -105,8 +105,8 @@ async function projeKur(uretici_id, ad, il, ilce, gorsel) {
   ]);
   // mahal
   await sb.from("mahal").insert(MAHALLER.map(([mahal, zemin, duvar, tavan], k) => ({ proje_id: pid, mahal, zemin, duvar, tavan, sira: k })));
-  // tahsis: herkese %2 (emlakçılar görsün)
-  await sb.from("tahsis").insert({ proje_id: pid, hedef_tip: "herkes", hedef_id: null, kapsam: {}, komisyon_tip: "yuzde", komisyon_deger: 2, fiyat_gorunur: true });
+  // tahsis YOK — proje TAHSİSSİZ başlar (kapalı-devre: üretici BİLİNÇLİ tahsis eder, "herkes" değil).
+  // Demo tahsis dağıtımı ayrı script: scripts/seed-tahsis.mjs (danisman/ofis bazlı özel tahsis).
 
   return { pid, ad, birim: bIds.length };
 }
