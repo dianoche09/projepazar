@@ -45,12 +45,15 @@ export function TahsisForm({
   katlar,
   tipler,
   ofisler,
+  geriYol,
 }: {
   projeId: string;
   bloklar: { id: string; ad: string | null }[];
   katlar: number[];
   tipler: { id: string; ad: string | null; oda: string | null }[];
   ofisler: { id: string; ad: string }[];
+  /** Wizard akışı: doluysa tahsis sonrası bu yola döner (yoksa proje ekranına). */
+  geriYol?: string;
 }) {
   const [hedef, setHedef] = useState<"herkes" | "ofis">("herkes");
   const [komisyon, setKomisyon] = useState<"yuzde" | "sabit" | "yok">("yuzde");
@@ -59,6 +62,7 @@ export function TahsisForm({
   return (
     <form action={tahsisEkle} className="grid gap-4 rounded-2xl border border-dashed border-hair bg-card/50 p-4">
       <input type="hidden" name="proje_id" value={projeId} />
+      {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
       {/* HEDEF */}
       <div>

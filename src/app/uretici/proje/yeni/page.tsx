@@ -1,69 +1,87 @@
-import Link from "next/link";
-import { projeOlustur } from "@/app/uretici/actions";
-import { SubmitButton } from "@/components/ui/SubmitButton";
-import { Field, Input, Grup } from "@/components/ui/Form";
+import { createClient } from "@/lib/supabase/server";
+import {
+  ProjeWizard,
+  type WizardProje,
+  type WizardBlok,
+  type WizardTip,
+  type WizardBelge,
+  type WizardOfis,
+} from "./ProjeWizard";
 
+/**
+ * Müteahhit yeni-proje SİHİRBAZI (7 adım). Tek route, ?id + ?adim query ile state.
+ * - Proje yoksa: yalnız adım 1 (projeOlustur). Oluşunca ?id=X&adim=2'ye döner.
+ * - Proje varsa: tüm adımlar düzenlenebilir; her adım mevcut server action'la kaydeder.
+ * - Düzenleme yüzeyi olarak /uretici/proje/[id]/kurulum KALIR (sonradan tahsis/fiyat oradan).
+ */
 export default async function YeniProje({
   searchParams,
 }: {
-  searchParams: Promise<{ hata?: string }>;
+  searchParams: Promise<{ id?: string; adim?: string; hata?: string; mesaj?: string }>;
 }) {
-  const { hata } = await searchParams;
+  const { id, adim, hata, mesaj } = await searchParams;
+  const adimNo = Math.min(7, Math.max(1, Number(adim) || 1));
+
+  // Proje yoksa boş wizard (adım 1 = projeOlustur).
+  if (!id) {
+    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} hata={hata} mesaj={mesaj} />;
+  }
+
+  const supabase = await createClient();
+  const { data: projeRaw } = await supabase.from("proje").select("*").eq("id", id).single();
+
+  // Proje bulunamadı (silinmiş / yetkisiz) → adım 1'e düş.
+  if (!projeRaw) {
+    return <ProjeWizard adim={1} proje={null} bloklar={[]} tipler={[]} birimSayisi={0} belgeler={[]} ofisler={[]} hata="Proje bulunamadı." mesaj={undefined} />;
+  }
+
+  const [{ data: bloklar }, { data: tipler }, { count: birimSayisi }, { data: belgeler }, { data: ofisler }] =
+    await Promise.all([
+      supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
+      supabase
+        .from("daire_tipi")
+        .select("id, ad, oda, net_m2, taban_fiyat")
+        .eq("proje_id", id)
+        .order("ad"),
+      supabase.from("birim").select("id", { count: "exact", head: true }).eq("proje_id", id),
+      supabase
+        .from("proje_belge")
+        .select("id, tip, ad, url")
+        .eq("proje_id", id)
+        .order("created_at", { ascending: false }),
+      supabase.from("ofis").select("id, ad").order("ad"),
+    ]);
+
+  const proje: WizardProje = {
+    id: projeRaw.id,
+    ad: projeRaw.ad,
+    il: projeRaw.il,
+    ilce: projeRaw.ilce,
+    mahalle: projeRaw.mahalle,
+    ada: projeRaw.ada,
+    parsel: projeRaw.parsel,
+    emsal: projeRaw.emsal,
+    taks: projeRaw.taks,
+    baslama_tarihi: projeRaw.baslama_tarihi,
+    teslim_tarihi: projeRaw.teslim_tarihi,
+    insaat_asamasi: projeRaw.insaat_asamasi,
+    para_birimi: projeRaw.para_birimi,
+    kira_getirisi_pct: projeRaw.kira_getirisi_pct,
+    amortisman_yil: projeRaw.amortisman_yil,
+    kunye: (projeRaw.kunye ?? {}) as Record<string, unknown>,
+  };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <Link href="/uretici" className="text-sm font-medium text-teal hover:underline">
-        ← Kokpit
-      </Link>
-      <h1 className="mt-3 font-display text-2xl font-semibold text-ink">Yeni proje</h1>
-      <p className="mt-1 text-sm text-gray">
-        Önce künye. Sonra Kurulum&apos;da kapak &amp; belgeler, ardından blok / daire tipi tanımlayıp
-        birim üretirsin.
-      </p>
-
-      {hata ? (
-        <p role="alert" className="mt-4 rounded-xl border border-red/30 bg-red-soft px-3.5 py-2.5 text-sm text-red">
-          {hata}
-        </p>
-      ) : null}
-
-      <form action={projeOlustur} className="mt-6 rounded-2xl border border-hair bg-card p-5 shadow-card sm:p-6">
-        <div className="flex flex-col gap-6">
-          <Grup baslik="Kimlik">
-            <Field label="Proje adı" required htmlFor="ad" className="sm:col-span-2">
-              <Input id="ad" name="ad" required placeholder="Çankaya Vadi Konakları" />
-            </Field>
-          </Grup>
-
-          <Grup baslik="Konum" aciklama="Projenin bulunduğu yer.">
-            <Field label="İl" htmlFor="il">
-              <Input id="il" name="il" placeholder="Ankara" />
-            </Field>
-            <Field label="İlçe" htmlFor="ilce">
-              <Input id="ilce" name="ilce" placeholder="Çankaya" />
-            </Field>
-            <Field label="Mahalle" htmlFor="mahalle" className="sm:col-span-2">
-              <Input id="mahalle" name="mahalle" placeholder="Kızılırmak" />
-            </Field>
-          </Grup>
-
-          <Grup baslik="Parsel & Teslim" aciklama="İmar detayını (emsal/TAKS/ruhsat) Kurulum&apos;da tamamlarsın.">
-            <Field label="Ada" htmlFor="ada">
-              <Input id="ada" name="ada" placeholder="12345" />
-            </Field>
-            <Field label="Parsel" htmlFor="parsel">
-              <Input id="parsel" name="parsel" placeholder="6" />
-            </Field>
-            <Field label="Tahmini teslim" htmlFor="teslim" className="sm:col-span-2">
-              <Input id="teslim" name="teslim_tarihi" type="date" />
-            </Field>
-          </Grup>
-        </div>
-
-        <div className="mt-6 border-t border-hair pt-5">
-          <SubmitButton className="w-full">Projeyi oluştur</SubmitButton>
-        </div>
-      </form>
-    </div>
+    <ProjeWizard
+      adim={adimNo}
+      proje={proje}
+      bloklar={(bloklar ?? []) as WizardBlok[]}
+      tipler={(tipler ?? []) as WizardTip[]}
+      birimSayisi={birimSayisi ?? 0}
+      belgeler={(belgeler ?? []) as WizardBelge[]}
+      ofisler={(ofisler ?? []) as WizardOfis[]}
+      hata={hata}
+      mesaj={mesaj}
+    />
   );
 }

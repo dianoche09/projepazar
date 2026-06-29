@@ -192,9 +192,6 @@ export function HavuzListe({ projeler }: { projeler: ProjeKart[] }) {
               <span className="text-slate-400">–</span>
               <span className="mono text-[12.5px] text-ink">{fiyatMax ? `₺${fiyat(Number(fiyatMax))}` : "Max"}</span>
             </span>
-            <span className="chip">
-              <span className="text-slate-400">Birim</span> {paraBirimi ? `${paraSimge(paraBirimi)} ${paraBirimi}` : "Tümü"} {okChevron}
-            </span>
             <span className="ml-auto flex items-center gap-2 pr-1">
               {aktifSayi > 0 ? (
                 <span className="mono rounded-full bg-teal px-2.5 py-0.5 text-[11px] font-extrabold text-white shadow-sm">

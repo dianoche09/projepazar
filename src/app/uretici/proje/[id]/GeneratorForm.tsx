@@ -29,10 +29,13 @@ export function GeneratorForm({
   projeId,
   bloklar,
   tipler,
+  geriYol,
 }: {
   projeId: string;
   bloklar: Blok[];
   tipler: Tip[];
+  /** Wizard akışı: doluysa üretim sonrası bu yola döner (yoksa proje ekranına). */
+  geriYol?: string;
 }) {
   const [blokId, setBlokId] = useState(bloklar[0]?.id ?? "");
   const [katBas, setKatBas] = useState(1);
@@ -54,6 +57,7 @@ export function GeneratorForm({
   return (
     <form action={birimGenerator} className="mt-3 grid gap-3 sm:grid-cols-3">
       <input type="hidden" name="proje_id" value={projeId} />
+      {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
       <label className={lblCls}>
         Blok

@@ -35,7 +35,37 @@ function hataya(yol: string, mesaj: string): never {
   redirect(`${yol}?hata=${encodeURIComponent(mesaj)}`);
 }
 
+/**
+ * Opsiyonel yönlendirme hedefi (wizard akışı için). Form'da `geri_yol` varsa onu
+ * doğrular ve döndürür; yoksa null. Açık-yönlendirme (open-redirect) koruması:
+ * yalnız uygulama-içi mutlak yol (`/uretici/...`) kabul edilir. Mevcut çağıranlar
+ * bu alanı göndermediği için varsayılan davranış birebir korunur (geriye uyumlu).
+ */
+function geriYol(formData: FormData): string | null {
+  const ham = String(formData.get("geri_yol") ?? "").trim();
+  if (!ham) return null;
+  if (!ham.startsWith("/uretici/")) return null;
+  if (ham.includes("//") || ham.includes("..")) return null;
+  return ham;
+}
+
+/** Başarı sonrası hedef yol + mesaj; geri_yol verilmişse oraya, yoksa varsayılana. */
+function basariya(varsayilan: string, formData: FormData, mesaj?: string): never {
+  const yol = geriYol(formData) ?? varsayilan;
+  const ayrac = yol.includes("?") ? "&" : "?";
+  redirect(mesaj ? `${yol}${ayrac}mesaj=${encodeURIComponent(mesaj)}` : yol);
+}
+
 // ---- Proje oluştur ----
+const INSAAT_ASAMA = [
+  "planlama",
+  "temel",
+  "kaba_insaat",
+  "ince_insaat",
+  "cevre_duzenleme",
+  "tamamlandi",
+] as const;
+
 const projeSemasi = z.object({
   ad: z.string().trim().min(2, "Proje adı en az 2 karakter olmalı"),
   il: z.string().trim().optional(),
@@ -43,7 +73,9 @@ const projeSemasi = z.object({
   mahalle: z.string().trim().optional(),
   ada: z.string().trim().optional(),
   parsel: z.string().trim().optional(),
+  baslama_tarihi: z.string().trim().optional(),
   teslim_tarihi: z.string().trim().optional(),
+  insaat_asamasi: z.enum(INSAAT_ASAMA).optional(),
 });
 
 export async function projeOlustur(formData: FormData) {
@@ -53,7 +85,18 @@ export async function projeOlustur(formData: FormData) {
     hataya("/uretici", "Üretici kaydı bulunamadı — proje oluşturmak için 'uretici' rolüyle giriş yapın.");
   }
 
-  const sonuc = projeSemasi.safeParse(Object.fromEntries(formData));
+  // geri_yol gibi kontrol alanlarını şema dışında tut.
+  const sonuc = projeSemasi.safeParse({
+    ad: formData.get("ad"),
+    il: formData.get("il") ?? undefined,
+    ilce: formData.get("ilce") ?? undefined,
+    mahalle: formData.get("mahalle") ?? undefined,
+    ada: formData.get("ada") ?? undefined,
+    parsel: formData.get("parsel") ?? undefined,
+    baslama_tarihi: formData.get("baslama_tarihi") ?? undefined,
+    teslim_tarihi: formData.get("teslim_tarihi") ?? undefined,
+    insaat_asamasi: (formData.get("insaat_asamasi") || undefined) as string | undefined,
+  });
   if (!sonuc.success) hataya("/uretici/proje/yeni", sonuc.error.issues[0].message);
   const d = sonuc.data;
 
@@ -67,13 +110,21 @@ export async function projeOlustur(formData: FormData) {
       mahalle: d.mahalle || null,
       ada: d.ada || null,
       parsel: d.parsel || null,
+      baslama_tarihi: d.baslama_tarihi || null,
       teslim_tarihi: d.teslim_tarihi || null,
+      insaat_asamasi: d.insaat_asamasi || "planlama",
     })
     .select("id")
     .single();
   if (error) hataya("/uretici/proje/yeni", error.message);
 
   revalidatePath("/uretici");
+  // Wizard akışı: geri_yol verilmişse oraya (id'yi enjekte ederek) yönlen; yoksa KURULUM'a düş.
+  const ham = String(formData.get("geri_yol") ?? "").trim();
+  if (ham.startsWith("/uretici/")) {
+    const yol = ham.replace(/__ID__/g, proje!.id);
+    redirect(yol);
+  }
   // Proje açılır açılmaz KURULUM'a düş: künye/imar + kapak + tanıtım envanteri + belgeler.
   redirect(`/uretici/proje/${proje!.id}/kurulum`);
 }
@@ -91,7 +142,7 @@ export async function blokEkle(formData: FormData) {
   if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}/kurulum`);
+  basariya(`/uretici/proje/${proje_id}/kurulum`, formData);
 }
 
 // ---- Blok düzelt ----
@@ -129,7 +180,7 @@ export async function blokSil(formData: FormData) {
   const { error } = await supabase.from("blok").delete().eq("id", blok_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Blok silindi")}`);
+  basariya(`/uretici/proje/${proje_id}`, formData, "Blok silindi");
 }
 
 // ---- Daire tipi ekle ----
@@ -154,7 +205,7 @@ export async function daireTipiEkle(formData: FormData) {
   if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}/kurulum`);
+  basariya(`/uretici/proje/${proje_id}/kurulum`, formData);
 }
 
 // ---- Daire tipi düzelt ----
@@ -189,7 +240,7 @@ export async function tipSil(formData: FormData) {
   const { error } = await supabase.from("daire_tipi").delete().eq("id", tip_id);
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent("Daire tipi silindi")}`);
+  basariya(`/uretici/proje/${proje_id}`, formData, "Daire tipi silindi");
 }
 
 // ---- Daire tipi plan görseli yükle (daire_tipi.plan_url; daireye basınca modalda görünür) ----
@@ -290,7 +341,7 @@ export async function birimGenerator(formData: FormData) {
   if (error) hataya(`/uretici/proje/${proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
   const mesaj = `${birimler.length} birim üretildi${atlanan ? ` · ${atlanan} mevcut atlandı` : ""}`;
-  redirect(`/uretici/proje/${proje_id}?mesaj=${encodeURIComponent(mesaj)}`);
+  basariya(`/uretici/proje/${proje_id}`, formData, mesaj);
 }
 
 // ---- Birim durum güncelle (ızgaradan tek tık) ----
@@ -589,7 +640,7 @@ export async function tahsisEkle(formData: FormData) {
   });
   if (error) hataya(`/uretici/proje/${d.proje_id}`, error.message);
   revalidatePath(`/uretici/proje/${d.proje_id}`);
-  redirect(`/uretici/proje/${d.proje_id}?mesaj=${encodeURIComponent("Tahsis eklendi")}`);
+  basariya(`/uretici/proje/${d.proje_id}`, formData, "Tahsis eklendi");
 }
 
 export async function tahsisSil(formData: FormData) {
@@ -663,7 +714,7 @@ export async function medyaYukle(formData: FormData) {
     const { error } = await admin.from("proje_belge").insert({ proje_id, tip, ad: ad0 || url, url });
     if (error) hataya(geri, error.message);
     revalidatePath(geri);
-    redirect(`${geri}?mesaj=${encodeURIComponent("Eklendi")}`);
+    basariya(geri, formData, "Eklendi");
   }
 
   // Kapak tekildir → eski kapağı (dosya + kayıt) temizle
@@ -697,7 +748,7 @@ export async function medyaYukle(formData: FormData) {
 
   revalidatePath(geri);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`${geri}?mesaj=${encodeURIComponent("Yüklendi")}`);
+  basariya(geri, formData, "Yüklendi");
 }
 
 export async function medyaSil(formData: FormData) {
@@ -768,7 +819,7 @@ export async function projeKunyeGuncelle(formData: FormData) {
   if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}`);
   revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
-  redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Künye güncellendi")}`);
+  basariya(`/uretici/proje/${proje_id}/kurulum`, formData, "Künye güncellendi");
 }
 
 // ── Yatırım & Yabancı Alıcı (Connject paritesi: para birimi + golden vize/oturum + kira getirisi/amortisman) ──
@@ -794,7 +845,7 @@ export async function projeYatirimGuncelle(formData: FormData) {
   if (error) hataya(`/uretici/proje/${proje_id}/kurulum`, error.message);
   revalidatePath(`/uretici/proje/${proje_id}/kurulum`);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`/uretici/proje/${proje_id}/kurulum?mesaj=${encodeURIComponent("Yatırım bilgileri kaydedildi")}`);
+  basariya(`/uretici/proje/${proje_id}/kurulum`, formData, "Yatırım bilgileri kaydedildi");
 }
 
 // ── Ödeme Planı (proje şablonu → tüm birimlere uygulanır; aylık taksit UI'da fiyattan hesaplanır) ──
@@ -815,7 +866,7 @@ export async function projeOdemePlaniGuncelle(formData: FormData) {
   if (!(await projeSahibiMi(supabase, proje_id))) hataya("/uretici", "Bu projeye erişim yok");
   // Boş submit = kazara tüm planları silme; no-op uyarısı.
   if (pesinat_pct == null && taksit_sayisi == null) {
-    redirect(`${geri}?mesaj=${encodeURIComponent("Ödeme planı için en az peşinat % veya taksit sayısı girin")}`);
+    basariya(geri, formData, "Ödeme planı için en az peşinat % veya taksit sayısı girin");
   }
 
   const plan = { pesinat_pct, taksit_sayisi, vade_farki_pct, ara_odemeler: [] as { ay: number; pct: number }[] };
@@ -826,7 +877,7 @@ export async function projeOdemePlaniGuncelle(formData: FormData) {
   if (error) hataya(geri, `Ödeme planı kaydedilemedi (migration çalıştı mı?): ${error.message}`);
   revalidatePath(geri);
   revalidatePath(`/uretici/proje/${proje_id}`);
-  redirect(`${geri}?mesaj=${encodeURIComponent("Ödeme planı tüm birimlere uygulandı")}`);
+  basariya(geri, formData, "Ödeme planı tüm birimlere uygulandı");
 }
 
 // ── Mahal Listesi (proje teslim standardı: her mahal için zemin/duvar/tavan) ──
