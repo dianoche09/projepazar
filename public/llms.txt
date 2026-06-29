@@ -1,0 +1,73 @@
+# ProjePazar
+
+> Proje sahipleri ile gayrimenkul danışmanlarını canlı, doğru veriyle buluşturan kapalı bir B2B konut stoğu dağıtım ağı. İlan portalı değildir. Proje sahibi stoğunu, fiyatını ve dağıtımını tek noktadan yönetir; gayrimenkul danışmanı canlı havuzdaki projeleri doğru fiyatla müşterisine paylaşır. Komisyon yok; danışmana ücretsiz.
+
+## Hakkında
+
+ProjePazar, Türkiye'de konut projelerinin satış ve dağıtımındaki en büyük sorunu çözer: dağınık, eski ve kontrolsüz bilgi. Bir konut projesinin fiyatı, hangi dairenin satılık, hangisinin opsiyonda olduğu bilgisi genelde Excel dosyaları, eski PDF'ler ve WhatsApp mesajları arasında kaybolur. Sonuç: yanlış fiyat, eksik bilgi, çift satış ve güven kaybı.
+
+ProjePazar bunu "tek doğru kaynak" ilkesiyle çözer. Fiyat ve durum yalnız tek bir birim kaydında tutulur; hiçbir yerde kopyalanmaz. Bir gayrimenkul danışmanı bir daireyi müşterisine paylaştığında, fiyat o anki canlı değerden basılır. Bir daire opsiyona alındığında, çift-satış kalkanı veritabanı seviyesinde kilitler. Her veride "● X önce" tazelik damgası bulunur; bilgi bayatladıkça rozet renk değiştirir.
+
+- Website: https://projepazar.vercel.app
+- Platform: Web + PWA (mobil-önce, telefona kurulabilir, çevrimdışına dayanıklı)
+- Kategori: Proptech / B2B konut stoğu dağıtım ağı
+- Model: Kapalı-devre, davetli B2B ağ. Son kullanıcıya açık ilan yok; paylaşım birebir/WhatsApp.
+- Fiyatlandırma: Komisyon alınmaz. Gayrimenkul danışmanı için başlangıçta tamamen ücretsiz.
+
+## Ana Sayfalar
+
+- [Ana sayfa](https://projepazar.vercel.app/) — ürünün tanıtımı, canlı havuz demosu, iki taraflı fayda, nasıl çalışır, SSS
+- [Kullanım Koşulları](https://projepazar.vercel.app/kullanim-kosullari)
+- [Gizlilik](https://projepazar.vercel.app/gizlilik)
+- [KVKK Aydınlatma](https://projepazar.vercel.app/kvkk-aydinlatma)
+
+## Temel Özellikler
+
+### Tek doğru kaynak
+- Fiyat ve durum yalnız birim kaydında tutulur, hiçbir yerde kopyalanmaz.
+- Paylaşımda fiyat o anki canlı değerden basılır; eski fiyat dolaşıma giremez.
+
+### Canlı stok ve durum
+- Her daire üç sinyalden biriyle işaretlidir: müsait (yeşil), opsiyon (amber), satıldı (kırmızı).
+- Bina kesiti, tablo ve mini-panel görünümleriyle tüm stok tek ekranda canlı.
+
+### Granüler tahsis (opsiyonel)
+- Gayrimenkul danışmanı canlı havuzdaki projeleri görür.
+- Proje sahibi isterse belirli daireleri veya projeleri yalnız seçtiği danışmanlara özel açar.
+
+### Çift-satış kalkanı
+- Aktif opsiyon veritabanı seviyesinde kilitlenir; aynı daire iki danışmana aynı anda satılamaz.
+
+### Görünür tazelik
+- Her güncelleme zaman damgalıdır; "● X önce" rozeti bilgi bayatladıkça renk değiştirir.
+
+### Canlı komuta merkezi
+- Bir daire opsiyonlandığında, fiyat değiştiğinde veya satış kapandığında herkes aynı anda görür.
+
+## Kimler İçin
+
+- **Proje sahibi (konut projesi geliştiren):** Stoğunu, fiyatını ve kimin neyi göreceğini tek panelden yönetir; yüzlerce danışmana tek noktadan ulaşır; markası yanlış bilgiyle yıpranmaz; satışı canlı izler.
+- **Gayrimenkul danışmanı (emlakçı):** Canlı havuzdaki projeleri görür, doğru fiyatla tek dokunuşla müşterisine paylaşır; eski fiyatla rezil olmaz; başlangıçta tamamen ücretsiz.
+- **Ofis / franchise:** Ekip erişimini ve portföyünü tek yerden yönetir.
+
+## Farklılıklar (dağınık portal / Excel / WhatsApp yerine)
+
+- İlan portalı değil, kapalı B2B güven protokolü.
+- Fiyat tek kaynakta; üç farklı yerde üç farklı fiyat olmaz.
+- Çift-satış veritabanı seviyesinde engellenir.
+- Tazelik her zaman görünür; eski veri belli olur.
+- Tahsis proje sahibinde; kimin neyi gördüğünü proje sahibi belirler.
+
+## Sık Sorulan Sorular
+
+- **ProjePazar bir ilan portalı mı?** Hayır. Proje sahipleri ile gayrimenkul danışmanlarını canlı ve doğru veriyle buluşturan kapalı bir B2B ağdır. Son kullanıcıya açık ilan yoktur; paylaşım birebir/WhatsApp ile yapılır.
+- **Gayrimenkul danışmanı için ücretli mi?** Başlangıçta tamamen ücretsizdir ve hiçbir satıştan komisyon alınmaz.
+- **Danışman hangi projeleri görür?** Canlı havuzdaki projeleri görür. Proje sahibi isterse belirli daireleri yalnız seçtiği danışmanlara özel açabilir.
+- **Fiyatlar nasıl güncel kalıyor?** Fiyat yalnız birim kaydında tutulur; paylaşımda o anki canlı değerden basılır, böylece eski fiyat dolaşamaz.
+- **Aynı daire iki danışmana satılabilir mi?** Hayır. Aktif opsiyon veritabanı seviyesinde kilitlenir (çift-satış kalkanı).
+- **Proje sahibi neyi kontrol eder?** Stoğunu, fiyatını ve kimin neyi göreceğini tek panelden yönetir; satışı canlı izler.
+- **Mobilde çalışır mı?** Evet. Mobil-önce bir PWA'dır; telefona kurulabilir, sahada hızlı ve çevrimdışına dayanıklı çalışır.
+
+## Yasal Uyarı
+
+ProjePazar satışa aracılık yapmaz ve satıştan komisyon almaz. Kapalı-devre, davetli bir B2B altyapısıdır. Son kullanıcıya açık ilan yayınlamaz.

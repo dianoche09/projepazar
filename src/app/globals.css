@@ -670,3 +670,192 @@ a:focus-visible,
     margin: 14mm;
   }
 }
+
+/* =========================================================
+   LANDING (anasayfa) — hero canlılık + interaktif panel
+   ========================================================= */
+
+/* hareketli aurora ışıma — açık zeminde subtle */
+@keyframes auroraMove {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(3%, -2.5%) scale(1.06); }
+  66% { transform: translate(-2.5%, 2%) scale(0.97); }
+}
+.hero-aurora {
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(34% 30% at 20% 24%, rgba(30, 155, 138, 0.16), transparent 62%),
+    radial-gradient(30% 28% at 82% 78%, rgba(47, 179, 107, 0.12), transparent 62%),
+    radial-gradient(40% 38% at 64% 6%, rgba(19, 49, 75, 0.09), transparent 62%);
+  filter: blur(10px);
+  animation: auroraMove 22s ease-in-out infinite;
+}
+
+/* yanıp sönen sinyal noktaları — panel tarafına maskeli (sol metin temiz) */
+.hero-dots {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(18, 1fr);
+  grid-auto-rows: 34px;
+  padding: 16px;
+  -webkit-mask-image: radial-gradient(85% 95% at 88% 34%, #000 22%, transparent 64%);
+  mask-image: radial-gradient(85% 95% at 88% 34%, #000 22%, transparent 64%);
+}
+.hero-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  justify-self: center;
+  align-self: center;
+  opacity: 0.1;
+}
+@keyframes sinyalPulse {
+  0%, 100% { opacity: 0.07; transform: scale(0.65); }
+  50% { opacity: 0.8; transform: scale(1); }
+}
+.hero-dots i.on { animation: sinyalPulse 3.4s ease-in-out infinite; }
+
+/* hero panel görünüm geçişi (kesit <-> daire detayı) */
+.pview { transition: opacity 0.35s ease, transform 0.35s ease; }
+.pview.gizli {
+  opacity: 0;
+  transform: translateX(-8px);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* tap halkası (daireye dokunma sinyali) */
+@keyframes tapRing {
+  0% { opacity: 0.9; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+.lhucre .tap {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  opacity: 0;
+}
+.lhucre.tapping .tap { animation: tapRing 0.6s ease-out; }
+
+/* paylaş toast (panel içi) */
+@keyframes toastUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.paylas-toast { opacity: 0; transform: translateY(12px); transition: 0.34s cubic-bezier(0.16, 1, 0.3, 1); }
+.paylas-toast.acik { opacity: 1; transform: translateY(0); }
+
+/* paylaş butonu vurgu */
+@keyframes btnFlash {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.95); box-shadow: 0 0 0 4px rgba(30, 155, 138, 0.25); }
+}
+.btn-flash { animation: btnFlash 0.5s ease; }
+
+/* V2 — animated gradient mesh (atmosfer, ölçülü) */
+@keyframes meshKay {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2.5%, -3%) scale(1.06); }
+  66% { transform: translate(-2%, 2.5%) scale(0.97); }
+}
+.mesh {
+  position: absolute;
+  inset: -22%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 34% at 18% 28%, rgba(30, 155, 138, 0.13), transparent 62%),
+    radial-gradient(32% 30% at 82% 22%, rgba(47, 179, 107, 0.10), transparent 62%),
+    radial-gradient(44% 40% at 62% 92%, rgba(19, 49, 75, 0.08), transparent 62%);
+  filter: blur(36px);
+  animation: meshKay 24s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mesh { animation: none; }
+}
+
+/* V2 — ince glass yüzey (sticky nav / floating kart) */
+.glass-v2 {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--golge-2);
+}
+
+/* V2 — bento hücre hover lift */
+.bento {
+  transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.bento:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--golge-3);
+}
+
+/* SSS açılır detay oku */
+.sss-item summary { list-style: none; cursor: pointer; }
+.sss-item summary::-webkit-details-marker { display: none; }
+.sss-item summary .ok { transition: transform 0.22s ease; }
+.sss-item[open] summary .ok { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aurora, .hero-dots i.on { animation: none !important; }
+}
+
+/* scroll-reveal — bölümler/kartlar görünürken belirir */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.gor {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Canlı Komuta Merkezi — koyu Bloomberg-vari zemin */
+.komuta {
+  background:
+    radial-gradient(1000px 520px at 82% -12%, rgba(30, 155, 138, 0.20), transparent 60%),
+    radial-gradient(820px 440px at -4% 112%, rgba(47, 179, 107, 0.12), transparent 55%),
+    linear-gradient(165deg, #0a1b2c 0%, #0d2438 52%, #102a44 100%);
+}
+.komuta-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+/* akan olay satırı */
+@keyframes olayGir {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.olay-gir { animation: olayGir 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* canlı veri "tarama" çizgisi (terminal hissi) */
+@keyframes tarama {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(420%); opacity: 0; }
+}
+.tarama-cizgi { animation: tarama 4.5s linear infinite; }
+
+/* sayaç şeridi ayraç */
+.sayac-ayrac { background: linear-gradient(180deg, transparent, var(--cizgi-2), transparent); }
+
+/* canlı havuz görünüm geçişi */
+.havuz-view { transition: opacity 0.3s ease; }
+.havuz-view.gizli { display: none; }
