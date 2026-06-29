@@ -30,7 +30,17 @@ type BirimRaw = {
   son_guncelleme: string | null;
 };
 
-export default async function UreticiStok() {
+export default async function UreticiStok({
+  searchParams,
+}: {
+  searchParams: Promise<{ durum?: string }>;
+}) {
+  const sp = await searchParams;
+  const baslangicDurum = (["musait", "opsiyon", "satildi"].includes(sp.durum ?? "") ? sp.durum : "tumu") as
+    | "musait"
+    | "opsiyon"
+    | "satildi"
+    | "tumu";
   const supabase = await createClient();
 
   const [{ data: projeler }, { data: birimRaw }, { data: bloklar }, { data: tipler }] =
@@ -146,7 +156,7 @@ export default async function UreticiStok() {
         </div>
       </section>
 
-      <StokTablo satirlar={satirlar} projeler={projeFiltre} kiraVar={kiraVar} />
+      <StokTablo satirlar={satirlar} projeler={projeFiltre} kiraVar={kiraVar} baslangicDurum={baslangicDurum} />
     </div>
   );
 }

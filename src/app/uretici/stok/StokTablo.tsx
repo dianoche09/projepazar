@@ -84,14 +84,16 @@ export function StokTablo({
   satirlar,
   projeler,
   kiraVar,
+  baslangicDurum = "tumu",
 }: {
   satirlar: StokSatir[];
   projeler: ProjeFiltre[];
   kiraVar: boolean;
+  baslangicDurum?: DurumKova | "tumu";
 }) {
   const router = useRouter();
   const [projeId, setProjeId] = useState<string>("tumu");
-  const [durum, setDurum] = useState<DurumKova | "tumu">("tumu");
+  const [durum, setDurum] = useState<DurumKova | "tumu">(baslangicDurum);
   // "Yönet" → açık daire modalı (satır + projesi). null = kapalı.
   const [acikSatir, setAcikSatir] = useState<StokSatir | null>(null);
 

@@ -383,11 +383,11 @@ export default async function UreticiKokpit() {
                 </span>
               </div>
               <div className="ml-auto flex items-center gap-1.5">
-                <Link href="/uretici/stok" className="chip h-8 px-3 text-[12px]">
+                <Link href="/uretici/stok?durum=musait" className="chip h-8 px-3 text-[12px]">
                   <span className="size-[7px] rounded-full bg-green" />
                   Müsait
                 </Link>
-                <Link href="/uretici/stok" className="chip h-8 px-3 text-[12px]">
+                <Link href="/uretici/stok?durum=opsiyon" className="chip h-8 px-3 text-[12px]">
                   <span className="size-[7px] rounded-full bg-amber" />
                   Opsiyon
                 </Link>

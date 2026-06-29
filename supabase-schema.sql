@@ -1,6 +1,16 @@
 -- ProjePazar — Supabase şema + RLS (MVP)
 -- Uygula: supabase migration / MCP apply_migration. RLS her tabloda açık.
 -- NOT: WhatsApp serbest-metin yazma YOK (Faz 2). Stok girişi panel/concierge.
+--
+-- ⚠️ BU DOSYA TEK BAŞINA GÜNCEL DEĞİL — kod aşağıdaki db/ migration'larının kolon/fonksiyonlarını
+--    kullanır; SIRAYLA bunlar da uygulanmış olmalı (canlıda uygulandı, ana şemaya merge bekliyor):
+--      db/2026-06-17_daire-tipi-detay.sql        (daire_tipi: banyo/balkon/otopark)
+--      db/2026-06-17_mahal-listesi.sql           (mahal tablosu + RLS)
+--      db/2026-06-17_birim-realtime.sql          (birim realtime publication)
+--      db/2026-06-17_proje-medya-storage.sql     (storage bucket + policy)
+--      db/2026-06-28_odeme-plani.sql             (birim.odeme_plani)
+--      db/2026-06-29_opsiyon-talep-onay.sql      (opsiyon talep→onay RPC + RLS admin-only + mahal.marka)
+--      db/2026-06-29b_opsiyon-talep-saglamlik.sql (bekleyen-talep unique index + onay FOR UPDATE)
 
 -- =========================================================
 -- ENUMS
