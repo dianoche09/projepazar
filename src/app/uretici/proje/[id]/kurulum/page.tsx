@@ -216,23 +216,13 @@ export default async function ProjeKurulum({
         </form>
       </Bolum>
 
-      {/* Yatırım & Yabancı Alıcı */}
-      <Bolum baslik="Yatırım & Yabancı Alıcı" aciklama="Para birimi, golden vize/oturum uygunluğu, kira getirisi — yabancı yatırımcı havuzunda filtrelenir.">
+      {/* Yatırım — Faz-1 yurtiçi (para birimi TRY; golden vize/oturum Faz-2) */}
+      <Bolum baslik="Yatırım" aciklama="Yıllık kira getirisi ve geri dönüş süresi — yurtiçi yatırımcı için havuzda gösterilir.">
         <form action={projeYatirimGuncelle} className="grid gap-2 sm:grid-cols-2">
           <input type="hidden" name="proje_id" value={id} />
-          <select name="para_birimi" defaultValue={proje.para_birimi ?? "TRY"} className={inpCls}>
-            <option value="TRY">₺ Türk Lirası</option>
-            <option value="USD">$ Amerikan Doları</option>
-            <option value="EUR">€ Euro</option>
-            <option value="GBP">£ Sterlin</option>
-            <option value="AED">AED Dirhem</option>
-          </select>
+          <input type="hidden" name="para_birimi" value="TRY" />
           <input name="kira_getirisi_pct" type="number" step="0.1" defaultValue={proje.kira_getirisi_pct ?? ""} placeholder="Yıllık kira getirisi %" className={inpCls} />
           <input name="amortisman_yil" type="number" step="0.1" defaultValue={proje.amortisman_yil ?? ""} placeholder="Yatırım geri dönüş süresi (yıl)" className={inpCls} />
-          <input name="golden_visa_esik" type="number" defaultValue={proje.golden_visa_esik ?? ""} placeholder="Golden vize eşiği (tutar; boş = uygun değil)" className={inpCls} />
-          <label className="flex items-center gap-2 text-sm text-ink sm:col-span-2">
-            <input type="checkbox" name="oturum_uygun" defaultChecked={!!proje.oturum_uygun} className="size-4" /> Oturum izni başvurusuna uygun
-          </label>
           <div className="sm:col-span-2"><SubmitButton>Yatırım bilgilerini kaydet</SubmitButton></div>
         </form>
       </Bolum>
