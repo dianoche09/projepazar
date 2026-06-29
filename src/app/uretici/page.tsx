@@ -129,33 +129,8 @@ export default async function UreticiKokpit() {
   // — Stok dağılım barı (% genişlik) —
   const w = (n: number) => (toplamBirim ? (n / toplamBirim) * 100 : 0);
 
-  // — En çok birimi olan proje + bloğu (Bina Kesiti için) —
+  // — En çok birimi olan proje (stok tablosu "tümünü gör" hedefi) —
   const enBuyukProje = [...ozet.entries()].sort((a, b) => b[1].toplam - a[1].toplam)[0]?.[0] ?? null;
-  const projeBirimleri = enBuyukProje ? birimler.filter((b) => b.proje_id === enBuyukProje) : [];
-  const blokSayac = new Map<string, number>();
-  for (const b of projeBirimleri) {
-    if (b.blok_id) blokSayac.set(b.blok_id, (blokSayac.get(b.blok_id) ?? 0) + 1);
-  }
-  const enBuyukBlok = [...blokSayac.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
-  const kesitBirimleri = enBuyukBlok
-    ? projeBirimleri.filter((b) => b.blok_id === enBuyukBlok)
-    : projeBirimleri.filter((b) => b.blok_id == null).slice(0, 24);
-
-  // kat → birimler (üstten alta)
-  const katSet = [
-    ...new Set(kesitBirimleri.map((b) => b.kat).filter((k): k is number => k != null)),
-  ].sort((a, b) => b - a);
-  const katlar = katSet.map((kat) => ({
-    kat,
-    birimler: kesitBirimleri
-      .filter((b) => b.kat === kat)
-      .sort((a, b) => (a.daire_no ?? "").localeCompare(b.daire_no ?? "")),
-  }));
-
-  // seçili daire (kesitteki ilk müsait, yoksa ilk birim)
-  const secili =
-    kesitBirimleri.find((b) => kova(b.durum) === "musait") ?? kesitBirimleri[0] ?? null;
-  const seciliKova = secili ? kova(secili.durum) : "musait";
 
   // — Talep Radarı (gerçek stok metrikleri; uydurma sayı YOK) —
   const eskiBirimSay = birimler.filter((b) => tazelik(b.son_guncelleme).gun > 15).length;
@@ -267,10 +242,10 @@ export default async function UreticiKokpit() {
 
       {/* ===================== ANA GRID ===================== */}
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
-        {/* ============ SOL: PROJELER + TABLO ============ */}
+        {/* ============ SOL: PROJE KARTLARI ============ */}
         <div className="flex min-w-0 flex-col gap-5">
-          {/* proje kartları */}
-          <div className="belir belir-2 grid grid-cols-1 gap-4 xl:grid-cols-2">
+          {/* proje kartları — en fazla 3 yanyana */}
+          <div className="belir belir-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {(projeler ?? []).map((p) => {
               const o = ozet.get(p.id) ?? { toplam: 0, musait: 0, opsiyon: 0, satildi: 0 };
               const t = tazelik(p.son_guncelleme);
@@ -372,9 +347,89 @@ export default async function UreticiKokpit() {
               </div>
             ) : null}
           </div>
+        </div>
 
-          {/* DETAYLI STOK TABLOSU (başrol) */}
-          <div className="kart belir belir-3 overflow-hidden">
+        {/* ============ SAĞ RAIL ============ */}
+        <div className="flex min-w-0 flex-col gap-5">
+          {/* TALEP RADARI — gerçek stok içgörüleri */}
+          <div className="kart belir belir-3 p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <svg width="17" height="17" className="text-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              <h2 className="font-display text-[15px] font-bold text-ink">Talep Radarı</h2>
+              <span className="ml-auto rounded-md bg-teal-soft px-2 py-[2px] text-[10.5px] font-semibold text-teal">stoktan</span>
+            </div>
+
+            <div className="flex flex-col gap-2.5">
+              {opsiyon > 0 ? (
+                <Insight renk="var(--color-amber)">
+                  <span className="mono flex-none text-[15px] font-bold text-amber">{opsiyon}</span>
+                  <p className="text-[12.5px] leading-snug text-ink-soft">
+                    <b className="text-ink">aktif opsiyon</b> karar bekliyor — teyit/serbest bırakma için takip et.
+                  </p>
+                </Insight>
+              ) : null}
+
+              {enCokMusaitAd ? (
+                <Insight renk="var(--color-green)">
+                  <span className="mono flex-none text-[15px] font-bold text-green">{enCokMusaitN}</span>
+                  <p className="text-[12.5px] leading-snug text-ink-soft">
+                    En çok müsait stok <b className="text-ink">{enCokMusaitAd}</b> — paylaşıma en hazır proje.
+                  </p>
+                </Insight>
+              ) : null}
+
+              {eskiBirimSay > 0 ? (
+                <Insight renk="var(--color-red)">
+                  <svg width="16" height="16" className="mt-[2px] flex-none text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 8v4l3 2" />
+                    <circle cx="12" cy="12" r="9" />
+                  </svg>
+                  <p className="text-[12.5px] leading-snug text-ink-soft">
+                    <b className="mono text-ink">{eskiBirimSay} birim</b> 15 günden eski — fiyat/durum tazelenmesi öneriliyor.
+                  </p>
+                </Insight>
+              ) : null}
+
+              {opsiyon === 0 && eskiBirimSay === 0 && !enCokMusaitAd ? (
+                <p className="rounded-[12px] bg-navy-soft px-3 py-4 text-center text-[12px] text-[var(--ink-faint)]">
+                  Stok eklendikçe içgörüler burada belirir.
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          {/* MÜŞTERİ SORGULA */}
+          <div className="kart belir belir-4 p-4">
+            <div className="mb-1.5 flex items-center gap-2">
+              <svg width="17" height="17" className="text-navy" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <h2 className="font-display text-[15px] font-bold text-ink">Müşteri Sorgula</h2>
+            </div>
+            <p className="mb-3 text-[11.5px] text-[var(--ink-faint)]">
+              Telefon / TCKN ile çift-satış ve mevcut opsiyon kontrolü. Lead sana otomatik akmaz — yalnız sorgu.
+            </p>
+            <Link href="/uretici/lead-sorgu" className="btn-primary h-[44px] w-full justify-center">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              Sorgula
+            </Link>
+            <div className="mt-3 flex items-center gap-2 border-t border-[var(--cizgi)] pt-3 text-[11px] text-[var(--ink-faint)]">
+              <svg width="13" height="13" className="text-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              Sorgu kayıt altına alınır · güven protokolü
+            </div>
+          </div>
+        </div>
+
+        {/* ============ STOK TABLOSU — FULL WIDTH (row 2) ============ */}
+        <div className="kart belir belir-3 overflow-hidden lg:col-span-2">
             <div className="flex flex-wrap items-center gap-3 border-b border-[var(--cizgi)] px-5 py-3.5">
               <div className="flex items-center gap-2">
                 <h2 className="font-display text-[16px] font-bold text-ink">Stok Tablosu</h2>
@@ -494,169 +549,6 @@ export default async function UreticiKokpit() {
           </div>
         </div>
 
-        {/* ============ SAĞ RAIL ============ */}
-        <div className="flex min-w-0 flex-col gap-5">
-          {/* BİNA KESİTİ (kompakt) */}
-          <div className="kart belir belir-2 signal-top p-4" style={{ ["--_sig" as string]: "var(--color-teal)" }}>
-            <div className="mb-1 flex items-center justify-between">
-              <div>
-                <h2 className="font-display text-[15px] font-bold text-ink">Bina Kesiti</h2>
-                <div className="text-[11px] text-[var(--ink-faint)]">
-                  {enBuyukProje ? projeAd.get(enBuyukProje) : "—"}
-                  {enBuyukBlok ? ` · ${blokAd.get(enBuyukBlok) ?? ""} Blok` : ""}
-                </div>
-              </div>
-              <span className={`taze ${sonSenkron.sinif}`}>
-                <span className="nokta" />
-                <span className="mono">{sonSenkron.metin}</span>
-              </span>
-            </div>
-
-            {katlar.length === 0 ? (
-              <p className="mt-3 rounded-xl border border-dashed border-hair bg-card/50 p-4 text-sm text-[var(--ink-faint)]">
-                Bu projede kesit için birim yok.
-              </p>
-            ) : (
-              <div className="mt-3 max-h-[380px] space-y-[5px] overflow-y-auto pr-1">
-                {katlar.map(({ kat, birimler: kb }) => (
-                  <div key={kat} className="flex items-center gap-[5px]">
-                    <span className="mono w-6 shrink-0 text-right text-[10px] text-[var(--ink-faint)]">K{kat}</span>
-                    <div className="grid flex-1 gap-[5px]" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(40px, 1fr))" }}>
-                      {kb.map((b) => {
-                        const k = kova(b.durum);
-                        const hSinif =
-                          k === "musait" ? "h-musait" : k === "opsiyon" ? "h-opsiyon" : k === "satildi" ? "h-satildi" : "h-bos";
-                        return (
-                          <div key={`${b.daire_no}-${b.kat}`} className={`hucre ${hSinif}`}>
-                            <span className="font-semibold">{b.daire_no ?? "—"}</span>
-                            <span style={{ opacity: 0.85 }}>{tipOda.get(b.tip_id ?? "") ?? "—"}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* seçili daire özeti */}
-            {secili ? (
-              <div className="mt-3.5 rounded-[12px] bg-navy-soft p-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={`durum ${DURUM_SINIF[seciliKova]}`}>
-                      <span className="nokta" />
-                      {DURUM_AD[seciliKova]}
-                    </span>
-                    <span className="mono text-[13px] font-semibold text-ink">
-                      {secili.daire_no ?? "—"} · {tipOda.get(secili.tip_id ?? "") ?? "—"}
-                    </span>
-                  </div>
-                  <span className="mono text-[14px] font-semibold text-ink">
-                    {secili.liste_fiyati ? paraKisa(secili.liste_fiyati, secili.para_birimi) : "—"}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center gap-3 text-[11px] text-[var(--ink-faint)]">
-                  <span>
-                    Net{" "}
-                    <b className="mono text-ink-soft">
-                      {(secili.net_m2 ?? tipNet.get(secili.tip_id ?? "")) ?? "—"} m²
-                    </b>
-                  </span>
-                  <span className={`taze ${tazelik(secili.son_guncelleme).sinif}`}>
-                    <span className="nokta" />
-                    <span className="mono">{tazelik(secili.son_guncelleme).metin}</span>
-                  </span>
-                </div>
-              </div>
-            ) : null}
-
-            {/* lejant */}
-            <div className="mt-3 flex items-center gap-4 text-[10.5px] text-[var(--ink-faint)]">
-              <LejantMini renk="var(--color-green)" etiket="Müsait" />
-              <LejantMini renk="var(--color-amber)" etiket="Opsiyon" />
-              <LejantMini renk="var(--color-red)" etiket="Satıldı" />
-            </div>
-          </div>
-
-          {/* TALEP RADARI — gerçek stok içgörüleri */}
-          <div className="kart belir belir-3 p-4">
-            <div className="mb-3 flex items-center gap-2">
-              <svg width="17" height="17" className="text-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-              </svg>
-              <h2 className="font-display text-[15px] font-bold text-ink">Talep Radarı</h2>
-              <span className="ml-auto rounded-md bg-teal-soft px-2 py-[2px] text-[10.5px] font-semibold text-teal">stoktan</span>
-            </div>
-
-            <div className="flex flex-col gap-2.5">
-              {opsiyon > 0 ? (
-                <Insight renk="var(--color-amber)">
-                  <span className="mono flex-none text-[15px] font-bold text-amber">{opsiyon}</span>
-                  <p className="text-[12.5px] leading-snug text-ink-soft">
-                    <b className="text-ink">aktif opsiyon</b> karar bekliyor — teyit/serbest bırakma için takip et.
-                  </p>
-                </Insight>
-              ) : null}
-
-              {enCokMusaitAd ? (
-                <Insight renk="var(--color-green)">
-                  <span className="mono flex-none text-[15px] font-bold text-green">{enCokMusaitN}</span>
-                  <p className="text-[12.5px] leading-snug text-ink-soft">
-                    En çok müsait stok <b className="text-ink">{enCokMusaitAd}</b> — paylaşıma en hazır proje.
-                  </p>
-                </Insight>
-              ) : null}
-
-              {eskiBirimSay > 0 ? (
-                <Insight renk="var(--color-red)">
-                  <svg width="16" height="16" className="mt-[2px] flex-none text-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 8v4l3 2" />
-                    <circle cx="12" cy="12" r="9" />
-                  </svg>
-                  <p className="text-[12.5px] leading-snug text-ink-soft">
-                    <b className="mono text-ink">{eskiBirimSay} birim</b> 15 günden eski — fiyat/durum tazelenmesi öneriliyor.
-                  </p>
-                </Insight>
-              ) : null}
-
-              {opsiyon === 0 && eskiBirimSay === 0 && !enCokMusaitAd ? (
-                <p className="rounded-[12px] bg-navy-soft px-3 py-4 text-center text-[12px] text-[var(--ink-faint)]">
-                  Stok eklendikçe içgörüler burada belirir.
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          {/* MÜŞTERİ SORGULA */}
-          <div className="kart belir belir-4 p-4">
-            <div className="mb-1.5 flex items-center gap-2">
-              <svg width="17" height="17" className="text-navy" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <h2 className="font-display text-[15px] font-bold text-ink">Müşteri Sorgula</h2>
-            </div>
-            <p className="mb-3 text-[11.5px] text-[var(--ink-faint)]">
-              Telefon / TCKN ile çift-satış ve mevcut opsiyon kontrolü. Lead sana otomatik akmaz — yalnız sorgu.
-            </p>
-            <Link href="/uretici/lead-sorgu" className="btn-primary h-[44px] w-full justify-center">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              Sorgula
-            </Link>
-            <div className="mt-3 flex items-center gap-2 border-t border-[var(--cizgi)] pt-3 text-[11px] text-[var(--ink-faint)]">
-              <svg width="13" height="13" className="text-teal" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              Sorgu kayıt altına alınır · güven protokolü
-            </div>
-          </div>
-        </div>
-      </div>
-
       <footer className="mt-6 flex items-center gap-2 text-[11px] text-[var(--ink-faint)]">
         <span className="nabiz inline-block size-[6px] rounded-full bg-green" aria-hidden />
         ProjePazar · canlı konut stoğu dağıtım ağı · veriler gerçek zamanlı senkronlanır
@@ -704,15 +596,6 @@ function LejantPunto({ renk, etiket, deger }: { renk: string; etiket: string; de
         {etiket} <b className="mono">{deger}</b>
       </span>
     </div>
-  );
-}
-
-function LejantMini({ renk, etiket }: { renk: string; etiket: string }) {
-  return (
-    <span className="flex items-center gap-1.5">
-      <span className="size-2.5 rounded-[3px]" style={{ background: renk }} />
-      {etiket}
-    </span>
   );
 }
 

@@ -18,11 +18,15 @@ export function FavoriButton({
   const anahtar = `favori:${birim}`;
 
   useEffect(() => {
-    try {
-      setFavori(localStorage.getItem(anahtar) === "1");
-    } catch {
-      /* localStorage yok */
-    }
+    // setState'i effect gövdesinden çıkar (cascading-render lint kuralı) — rAF ile defer
+    const id = requestAnimationFrame(() => {
+      try {
+        setFavori(localStorage.getItem(anahtar) === "1");
+      } catch {
+        /* localStorage yok */
+      }
+    });
+    return () => cancelAnimationFrame(id);
   }, [anahtar]);
 
   function toggle() {
