@@ -603,11 +603,8 @@ export async function excelImport(formData: FormData) {
   );
 }
 
-// ── Tahsis (MOAT — granüler dağıtım: kim hangi kapsamı görür/satar) ──
-const tahsisSemasi = z.object({
-  proje_id: z.string().uuid(),
-  hedef_tip: z.enum(["herkes", "ofis", "danisman"]),
-  hedef_id: z.union([z.string().uuid(), z.literal("")]),
+// ── Tahsis (MOAT — granüler dağıtım) — ÇOKLU ALICI + daire-bazlı kapsam ──
+const TerimSemasi = z.object({
   komisyon_tip: z.enum(["yuzde", "sabit", "yok"]),
   komisyon_deger: z.coerce.number().nonnegative().nullable(),
   munhasir: z.boolean(),
@@ -617,58 +614,65 @@ const tahsisSemasi = z.object({
 
 export async function tahsisEkle(formData: FormData) {
   const proje_id = String(formData.get("proje_id"));
+  if (!z.string().uuid().safeParse(proje_id).success) hataya("/uretici", "Geçersiz proje");
+  const geri = `/uretici/proje/${proje_id}`;
+
+  // ALICILAR — çoklu emlakçı + çoklu ofis + herkes (her alıcı = ayrı tahsis satırı)
+  const uuidler = (k: string) =>
+    formData.getAll(k).map(String).filter((s) => z.string().uuid().safeParse(s).success);
+  const alicilar: { hedef_tip: "danisman" | "ofis" | "herkes"; hedef_id: string | null }[] = [
+    ...uuidler("emlakci_ids").map((id) => ({ hedef_tip: "danisman" as const, hedef_id: id })),
+    ...uuidler("ofis_ids").map((id) => ({ hedef_tip: "ofis" as const, hedef_id: id })),
+    ...(formData.get("herkes") === "on" ? [{ hedef_tip: "herkes" as const, hedef_id: null }] : []),
+  ];
+  if (alicilar.length === 0) hataya(geri, "En az bir alıcı (danışman/ofis/herkes) seç");
+
+  // ŞARTLAR (seçili tüm alıcılara aynı; farklı şart için ayrı kayıt yap)
   const komRaw = String(formData.get("komisyon_deger") ?? "").trim();
   const kotRaw = String(formData.get("kontenjan") ?? "").trim();
-  const parsed = tahsisSemasi.safeParse({
-    proje_id: formData.get("proje_id"),
-    hedef_tip: formData.get("hedef_tip"),
-    hedef_id: formData.get("hedef_id") ?? "",
+  const t = TerimSemasi.safeParse({
     komisyon_tip: formData.get("komisyon_tip") ?? "yuzde",
     komisyon_deger: komRaw === "" ? null : komRaw,
     munhasir: formData.get("munhasir") === "on",
     kontenjan: kotRaw === "" ? null : kotRaw,
     fiyat_gorunur: formData.get("fiyat_gorunur") === "on",
   });
-  if (!parsed.success) hataya(`/uretici/proje/${proje_id}`, "Geçersiz tahsis bilgisi");
-  const d = parsed.data;
-  if ((d.hedef_tip === "ofis" || d.hedef_tip === "danisman") && !d.hedef_id) {
-    hataya(
-      `/uretici/proje/${proje_id}`,
-      d.hedef_tip === "ofis" ? "Ofis tahsisinde ofis seçilmeli" : "Danışman tahsisinde danışman seçilmeli",
-    );
+  if (!t.success) hataya(geri, "Geçersiz şart bilgisi");
+  const terim = t.data;
+
+  // KAPSAM — kapsam_tip="belirli" ise blok/kat/tip/tür/DAİRE; "tum" ise boş = tüm proje
+  const kapsam: Record<string, string[]> = {};
+  if (String(formData.get("kapsam_tip")) === "belirli") {
+    const al = (k: string) => formData.getAll(k).map(String).filter(Boolean);
+    const bloklar = al("bloklar"), katlar = al("katlar"), tipler = al("tipler"), turler = al("turler"), birimler = al("birimler");
+    if (bloklar.length) kapsam.bloklar = bloklar;
+    if (katlar.length) kapsam.katlar = katlar;
+    if (tipler.length) kapsam.tipler = tipler;
+    if (turler.length) kapsam.turler = turler;
+    if (birimler.length) kapsam.birimler = birimler; // daire-bazlı (RLS emlakci_birim_gorebilir 2026-06-29d)
   }
 
-  // Granüler kapsam: blok × kat × tip × tür (boş = tüm proje). RLS emlakci_birim_gorebilir kontrol eder.
-  const bloklar = formData.getAll("bloklar").map(String).filter(Boolean);
-  const katlar = formData.getAll("katlar").map(String).filter(Boolean);
-  const tipler = formData.getAll("tipler").map(String).filter(Boolean);
-  const turler = formData.getAll("turler").map(String).filter(Boolean);
-  const kapsam: Record<string, string[]> = {};
-  if (bloklar.length) kapsam.bloklar = bloklar;
-  if (katlar.length) kapsam.katlar = katlar;
-  if (tipler.length) kapsam.tipler = tipler;
-  if (turler.length) kapsam.turler = turler;
-
-  // Erişim süresi (gün) → bitiş tarihi (boş = süresiz). Münhasır ayrı flag.
-  const sureRaw = String(formData.get("bitis_gun") ?? formData.get("munhasir_sure") ?? "").trim();
+  const sureRaw = String(formData.get("bitis_gun") ?? "").trim();
   const bitis = sureRaw ? new Date(Date.now() + Number(sureRaw) * 86_400_000).toISOString() : null;
 
   const supabase = await createClient();
-  const { error } = await supabase.from("tahsis").insert({
-    proje_id: d.proje_id,
-    hedef_tip: d.hedef_tip,
-    hedef_id: d.hedef_tip === "herkes" ? null : d.hedef_id || null,
-    kapsam,
-    komisyon_tip: d.komisyon_tip,
-    komisyon_deger: d.komisyon_deger,
-    munhasir: d.munhasir,
-    kontenjan: d.kontenjan,
-    fiyat_gorunur: d.fiyat_gorunur,
-    bitis,
-  });
-  if (error) hataya(`/uretici/proje/${d.proje_id}`, error.message);
-  revalidatePath(`/uretici/proje/${d.proje_id}`);
-  basariya(`/uretici/proje/${d.proje_id}`, formData, "Tahsis eklendi");
+  const { error } = await supabase.from("tahsis").insert(
+    alicilar.map((a) => ({
+      proje_id,
+      hedef_tip: a.hedef_tip,
+      hedef_id: a.hedef_id,
+      kapsam,
+      komisyon_tip: terim.komisyon_tip,
+      komisyon_deger: terim.komisyon_deger,
+      munhasir: terim.munhasir,
+      kontenjan: terim.kontenjan,
+      fiyat_gorunur: terim.fiyat_gorunur,
+      bitis,
+    })),
+  );
+  if (error) hataya(geri, error.message);
+  revalidatePath(geri);
+  basariya(geri, formData, `${alicilar.length} tahsis eklendi`);
 }
 
 export async function tahsisSil(formData: FormData) {

@@ -452,6 +452,7 @@ export function ProjeWizard({
             tipler={tipler.map((t) => ({ id: t.id, ad: t.ad, oda: t.oda }))}
             ofisler={ofisler}
             emlakcilar={emlakcilar}
+            birimler={[]}
             geriYol={geriYol(6)}
           />
           <p className="mt-3 text-xs text-gray">

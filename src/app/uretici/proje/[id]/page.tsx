@@ -245,6 +245,12 @@ export default async function ProjeDetay({
             tipler={tipler ?? []}
             ofisler={ofisler ?? []}
             emlakcilar={emlakcilar}
+            birimler={(birimler ?? []).map((b) => ({
+              id: b.id,
+              daire_no: b.daire_no,
+              blok_id: b.blok_id,
+              kat: b.kat,
+            }))}
           />
         </div>
       </section>
