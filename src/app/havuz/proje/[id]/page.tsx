@@ -8,7 +8,7 @@ import { projeKapak } from "@/lib/gorsel";
 import { generateShareToken } from "@/lib/sharing";
 
 type Belge = { id: string; tip: string | null; ad: string | null; url: string | null };
-type Mahal = { id: string; mahal: string; zemin: string | null; duvar: string | null; tavan: string | null };
+type Mahal = { id: string; mahal: string; zemin: string | null; duvar: string | null; tavan: string | null; marka: string | null };
 type Tip = { id: string; ad: string | null; oda: string | null; net_m2: number | null; taban_fiyat: number | null; plan_url: string | null };
 
 function trTarih(iso: string | null): string {
@@ -60,7 +60,7 @@ export default async function HavuzProjeDetay({
         )
         .eq("proje_id", id),
       supabase.from("proje_belge").select("id, tip, ad, url").eq("proje_id", id).order("created_at", { ascending: false }),
-      supabase.from("mahal").select("id, mahal, zemin, duvar, tavan").eq("proje_id", id).order("sira").order("created_at"),
+      supabase.from("mahal").select("id, mahal, zemin, duvar, tavan, marka").eq("proje_id", id).order("sira").order("created_at"),
     ]);
 
   const belgeler = (belgelerRaw ?? []) as Belge[];
@@ -388,6 +388,7 @@ export default async function HavuzProjeDetay({
                   <th>Zemin</th>
                   <th>Duvar</th>
                   <th>Tavan</th>
+                  <th>Marka</th>
                 </tr>
               </thead>
               <tbody>
@@ -397,6 +398,7 @@ export default async function HavuzProjeDetay({
                     <td className="mono text-gray">{m.zemin ?? "—"}</td>
                     <td className="mono text-gray">{m.duvar ?? "—"}</td>
                     <td className="mono text-gray">{m.tavan ?? "—"}</td>
+                    <td className="font-semibold text-ink">{m.marka ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>

@@ -920,6 +920,7 @@ export async function mahalEkle(formData: FormData) {
     zemin: al("zemin"),
     duvar: al("duvar"),
     tavan: al("tavan"),
+    marka: al("marka"),
     aciklama: al("aciklama"),
   });
   if (error) hataya(geri, error.message);

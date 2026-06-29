@@ -104,7 +104,7 @@ export default async function ProjeKurulum({
   const [{ data: bloklar }, { data: tipler }, { data: mahaller }] = await Promise.all([
     supabase.from("blok").select("id, ad, kat_sayisi").eq("proje_id", id).order("ad"),
     supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, plan_url").eq("proje_id", id).order("ad"),
-    supabase.from("mahal").select("id, mahal, zemin, duvar, tavan").eq("proje_id", id).order("sira").order("created_at"),
+    supabase.from("mahal").select("id, mahal, zemin, duvar, tavan, marka").eq("proje_id", id).order("sira").order("created_at"),
   ]);
   const mahalListe = (mahaller ?? []) as {
     id: string;
@@ -112,6 +112,7 @@ export default async function ProjeKurulum({
     zemin: string | null;
     duvar: string | null;
     tavan: string | null;
+    marka: string | null;
   }[];
 
   const kapak = belgeler.find((b) => b.tip === "kapak") ?? null;
@@ -261,6 +262,7 @@ export default async function ProjeKurulum({
                   <th className="pb-2 pr-3 font-medium">Zemin</th>
                   <th className="pb-2 pr-3 font-medium">Duvar</th>
                   <th className="pb-2 pr-3 font-medium">Tavan</th>
+                  <th className="pb-2 pr-3 font-medium">Marka</th>
                   <th className="pb-2" />
                 </tr>
               </thead>
@@ -271,6 +273,7 @@ export default async function ProjeKurulum({
                     <td className="py-2 pr-3 text-gray">{m.zemin ?? "—"}</td>
                     <td className="py-2 pr-3 text-gray">{m.duvar ?? "—"}</td>
                     <td className="py-2 pr-3 text-gray">{m.tavan ?? "—"}</td>
+                    <td className="py-2 pr-3 text-ink">{m.marka ?? "—"}</td>
                     <td className="py-2 text-right">
                       <form action={mahalSil}>
                         <input type="hidden" name="mahal_id" value={m.id} />
@@ -284,13 +287,14 @@ export default async function ProjeKurulum({
             </table>
           </div>
         ) : null}
-        <form action={mahalEkle} className="mt-3 grid gap-2 sm:grid-cols-4">
+        <form action={mahalEkle} className="mt-3 grid gap-2 sm:grid-cols-5">
           <input type="hidden" name="proje_id" value={id} />
           <input name="mahal" placeholder="Salon" required className={inpCls} />
           <input name="zemin" placeholder="Zemin (ör. seramik)" className={inpCls} />
           <input name="duvar" placeholder="Duvar (ör. saten boya)" className={inpCls} />
           <input name="tavan" placeholder="Tavan (ör. alçı)" className={inpCls} />
-          <div className="sm:col-span-4">
+          <input name="marka" placeholder="Marka (ör. VitrA)" className={inpCls} />
+          <div className="sm:col-span-5">
             <SubmitButton>Mahal ekle</SubmitButton>
           </div>
         </form>
