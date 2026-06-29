@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Talep Radarı — Demosaha İnşaat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="stil.css" />
+</head>
+<body>
+
+<div class="flex max-w-[1640px] mx-auto">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar px-4 py-6 flex flex-col gap-2 sticky top-0 h-screen">
+    <div class="flex items-center gap-3 px-3 mb-7">
+      <div class="marka-logo">
+        <span class="bg-white/95"></span><span class="bg-white/55"></span><span class="bg-white/95"></span>
+        <span class="bg-white/55"></span><span class="bg-white/95"></span><span class="bg-white/55"></span>
+        <span class="bg-white/95"></span><span class="bg-white/55"></span><span class="bg-white/95"></span>
+      </div>
+      <div>
+        <div class="font-display font-bold text-[18px] leading-none tracking-tight text-[var(--navy)]">ProjePazar</div>
+        <div class="text-[11px] text-[var(--ink-faint)] mt-1 font-medium">Müteahhit Paneli</div>
+      </div>
+    </div>
+
+    <a href="kokpit.html" class="btn btn-primary w-full mb-3" style="min-height:42px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      Yeni proje
+    </a>
+
+    <nav class="flex flex-col gap-1.5 flex-1">
+      <a href="kokpit.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Kokpit
+        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--teal)] nabiz text-[var(--teal)]"></span>
+      </a>
+      <a href="projeler.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        Projeler
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--ink-soft)] bg-[rgba(16,36,58,.07)] px-2 py-0.5 rounded-full">2</span>
+      </a>
+      <a href="stok.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Stok
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--ink-soft)] bg-[rgba(16,36,58,.07)] px-2 py-0.5 rounded-full">160</span>
+      </a>
+      <a href="tahsis.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Tahsis
+      </a>
+      <a href="opsiyonlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        Opsiyonlar
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--opsiyon)] bg-[#e3a12c1a] px-2 py-0.5 rounded-full">4</span>
+      </a>
+      <a href="talep-radari.html" class="nav-item active">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Talep Radarı
+      </a>
+      <a href="musteri-sorgula.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Müşteri Sorgula
+      </a>
+      <a href="raporlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        Raporlar
+      </a>
+      <a href="ayarlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Ayarlar
+      </a>
+    </nav>
+
+    <!-- Kullanıcı / firma -->
+    <div class="kart kart-3d p-3 flex items-center gap-3" style="border-radius:18px;">
+      <div class="w-9 h-9 rounded-[11px] grid place-items-center font-display font-bold text-white text-[14px]" style="background:linear-gradient(145deg,#13314b,#1e9b8a);">D</div>
+      <div class="min-w-0 flex-1">
+        <div class="text-[13px] font-semibold leading-tight truncate">Demosaha İnşaat</div>
+        <div class="flex items-center gap-1 text-[10.5px] text-[var(--teal)] mt-0.5">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Doğrulanmış üretici
+        </div>
+      </div>
+      <button class="w-8 h-8 rounded-[10px] grid place-items-center text-[var(--ink-faint)] hover:bg-[rgba(16,36,58,.06)] hover:text-[var(--satildi)] transition" title="Çıkış">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+
+  <!-- ============ ANA ALAN ============ -->
+  <main class="flex-1 min-w-0 px-5 md:px-8 py-6 md:py-7">
+
+    <!-- Başlık -->
+    <header class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <div class="flex items-center gap-2.5 mb-1.5">
+          <span class="rozet" style="background:rgba(47,179,107,.12); color:var(--musait);">
+            <span class="freshdot nabiz" style="background:var(--musait); color:var(--musait);"></span>
+            Canlı
+          </span>
+          <span class="text-[12.5px] text-[var(--ink-faint)] font-medium">son senkron <span class="mono text-[var(--ink-soft)]">2 sa önce</span></span>
+          <span class="text-[var(--cizgi-2)]">·</span>
+          <span class="text-[12.5px] text-[var(--ink-faint)]">satış zekası akışı</span>
+        </div>
+        <h1 class="font-display font-bold text-[27px] md:text-[31px] leading-none tracking-tight text-[var(--navy)]">Talep Radarı</h1>
+        <p class="text-[13.5px] text-[var(--ink-soft)] mt-2 max-w-[600px]">Stoğunda hangi birim, kim tarafından, ne kadar ilgi görüyor — ham olay akışından damıtılmış aksiyon edilebilir sinyaller. Grafiğe değil, karara odaklanır.</p>
+      </div>
+      <div class="topbar-meta flex items-center gap-2.5">
+        <div class="flex items-center gap-1.5 bg-white border border-[var(--cizgi-2)] rounded-[12px] p-1">
+          <span class="chip on" style="height:34px;">son 7 gün</span>
+          <span class="chip" style="height:34px; border:none; background:transparent;">son 30 gün</span>
+        </div>
+        <button class="w-[42px] h-[42px] rounded-[12px] grid place-items-center bg-white border border-[var(--cizgi-2)] text-[var(--ink-soft)] hover:text-[var(--ink)] transition relative">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--satildi)] ring-2 ring-white"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ÜST ŞERİT: 4 mini KPI -->
+    <section class="kart mb-5 px-1 py-1">
+      <div class="kpi-grid grid grid-cols-2 md:grid-cols-4">
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Görüntülenme</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--ink)]">1.240</div>
+          <div class="flex items-center gap-1 text-[11.5px] mt-2 text-[var(--musait)]">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg>
+            <span class="mono">+18%</span> geçen haftaya
+          </div>
+        </div>
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Paylaşım</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--teal)]">38</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">9 danışman tarafından</div>
+        </div>
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">WhatsApp Tık</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--ink)]">96</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">deep-link açılışı</div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Opsiyon Dönüşüm</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--opsiyon)]">%8</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">paylaşım → opsiyon</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANA GRID: insight grid + hareket akışı ===== -->
+    <div class="grid-main grid gap-5" style="grid-template-columns:minmax(0,1fr) 380px;">
+
+      <!-- SOL: INSIGHT GRID -->
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 mb-3">
+          <svg width="18" height="18" style="color:var(--teal)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <h2 class="font-display font-bold text-[17px] text-[var(--ink)]">Sinyaller</h2>
+          <span class="ml-auto text-[10.5px] px-2 py-[2px] rounded-md font-semibold" style="background:rgba(30,155,138,.12); color:var(--teal)">son 7 gün · 8 sinyal</span>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+
+          <!-- 1 -->
+          <div class="insight kart-3d" style="--_c:var(--musait);">
+            <div class="flex items-start gap-2.5">
+              <span class="mono font-bold text-[18px] flex-none leading-none mt-[1px]" style="color:var(--musait)">+%42</span>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">A Blok · 7. kat · 3+1</b> daireleri son 7 günde diğer tiplere göre <b class="text-[var(--ink)]">%42 daha fazla</b> görüntülendi — talep yoğun, fiyat sabit tutulabilir.</p>
+            </div>
+          </div>
+
+          <!-- 2 -->
+          <div class="insight kart-3d" style="--_c:var(--teal);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--teal)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Çankaya Vadi</b> en çok paylaşılan proje — <b class="mono text-[var(--ink)]">38</b> paylaşımın <b class="mono text-[var(--ink)]">31</b>'i bu projeden.</p>
+            </div>
+          </div>
+
+          <!-- 3 (amber) -->
+          <div class="insight kart-3d" style="--_c:var(--opsiyon);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--opsiyon)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="mono text-[var(--ink)]">12 birim</b> 15 günden eski — fiyat/durum tazelenmesi öneriliyor. Bayat stok daha az görüntüleniyor.</p>
+            </div>
+          </div>
+
+          <!-- 4 -->
+          <div class="insight kart-3d" style="--_c:var(--teal);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--teal)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">En çok WhatsApp'lanan birim: <b class="mono text-[var(--ink)]">A-12</b> — son 7 günde <b class="mono text-[var(--ink)]">17</b> deep-link açılışı aldı.</p>
+            </div>
+          </div>
+
+          <!-- 5 -->
+          <div class="insight kart-3d" style="--_c:var(--navy);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--navy)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">3+1 tipi</b> en çok opsiyonlanan tip — aktif 4 opsiyonun <b class="mono text-[var(--ink)]">3</b>'ü bu tipte. Stoğun talep odağı.</p>
+            </div>
+          </div>
+
+          <!-- 6 -->
+          <div class="insight kart-3d" style="--_c:var(--teal);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--teal)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">En aktif danışman: <b class="text-[var(--ink)]">Selin Demir</b> — <b class="mono text-[var(--ink)]">14</b> paylaşım, <b class="mono text-[var(--ink)]">2</b> opsiyon dönüşümü.</p>
+            </div>
+          </div>
+
+          <!-- 7 -->
+          <div class="insight kart-3d" style="--_c:var(--musait);">
+            <div class="flex items-start gap-2.5">
+              <span class="mono font-bold text-[18px] flex-none leading-none mt-[1px]" style="color:var(--musait)">+%28</span>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">Fiyat güncellemesi sonrası <b class="mono text-[var(--ink)]">B-09</b> görüntülenmesi <b class="text-[var(--ink)]">%28 arttı</b> — tazelik etkisi doğrulandı.</p>
+            </div>
+          </div>
+
+          <!-- 8 (amber) -->
+          <div class="insight kart-3d" style="--_c:var(--opsiyon);">
+            <div class="flex items-start gap-2.5">
+              <svg width="18" height="18" class="flex-none mt-[1px]" style="color:var(--opsiyon)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+              <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Test Konakları</b> bayat: <b class="mono text-[var(--ink)]">11 gündür</b> güncellenmedi. Stok yeşil rozetten sarıya düştü — senkron öneriliyor.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SAĞ: SON HAREKETLER ZAMAN AKIŞI -->
+      <div class="min-w-0">
+        <div class="kart p-0 overflow-hidden">
+          <div class="flex items-center gap-2 px-5 py-3.5" style="border-bottom:1px solid var(--cizgi);">
+            <span class="freshdot nabiz" style="background:var(--musait); color:var(--musait);"></span>
+            <h2 class="font-display font-bold text-[15px] text-[var(--ink)]">Son Hareketler</h2>
+            <span class="ml-auto mono text-[11px] text-[var(--ink-faint)]">canlı akış</span>
+          </div>
+          <div class="px-5 py-4 flex flex-col gap-3.5" style="max-height:640px; overflow-y:auto;">
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(30,155,138,.12); color:var(--teal)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Selin Demir</b> <span class="mono text-[var(--ink)]">A-12</span>'yi WhatsApp'tan paylaştı</p>
+                <span class="taze t-0 mt-1"><span class="nokta"></span><span class="mono">12 dk önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:#e3a12c1a; color:var(--opsiyon)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">Yeni opsiyon: <span class="mono text-[var(--ink)]">Test A-04</span> · <b class="text-[var(--ink)]">Selin Demir</b></p>
+                <span class="taze t-0 mt-1"><span class="nokta"></span><span class="mono">48 dk önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(209,90,78,.12); color:var(--satildi)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><span class="mono text-[var(--ink)]">B-14</span> satıldı olarak işaretlendi · <b class="text-[var(--ink)]">Mehmet Arslan</b></p>
+                <span class="taze t-0 mt-1"><span class="nokta"></span><span class="mono">1 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(30,155,138,.12); color:var(--teal)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Zeynep Şahin</b> <span class="mono text-[var(--ink)]">Test B-08</span>'i paylaştı</p>
+                <span class="taze t-0 mt-1"><span class="nokta"></span><span class="mono">2 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(16,36,58,.07); color:var(--navy)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Çankaya Vadi · A-07</b> 23 kez görüntülendi (bugün)</p>
+                <span class="taze t-0 mt-1"><span class="nokta"></span><span class="mono">3 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(30,155,138,.12); color:var(--teal)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 7 13.5 15.5 8.5 10.5 2 17"/><path d="M16 7h6v6"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><span class="mono text-[var(--ink)]">B-09</span> fiyatı güncellendi · görüntülenme arttı</p>
+                <span class="taze t-7 mt-1"><span class="nokta"></span><span class="mono">5 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:#e3a12c1a; color:var(--opsiyon)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">Yeni opsiyon: <span class="mono text-[var(--ink)]">Test A-22</span> · <b class="text-[var(--ink)]">Emre Yıldız</b></p>
+                <span class="taze t-7 mt-1"><span class="nokta"></span><span class="mono">6 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(16,36,58,.07); color:var(--navy)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">Yeni tahsis: <b class="text-[var(--ink)]">Deniz Aydın</b> · Test A 36-50</p>
+                <span class="taze t-7 mt-1"><span class="nokta"></span><span class="mono">9 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(30,155,138,.12); color:var(--teal)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><b class="text-[var(--ink)]">Ayşe Kaya</b> <span class="mono text-[var(--ink)]">B-09</span>'u paylaştı (4+1)</p>
+                <span class="taze t-7 mt-1"><span class="nokta"></span><span class="mono">14 sa önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:rgba(209,90,78,.12); color:var(--satildi)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]"><span class="mono text-[var(--ink)]">A-03</span> satıldı olarak işaretlendi · <b class="text-[var(--ink)]">Mehmet Arslan</b></p>
+                <span class="taze t-7 mt-1"><span class="nokta"></span><span class="mono">3 gün önce</span></span>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <span class="w-7 h-7 rounded-[9px] grid place-items-center flex-none" style="background:#e3a12c1a; color:var(--opsiyon)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span>
+              <div class="min-w-0 flex-1">
+                <p class="text-[12.5px] leading-snug text-[var(--ink-soft)]">Test Konakları stoğu <b class="text-[var(--ink)]">bayat</b> olarak işaretlendi</p>
+                <span class="taze t-15 mt-1"><span class="nokta"></span><span class="mono">11 gün önce</span></span>
+              </div>
+            </div>
+
+          </div>
+          <div class="px-5 py-3 text-center" style="border-top:1px solid var(--cizgi);">
+            <a href="#" class="text-[12.5px] font-semibold text-[var(--teal)]">Tüm olay kaydını gör →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-7 mb-2 flex items-center justify-center gap-2 text-[11.5px] text-[var(--ink-faint)]">
+      <span class="nabiz inline-block w-[6px] h-[6px] rounded-full" style="background:var(--musait); color:var(--musait)"></span>
+      ProjePazar · Canlı Konut Stoğu Dağıtım Ağı · <span class="mono">Demosaha İnşaat</span> · sinyaller ham olay akışından damıtılır
+    </footer>
+  </main>
+</div>
+</body>
+</html>

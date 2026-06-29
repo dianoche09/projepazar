@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Tıklanır Prototip</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Geist+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root{ --zemin:#eef1f6; --ink:#10243a; --ink-soft:#46586b; --ink-faint:#7d8da0; --navy:#13314b; --teal:#1e9b8a; --cizgi:rgba(16,36,58,.08); }
+  *{ -webkit-font-smoothing:antialiased; box-sizing:border-box; }
+  body{ font-family:'Inter',system-ui,sans-serif; color:var(--ink); margin:0; min-height:100vh;
+    background:radial-gradient(1200px 700px at 78% -8%, rgba(30,155,138,.12), transparent 60%), radial-gradient(1000px 600px at -6% 8%, rgba(19,49,75,.08), transparent 55%), linear-gradient(180deg,#eef1f6,#e9edf4); }
+  .font-display{ font-family:'Outfit',sans-serif; letter-spacing:-.02em; }
+  .mono{ font-family:'Geist Mono',monospace; }
+  .kart{ background:#fff; border:1px solid var(--cizgi); border-radius:22px; box-shadow:0 2px 6px rgba(16,36,58,.05),0 12px 28px rgba(16,36,58,.08); transition:transform .3s cubic-bezier(.22,.61,.36,1), box-shadow .3s; text-decoration:none; color:inherit; display:block; }
+  .kart:hover{ transform:translateY(-6px); box-shadow:0 4px 12px rgba(16,36,58,.07),0 24px 56px rgba(16,36,58,.14); border-color:rgba(30,155,138,.3); }
+</style>
+</head>
+<body>
+<div class="max-w-5xl mx-auto px-6 py-16 sm:py-24">
+  <div class="flex items-center gap-3">
+    <div class="w-11 h-11 rounded-[14px] grid grid-cols-3 grid-rows-3 gap-[3px] p-[8px]" style="background:linear-gradient(145deg,#13314b,#1e9b8a);">
+      <span class="rounded-[2px] bg-white/95"></span><span class="rounded-[2px] bg-white/55"></span><span class="rounded-[2px] bg-white/95"></span>
+      <span class="rounded-[2px] bg-white/55"></span><span class="rounded-[2px] bg-white/95"></span><span class="rounded-[2px] bg-white/55"></span>
+      <span class="rounded-[2px] bg-white/95"></span><span class="rounded-[2px] bg-white/55"></span><span class="rounded-[2px] bg-white/95"></span>
+    </div>
+    <div>
+      <div class="font-display text-2xl font-bold" style="color:var(--navy)">ProjePazar</div>
+      <div class="text-[12px] font-medium" style="color:var(--ink-faint)">Tıklanır Prototip · tüm menüler çalışır</div>
+    </div>
+  </div>
+
+  <h1 class="font-display text-3xl sm:text-4xl font-extrabold mt-10 leading-tight" style="color:var(--ink)">Hangi paneli gezmek istersin?</h1>
+  <p class="mt-2 text-[14px] max-w-xl" style="color:var(--ink-soft)">Her panelin tüm menüleri tıklanır + birbirine bağlı. İçinde gez, beğendiğin yerleri işaretle.</p>
+
+  <div class="grid gap-5 sm:grid-cols-3 mt-10">
+    <a href="muteahhit/kokpit.html" class="kart p-6">
+      <div class="w-10 h-10 rounded-xl grid place-items-center text-white font-bold" style="background:var(--navy)">Ü</div>
+      <h2 class="font-display text-lg font-bold mt-4" style="color:var(--ink)">Müteahhit / Üretici</h2>
+      <p class="text-[13px] mt-1.5" style="color:var(--ink-soft)">Kokpit · Projeler · Stok · Tahsis · Opsiyonlar · Talep Radarı · Müşteri Sorgula · Raporlar · Ayarlar</p>
+      <span class="mono text-[12px] font-semibold mt-4 inline-block" style="color:var(--teal)">Gez →</span>
+    </a>
+    <a href="emlakci/havuz.html" class="kart p-6">
+      <div class="w-10 h-10 rounded-xl grid place-items-center text-white font-bold" style="background:var(--teal)">D</div>
+      <h2 class="font-display text-lg font-bold mt-4" style="color:var(--ink)">Emlakçı / Danışman</h2>
+      <p class="text-[13px] mt-1.5" style="color:var(--ink-soft)">Havuz · Proje deneyimi (medya hub) · Lead'lerim · Opsiyonlarım · Paylaştıklarım · Profil</p>
+      <span class="mono text-[12px] font-semibold mt-4 inline-block" style="color:var(--teal)">Gez →</span>
+    </a>
+    <a href="admin/genel-bakis.html" class="kart p-6">
+      <div class="w-10 h-10 rounded-xl grid place-items-center text-white font-bold" style="background:#46586b">P</div>
+      <h2 class="font-display text-lg font-bold mt-4" style="color:var(--ink)">Admin / Platform</h2>
+      <p class="text-[13px] mt-1.5" style="color:var(--ink-soft)">Genel Bakış · Onay Kuyruğu · Kullanıcılar · Üreticiler · Ofisler · Üyelik · Denetim</p>
+      <span class="mono text-[12px] font-semibold mt-4 inline-block" style="color:var(--teal)">Gez →</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

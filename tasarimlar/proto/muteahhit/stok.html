@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Stok — Demosaha İnşaat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="stil.css" />
+</head>
+<body>
+
+<div class="flex max-w-[1640px] mx-auto">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar px-4 py-6 flex flex-col gap-2 sticky top-0 h-screen">
+    <div class="flex items-center gap-3 px-3 mb-7">
+      <div class="marka-logo">
+        <span class="bg-white/95"></span><span class="bg-white/55"></span><span class="bg-white/95"></span>
+        <span class="bg-white/55"></span><span class="bg-white/95"></span><span class="bg-white/55"></span>
+        <span class="bg-white/95"></span><span class="bg-white/55"></span><span class="bg-white/95"></span>
+      </div>
+      <div>
+        <div class="font-display font-bold text-[18px] leading-none tracking-tight text-[var(--navy)]">ProjePazar</div>
+        <div class="text-[11px] text-[var(--ink-faint)] mt-1 font-medium">Müteahhit Paneli</div>
+      </div>
+    </div>
+
+    <a href="projeler.html" class="btn btn-primary w-full mb-3" style="min-height:42px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      Yeni proje
+    </a>
+
+    <nav class="flex flex-col gap-1.5 flex-1">
+      <a href="kokpit.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Kokpit
+        <span class="ml-auto w-1.5 h-1.5 rounded-full bg-[var(--teal)] nabiz text-[var(--teal)]"></span>
+      </a>
+      <a href="projeler.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-6h6v6"/></svg>
+        Projeler
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--ink-soft)] bg-[rgba(16,36,58,.07)] px-2 py-0.5 rounded-full">2</span>
+      </a>
+      <a href="stok.html" class="nav-item active">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Stok
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--ink-soft)] bg-[rgba(16,36,58,.07)] px-2 py-0.5 rounded-full">160</span>
+      </a>
+      <a href="tahsis.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Tahsis
+      </a>
+      <a href="opsiyonlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+        Opsiyonlar
+        <span class="ml-auto mono text-[11px] font-semibold text-[var(--opsiyon)] bg-[#e3a12c1a] px-2 py-0.5 rounded-full">4</span>
+      </a>
+      <a href="talep-radari.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Talep Radarı
+      </a>
+      <a href="musteri-sorgula.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Müşteri Sorgula
+      </a>
+      <a href="raporlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        Raporlar
+      </a>
+      <a href="ayarlar.html" class="nav-item">
+        <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Ayarlar
+      </a>
+    </nav>
+
+    <!-- Kullanıcı / firma -->
+    <div class="kart kart-3d p-3 flex items-center gap-3" style="border-radius:18px;">
+      <div class="w-9 h-9 rounded-[11px] grid place-items-center font-display font-bold text-white text-[14px]" style="background:linear-gradient(145deg,#13314b,#1e9b8a);">D</div>
+      <div class="min-w-0 flex-1">
+        <div class="text-[13px] font-semibold leading-tight truncate">Demosaha İnşaat</div>
+        <div class="flex items-center gap-1 text-[10.5px] text-[var(--teal)] mt-0.5">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+          Doğrulanmış üretici
+        </div>
+      </div>
+      <button class="w-8 h-8 rounded-[10px] grid place-items-center text-[var(--ink-faint)] hover:bg-[rgba(16,36,58,.06)] hover:text-[var(--satildi)] transition" title="Çıkış">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+
+  <!-- ============ ANA ALAN ============ -->
+  <main class="flex-1 min-w-0 px-5 md:px-8 py-6 md:py-7">
+
+    <!-- Başlık -->
+    <header class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <div class="flex items-center gap-2.5 mb-1.5">
+          <span class="rozet" style="background:rgba(47,179,107,.12); color:var(--musait);">
+            <span class="freshdot nabiz" style="background:var(--musait); color:var(--musait);"></span>
+            Canlı
+          </span>
+          <span class="text-[12.5px] text-[var(--ink-faint)] font-medium">son senkron <span class="mono text-[var(--ink-soft)]">2 sa önce</span></span>
+          <span class="text-[var(--cizgi-2)]">·</span>
+          <span class="text-[12.5px] text-[var(--ink-faint)]">tek doğru kaynak · fiyat canlı</span>
+        </div>
+        <h1 class="font-display font-bold text-[27px] md:text-[31px] leading-none tracking-tight text-[var(--navy)]">Stok &amp; Fiyat Listesi</h1>
+        <p class="text-[13.5px] text-[var(--ink-soft)] mt-2 max-w-[560px]">Tüm birimlerin fiyat ve durumu tek tabloda. Burada güncellediğin her değer dağıtım ağına anında basılır — fiyatın tek doğru kaynağı budur.</p>
+      </div>
+      <div class="topbar-meta flex items-center gap-2.5">
+        <button class="chip" style="height:42px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          Birim ara
+          <span class="mono text-[10px] text-[var(--ink-faint)] border border-[var(--cizgi-2)] rounded px-1.5 py-0.5 ml-1">⌘K</span>
+        </button>
+        <button class="w-[42px] h-[42px] rounded-[12px] grid place-items-center bg-white border border-[var(--cizgi-2)] text-[var(--ink-soft)] hover:text-[var(--ink)] transition relative">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--satildi)] ring-2 ring-white"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI şeridi -->
+    <section class="kart mb-4 px-1 py-1">
+      <div class="kpi-grid grid grid-cols-2 md:grid-cols-4">
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Toplam Birim</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--ink)]">160</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">2 aktif proje</div>
+        </div>
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Müsait</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--musait)]">149</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]"><span class="mono">%93</span> stok</div>
+        </div>
+        <div class="px-5 py-4" style="border-right:1px solid var(--cizgi)">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Opsiyon</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--opsiyon)]">4</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">Test Konakları</div>
+        </div>
+        <div class="px-5 py-4">
+          <div class="text-[11px] font-semibold uppercase tracking-wide mb-1.5 text-[var(--ink-faint)]">Satıldı</div>
+          <div class="mono font-semibold text-[30px] leading-none text-[var(--satildi)]">6</div>
+          <div class="text-[11.5px] mt-2 text-[var(--ink-faint)]">Çankaya Vadi</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FİYAT LİSTESİ TABLOSU -->
+    <div class="kart overflow-hidden">
+
+      <!-- Filtre bar -->
+      <div class="filterbar flex flex-wrap items-center gap-1.5 px-5 py-3.5" style="border-bottom:1px solid var(--cizgi);">
+        <span class="chip on">Tümü</span>
+        <span class="chip">Çankaya Vadi</span>
+        <span class="chip">Test Konakları</span>
+        <span class="w-px h-6 bg-[var(--cizgi-2)] mx-1"></span>
+        <span class="chip"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--musait)"></span>Müsait</span>
+        <span class="chip"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--opsiyon)"></span>Opsiyon</span>
+        <span class="chip"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--satildi)"></span>Satıldı</span>
+        <span class="w-px h-6 bg-[var(--cizgi-2)] mx-1"></span>
+        <span class="chip">2+1</span>
+        <span class="chip">3+1</span>
+        <span class="chip">4+1</span>
+        <div class="flex items-center gap-1.5 ml-auto">
+          <span class="chip"><span class="mono">₺ TRY</span></span>
+          <button class="btn btn-ghost btn-xs" style="min-height:36px; padding:0 12px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+            Dışa aktar
+          </button>
+        </div>
+      </div>
+
+      <!-- Tablo -->
+      <div class="overflow-x-auto" style="max-height:640px; overflow-y:auto;">
+        <table class="tbl">
+          <thead><tr>
+            <th>Proje</th><th>Blok</th><th>Kat</th><th>No</th><th>Tip</th>
+            <th class="text-right">Net m²</th><th class="text-right">Fiyat</th>
+            <th>Durum</th><th>Son Güncelleme</th><th></th>
+          </tr></thead>
+          <tbody>
+
+            <!-- ÇANKAYA VADİ — t-0 (2 sa) -->
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">A</td><td class="mono">12</td><td class="mono">A-12</td><td>3+1</td>
+              <td class="text-right mono">142</td><td class="text-right mono font-semibold">₺8.75M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">A</td><td class="mono">7</td><td class="mono">A-07</td><td>3+1</td>
+              <td class="text-right mono">138</td><td class="text-right mono font-semibold">₺8.40M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr style="background:rgba(209,90,78,.035)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">A</td><td class="mono">3</td><td class="mono">A-03</td><td>2+1</td>
+              <td class="text-right mono">98</td><td class="text-right mono font-semibold text-[var(--ink-faint)]">₺6.20M</td>
+              <td><span class="durum d-satildi"><span class="nokta"></span>Satıldı</span></td>
+              <td><span class="taze t-7"><span class="nokta"></span><span class="mono">3 gün önce</span></span></td>
+              <td><span class="text-[11px] text-[var(--ink-faint)]">—</span></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">A</td><td class="mono">2</td><td class="mono">A-02</td><td>3+1</td>
+              <td class="text-right mono">140</td><td class="text-right mono font-semibold">₺8.55M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">B</td><td class="mono">9</td><td class="mono">B-09</td><td>4+1</td>
+              <td class="text-right mono">168</td><td class="text-right mono font-semibold">₺11.20M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">B</td><td class="mono">6</td><td class="mono">B-06</td><td>4+1</td>
+              <td class="text-right mono">172</td><td class="text-right mono font-semibold">₺11.80M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr style="background:rgba(209,90,78,.035)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">B</td><td class="mono">2</td><td class="mono">B-02</td><td>2+1</td>
+              <td class="text-right mono">96</td><td class="text-right mono font-semibold text-[var(--ink-faint)]">₺6.40M</td>
+              <td><span class="durum d-satildi"><span class="nokta"></span>Satıldı</span></td>
+              <td><span class="taze t-7"><span class="nokta"></span><span class="mono">4 gün önce</span></span></td>
+              <td><span class="text-[11px] text-[var(--ink-faint)]">—</span></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">C</td><td class="mono">11</td><td class="mono">C-11</td><td>3+1</td>
+              <td class="text-right mono">140</td><td class="text-right mono font-semibold">₺8.90M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">C</td><td class="mono">8</td><td class="mono">C-08</td><td>4+1</td>
+              <td class="text-right mono">175</td><td class="text-right mono font-semibold">₺12.50M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Çankaya Vadi</span></td>
+              <td class="mono font-medium">C</td><td class="mono">14</td><td class="mono">C-14</td><td>4+1</td>
+              <td class="text-right mono">190</td><td class="text-right mono font-semibold">₺14.80M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-0"><span class="nokta"></span><span class="mono">2 sa önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+
+            <!-- TEST KONAKLARI — t-15 (11 gün, bayat) -->
+            <tr style="background:rgba(227,161,44,.045)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">A</td><td class="mono">4</td><td class="mono">A-04</td><td>3+1</td>
+              <td class="text-right mono">130</td><td class="text-right mono font-semibold">₺7.90M</td>
+              <td><span class="durum d-opsiyon"><span class="nokta"></span>Opsiyon</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-ghost btn-xs">Teyit</button></td>
+            </tr>
+            <tr style="background:rgba(227,161,44,.045)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">A</td><td class="mono">9</td><td class="mono">A-09</td><td>3+1</td>
+              <td class="text-right mono">128</td><td class="text-right mono font-semibold">₺7.75M</td>
+              <td><span class="durum d-opsiyon"><span class="nokta"></span>Opsiyon</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-ghost btn-xs">Teyit</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">A</td><td class="mono">1</td><td class="mono">A-01</td><td>2+1</td>
+              <td class="text-right mono">92</td><td class="text-right mono font-semibold">₺4.10M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">A</td><td class="mono">6</td><td class="mono">A-06</td><td>2+1</td>
+              <td class="text-right mono">94</td><td class="text-right mono font-semibold">₺4.35M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">B</td><td class="mono">8</td><td class="mono">B-08</td><td>4+1</td>
+              <td class="text-right mono">156</td><td class="text-right mono font-semibold">₺9.30M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">B</td><td class="mono">5</td><td class="mono">B-05</td><td>3+1</td>
+              <td class="text-right mono">132</td><td class="text-right mono font-semibold">₺8.05M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr style="background:rgba(227,161,44,.045)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">B</td><td class="mono">3</td><td class="mono">B-03</td><td>3+1</td>
+              <td class="text-right mono">130</td><td class="text-right mono font-semibold">₺7.85M</td>
+              <td><span class="durum d-opsiyon"><span class="nokta"></span>Opsiyon</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-ghost btn-xs">Teyit</button></td>
+            </tr>
+            <tr>
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">C</td><td class="mono">12</td><td class="mono">C-12</td><td>4+1</td>
+              <td class="text-right mono">160</td><td class="text-right mono font-semibold">₺9.30M</td>
+              <td><span class="durum d-musait"><span class="nokta"></span>Müsait</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-teal btn-xs">Paylaş</button></td>
+            </tr>
+            <tr style="background:rgba(227,161,44,.045)">
+              <td><span class="text-[12px] text-[var(--ink-soft)]">Test Konakları</span></td>
+              <td class="mono font-medium">C</td><td class="mono">7</td><td class="mono">C-07</td><td>3+1</td>
+              <td class="text-right mono">129</td><td class="text-right mono font-semibold">₺7.80M</td>
+              <td><span class="durum d-opsiyon"><span class="nokta"></span>Opsiyon</span></td>
+              <td><span class="taze t-15"><span class="nokta"></span><span class="mono">11 gün önce</span></span></td>
+              <td><button class="btn btn-ghost btn-xs">Teyit</button></td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sayfalama -->
+      <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3" style="border-top:1px solid var(--cizgi);">
+        <span class="text-[12px] text-[var(--ink-faint)]"><span class="mono text-[var(--ink-soft)]">20</span> / <span class="mono text-[var(--ink-soft)]">160</span> birim gösteriliyor</span>
+        <div class="flex items-center gap-1.5">
+          <button class="w-8 h-8 rounded-[10px] grid place-items-center bg-white border border-[var(--cizgi-2)] text-[var(--ink-faint)] hover:text-[var(--ink)] transition">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span class="chip on">1</span>
+          <span class="chip">2</span>
+          <span class="chip">3</span>
+          <span class="text-[var(--ink-faint)] px-1">…</span>
+          <span class="chip">8</span>
+          <button class="w-8 h-8 rounded-[10px] grid place-items-center bg-white border border-[var(--cizgi-2)] text-[var(--ink-soft)] hover:text-[var(--ink)] transition">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-7 mb-2 flex items-center justify-center gap-2 text-[11.5px] text-[var(--ink-faint)]">
+      <span class="nabiz inline-block w-[6px] h-[6px] rounded-full" style="background:var(--musait); color:var(--musait)"></span>
+      ProjePazar · Canlı Konut Stoğu Dağıtım Ağı · <span class="mono">Demosaha İnşaat</span> · fiyat tek doğru kaynaktan akar
+    </footer>
+  </main>
+</div>
+</body>
+</html>

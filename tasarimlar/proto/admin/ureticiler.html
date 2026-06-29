@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProjePazar · Admin — Üreticiler</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="stil.css" />
+</head>
+<body>
+
+<!-- ===================== SIDEBAR ===================== -->
+<aside class="sidebar" style="position:fixed; inset:0 auto 0 0; width:248px; padding:20px 16px; display:flex; flex-direction:column; border-right:1px solid var(--cizgi); background:rgba(255,255,255,.55); backdrop-filter:blur(14px); z-index:10;">
+  <div style="display:flex; align-items:center; gap:11px; padding:4px 6px 22px;">
+    <div class="logo-grid">
+      <span class="on"></span><span></span><span class="mid"></span>
+      <span></span><span class="mid"></span><span></span>
+      <span class="mid"></span><span></span><span class="on"></span>
+    </div>
+    <div style="line-height:1.05;">
+      <div class="font-display" style="font-weight:700; font-size:17px; letter-spacing:-.3px;">ProjePazar</div>
+      <div class="mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:1.5px; margin-top:2px;">ADMIN KONSOLU</div>
+    </div>
+  </div>
+
+  <nav style="display:flex; flex-direction:column; gap:3px;">
+    <a class="nav-item" href="genel-bakis.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      Genel Bakış
+    </a>
+    <a class="nav-item" href="onay.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Onay Kuyruğu
+      <span class="nav-badge">12</span>
+    </a>
+    <a class="nav-item" href="kullanicilar.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Kullanıcılar
+    </a>
+    <a class="nav-item active" href="ureticiler.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>
+      Üreticiler
+    </a>
+    <a class="nav-item" href="ofisler.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Ofisler
+    </a>
+    <a class="nav-item" href="uyelik.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20"/></svg>
+      Üyelik Paketleri
+    </a>
+    <a class="nav-item" href="denetim.html">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      Denetim
+    </a>
+  </nav>
+
+  <div style="margin-top:auto; padding-top:16px;">
+    <div class="kapsam-not">
+      <div style="display:flex; align-items:center; gap:6px; font-weight:600; color:var(--navy); margin-bottom:5px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
+        Platform İşletmecisi
+      </div>
+      Bu panel <b>stok / birim / bina kesiti görmez</b>. Gelir · hesap · doğrulama · denetim.
+    </div>
+    <div style="display:flex; align-items:center; gap:11px; padding:11px; border-radius:14px; border:1px solid var(--cizgi); background:#fff; box-shadow:var(--golge-1);">
+      <div class="avatar" style="background:linear-gradient(150deg,#1b5e6e,#1e9b8a);">PA</div>
+      <div style="line-height:1.2; min-width:0; flex:1;">
+        <div style="font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">ProjePazar Admin</div>
+        <div style="font-size:11px; color:var(--ink-faint);">Platform İşletmecisi</div>
+      </div>
+      <a href="genel-bakis.html" title="Çıkış" style="border:none; background:none; cursor:pointer; color:var(--ink-faint); padding:4px; display:flex;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- ===================== MAIN ===================== -->
+<main class="main" style="margin-left:248px; padding:22px 26px 40px; max-width:1340px;">
+
+  <header style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+    <div>
+      <div style="display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-faint); margin-bottom:7px;">
+        <a href="genel-bakis.html" style="color:var(--ink-faint); text-decoration:none;">Genel Bakış</a>
+        <span style="color:var(--cizgi-2);">›</span>
+        <span style="color:var(--ink-soft); font-weight:600;">Üreticiler</span>
+      </div>
+      <h1 class="font-display" style="font-size:27px; font-weight:700; letter-spacing:-.5px; margin:0;">Üreticiler</h1>
+      <div style="display:flex; align-items:center; gap:9px; margin-top:5px; font-size:13px; color:var(--ink-soft); font-weight:500;">
+        <span class="mono">8 firma</span>
+        <span style="color:var(--cizgi-2);">·</span>
+        <span style="color:var(--musait); font-weight:600;">5 doğrulanmış</span>
+        <span style="color:var(--cizgi-2);">·</span>
+        <span style="color:#9a6c16; font-weight:600;">3 bekliyor</span>
+      </div>
+    </div>
+    <div class="topbar-meta" style="margin-left:auto; display:flex; align-items:center; gap:10px;">
+      <div style="display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--cizgi); border-radius:12px; padding:8px 13px; box-shadow:var(--golge-1);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <span style="font-size:13px; color:var(--ink-faint);">Firma ara…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== KPI ŞERİDİ ===== -->
+  <section style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px;">
+    <div class="kart" style="padding:16px 18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:12.5px; font-weight:600; color:var(--ink-soft);">Toplam üretici</span>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg>
+      </div>
+      <div class="mono" style="font-size:30px; font-weight:600; letter-spacing:-1px; color:var(--navy); line-height:1; margin-top:11px;">8</div>
+      <div style="font-size:12px; color:var(--ink-faint); margin-top:7px;">kayıtlı firma</div>
+    </div>
+    <div class="kart" style="padding:16px 18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:12.5px; font-weight:600; color:var(--ink-soft);">Doğrulanmış</span>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--musait)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <div class="mono" style="font-size:30px; font-weight:600; letter-spacing:-1px; color:var(--musait); line-height:1; margin-top:11px;">5</div>
+      <div style="margin-top:8px;"><span class="pill pill-musait">güven rozeti aktif</span></div>
+    </div>
+    <div class="kart" style="padding:16px 18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:12.5px; font-weight:600; color:var(--ink-soft);">Belge bekleyen</span>
+        <span class="nabiz" style="color:var(--satildi); width:7px; height:7px;"><span style="display:block; width:7px; height:7px; border-radius:50%; background:var(--satildi);"></span></span>
+      </div>
+      <div class="mono" style="font-size:30px; font-weight:600; letter-spacing:-1px; color:var(--satildi); line-height:1; margin-top:11px;">3</div>
+      <div style="margin-top:8px;"><span class="pill pill-satildi">doğrulama bekliyor</span></div>
+    </div>
+  </section>
+
+  <!-- ===== DOĞRULAMA BEKLEYENLER ===== -->
+  <section style="margin-bottom:16px;">
+    <div class="kart signal-top" style="--_sig:var(--satildi); padding:18px 20px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h2 class="font-display" style="font-size:16px; font-weight:600; margin:0;">Doğrulama bekleyenler</h2>
+        <span class="pill pill-satildi mono">3 firma</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:11px;">
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 13px; border:1px solid var(--cizgi); border-radius:14px;">
+          <div class="avatar" style="background:linear-gradient(150deg,#2a4d6e,#13314b); width:38px; height:38px; border-radius:12px;">EY</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:14px;">Egemen Yapı A.Ş.</div>
+            <div style="margin-top:3px;"><span class="pill pill-satildi" style="padding:2px 8px; font-size:10.5px;">Vergi levhası bekliyor</span></div>
+          </div>
+          <button class="btn btn-teal btn-sm">Doğrula</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 13px; border:1px solid var(--cizgi); border-radius:14px;">
+          <div class="avatar" style="background:linear-gradient(150deg,#1b5e6e,#1e9b8a); width:38px; height:38px; border-radius:12px;">NK</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:14px;">Nurol Konut Ltd.</div>
+            <div style="margin-top:3px;"><span class="pill pill-opsiyon" style="padding:2px 8px; font-size:10.5px;">İmza sirküsü bekliyor</span></div>
+          </div>
+          <button class="btn btn-teal btn-sm">Doğrula</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 13px; border:1px solid var(--cizgi); border-radius:14px;">
+          <div class="avatar" style="background:linear-gradient(150deg,#c98a2e,#e3a12c); width:38px; height:38px; border-radius:12px;">Dİ</div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:600; font-size:14px;">Demir İnşaat</div>
+            <div style="margin-top:3px;"><span class="pill pill-satildi" style="padding:2px 8px; font-size:10.5px;">Vergi levhası + sirküler</span></div>
+          </div>
+          <button class="btn btn-teal btn-sm">Doğrula</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TÜM ÜRETİCİLER TABLOSU ===== -->
+  <section>
+    <div class="kart" style="padding:0; overflow:hidden;">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 20px 14px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <h2 class="font-display" style="font-size:16px; font-weight:600; margin:0;">Tüm Üreticiler</h2>
+          <span class="pill pill-navy mono">8 firma</span>
+        </div>
+        <span class="mono" style="font-size:12px; color:var(--ink-faint);">doğrulama = güven rozeti</span>
+      </div>
+      <div class="scroll-x">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(16,36,58,.03);">
+              <th class="th" style="padding:9px 20px;">Firma</th>
+              <th class="th" style="padding:9px 12px;">Yetkili</th>
+              <th class="th" style="padding:9px 12px;">Doğrulama</th>
+              <th class="th" style="padding:9px 12px;">Abonelik</th>
+              <th class="th" style="padding:9px 20px; text-align:right;">Aksiyon</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#2a4d6e,#13314b);">EY</div><div style="font-weight:600; font-size:14px;">Egemen Yapı A.Ş.</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Egemen Yılmaz</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-satildi">Belge bekliyor</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-teal btn-sm">Doğrula</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#1b5e6e,#1e9b8a);">NK</div><div style="font-weight:600; font-size:14px;">Nurol Konut Ltd.</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Necati Kurt</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-opsiyon">Eksik belge</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-teal btn-sm">Doğrula</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#c98a2e,#e3a12c);">Dİ</div><div style="font-weight:600; font-size:14px;">Demir İnşaat</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Onur Kaplan</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-satildi">Belge bekliyor</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-gri">Anlaşma yok</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-teal btn-sm">Doğrula</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#2a4d6e,#13314b);">ÇY</div><div style="font-weight:600; font-size:14px;">Çelik Yapı A.Ş.</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Cem Çelik</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-musait">Doğrulanmış ✓</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-ghost btn-sm">Detay</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#1b5e6e,#1e9b8a);">PV</div><div style="font-weight:600; font-size:14px;">Park Vadi İnşaat</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Pelin Vardar</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-musait">Doğrulanmış ✓</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-ghost btn-sm">Detay</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#c98a2e,#e3a12c);">MŞ</div><div style="font-weight:600; font-size:14px;">Mavişehir Yapı</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Murat Aksoy</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-musait">Doğrulanmış ✓</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-ghost btn-sm">Detay</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#2a4d6e,#13314b);">BK</div><div style="font-weight:600; font-size:14px;">Başkent Konut</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Berk Şen</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-musait">Doğrulanmış ✓</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-ghost btn-sm">Detay</button></div></td>
+            </tr>
+            <tr class="row-hover" style="border-top:1px solid var(--cizgi);">
+              <td style="padding:12px 20px;"><div style="display:flex; align-items:center; gap:11px;"><div class="avatar" style="background:linear-gradient(150deg,#1b5e6e,#1e9b8a);">TY</div><div style="font-weight:600; font-size:14px;">Tuna Yapı Grup</div></div></td>
+              <td style="padding:12px 12px;"><span style="font-size:13.5px; color:var(--ink-soft);">Tuna Er</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-musait">Doğrulanmış ✓</span></td>
+              <td style="padding:12px 12px;"><span class="pill pill-navy">Müteahhit anlaşması</span></td>
+              <td style="padding:12px 20px;"><div style="display:flex; justify-content:flex-end;"><button class="btn btn-ghost btn-sm">Detay</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer style="margin-top:22px; display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:var(--ink-faint); padding:0 4px; flex-wrap:wrap; gap:8px;">
+    <span>ProjePazar Admin · Platform İşletmecisi paneli</span>
+    <span class="mono">Doğrulama = güven rozeti. Stok / tahsis üreticinin kendi panelinde.</span>
+  </footer>
+</main>
+
+</body>
+</html>

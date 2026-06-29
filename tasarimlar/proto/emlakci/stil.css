@@ -1,0 +1,194 @@
+/* ============================================================
+   ProjePazar — Danışman (Emlakçı) Paneli · Ortak Stil
+   Kaynak: tasarimlar/v2-emlakci.html <style> — birebir.
+   "Spatial Açık" paleti (kilitli). Sinyal renkleri SABİT.
+   ============================================================ */
+:root{
+  --zemin:#eef1f6;
+  --zemin-2:#e7ebf2;
+  --ink:#10243a;
+  --ink-soft:#46586b;
+  --ink-faint:#7d8da0;
+  --navy:#13314b;
+  --teal:#1e9b8a;
+  --musait:#2fb36b;
+  --opsiyon:#e3a12c;
+  --satildi:#d15a4e;
+  --pasif:#98a2b3;
+  --kart:#ffffff;
+  --cizgi:rgba(16,36,58,.08);
+  --cizgi-2:rgba(16,36,58,.12);
+  --golge-1:0 1px 2px rgba(16,36,58,.04), 0 2px 6px rgba(16,36,58,.05);
+  --golge-2:0 2px 6px rgba(16,36,58,.05), 0 12px 28px rgba(16,36,58,.08);
+  --golge-3:0 4px 12px rgba(16,36,58,.07), 0 24px 56px rgba(16,36,58,.12);
+}
+*{ -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; box-sizing:border-box; }
+html,body{ background:var(--zemin); margin:0; }
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 700px at 78% -8%, rgba(30,155,138,.10), transparent 60%),
+    radial-gradient(1000px 600px at -6% 8%, rgba(19,49,75,.07), transparent 55%),
+    linear-gradient(180deg,#eef1f6 0%, #e9edf4 100%);
+  background-attachment:fixed;
+  min-height:100vh;
+}
+.font-display{ font-family:'Outfit',sans-serif; }
+.mono{ font-family:'Geist Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1; }
+
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:rgba(16,36,58,.16); border-radius:8px; border:2px solid transparent; background-clip:padding-box; }
+::-webkit-scrollbar-thumb:hover{ background:rgba(16,36,58,.28); background-clip:padding-box; }
+
+/* ---- spatial kart ---- */
+.kart{
+  background:var(--kart);
+  border:1px solid var(--cizgi);
+  border-radius:20px;
+  box-shadow:var(--golge-2);
+  transition:transform .32s cubic-bezier(.22,.61,.36,1), box-shadow .32s cubic-bezier(.22,.61,.36,1);
+}
+.kart-3d:hover{ transform:translateY(-4px); box-shadow:var(--golge-3); }
+
+.signal-top{ position:relative; overflow:hidden; }
+.signal-top::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:4px;
+  background:var(--_sig,var(--teal)); opacity:.92;
+}
+
+/* ---- sidebar nav ---- */
+.nav-item{
+  display:flex; align-items:center; gap:13px;
+  padding:11px 14px; border-radius:14px;
+  color:var(--ink-soft); font-weight:500; font-size:14.5px;
+  transition:all .2s ease; position:relative; cursor:pointer;
+  text-decoration:none;
+}
+.nav-item:hover{ background:rgba(16,36,58,.05); color:var(--ink); }
+.nav-item.active{ background:#fff; color:var(--navy); font-weight:600; box-shadow:var(--golge-1); }
+.nav-item.active::before{
+  content:""; position:absolute; left:-9px; top:50%; transform:translateY(-50%);
+  width:4px; height:20px; border-radius:4px; background:var(--teal);
+}
+.nav-ic{ width:19px; height:19px; flex:none; opacity:.85; }
+
+/* ---- canlılık nabız ---- */
+.nabiz{ position:relative; }
+.nabiz::after{
+  content:""; position:absolute; inset:-4px; border-radius:50%;
+  border:2px solid currentColor; opacity:.55;
+  animation:nabiz 2s ease-out infinite;
+}
+@keyframes nabiz{ 0%{transform:scale(.7);opacity:.6} 100%{transform:scale(2.1);opacity:0} }
+
+/* ---- bina kesiti hücre ---- */
+.hucre{
+  border-radius:9px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:7px 4px; min-height:54px;
+  font-size:10px; font-weight:600;
+  cursor:pointer; position:relative;
+  transition:transform .18s ease, box-shadow .18s ease;
+  color:#fff; text-align:center; line-height:1.25;
+}
+.hucre:hover{ transform:translateY(-3px) scale(1.05); box-shadow:0 8px 18px rgba(16,36,58,.22); z-index:5; }
+.h-musait{ background:linear-gradient(150deg,#37c178,#2fb36b); }
+.h-opsiyon{ background:linear-gradient(150deg,#eab23f,#e3a12c); }
+.h-satildi{ background:linear-gradient(150deg,#dd6a5e,#d15a4e); }
+/* tahsisli olmayan — emlakçı göremez */
+.h-kilit{
+  background:repeating-linear-gradient(135deg, rgba(16,36,58,.05) 0 7px, rgba(16,36,58,.085) 7px 14px);
+  color:var(--ink-faint); cursor:not-allowed;
+  border:1px dashed rgba(16,36,58,.18);
+}
+.h-kilit:hover{ transform:none; box-shadow:none; }
+
+/* ---- mini stok bar ---- */
+.stokbar{ height:9px; border-radius:6px; overflow:hidden; display:flex; background:rgba(16,36,58,.07); }
+
+.rozet{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:999px;
+  font-size:11.5px; font-weight:600; line-height:1;
+}
+
+/* ---- proje görsel mini (hero değil, sadece şerit) ---- */
+.proj-thumb{ position:relative; overflow:hidden; }
+.proj-a{ background:radial-gradient(120% 90% at 80% 12%, rgba(255,255,255,.30), transparent 55%), linear-gradient(140deg,#16465a 0%, #1e7d8a 48%, #2fb36b 100%); }
+.proj-b{ background:radial-gradient(120% 90% at 80% 12%, rgba(255,255,255,.26), transparent 55%), linear-gradient(140deg,#3a3357 0%, #6a5a8c 50%, #b58f54 100%); }
+.img-skyline::after{
+  content:""; position:absolute; inset:0;
+  background:repeating-linear-gradient(90deg, rgba(8,26,40,.18) 0 6px, transparent 6px 15px);
+  mask:linear-gradient(180deg, transparent 38%, #000 100%);
+  -webkit-mask:linear-gradient(180deg, transparent 38%, #000 100%);
+}
+
+/* ---- buton ---- */
+.btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  border-radius:13px; font-weight:600; font-size:13.5px; line-height:1;
+  min-height:44px; padding:0 16px; transition:all .18s ease; cursor:pointer; white-space:nowrap;
+  text-decoration:none; border:none; }
+.btn-primary{ background:var(--navy); color:#fff; }
+.btn-primary:hover{ background:#0d2438; box-shadow:var(--golge-2); }
+.btn-action{ background:var(--teal); color:#fff; }
+.btn-action:hover{ background:#1a8676; box-shadow:0 6px 16px rgba(30,155,138,.30); }
+.btn-wa{ background:#1faa5b; color:#fff; }
+.btn-wa:hover{ background:#178c4a; box-shadow:0 6px 16px rgba(31,170,91,.30); }
+.btn-ghost{ background:#fff; color:var(--ink); border:1px solid var(--cizgi-2); }
+.btn-ghost:hover{ background:rgba(16,36,58,.04); }
+
+.chip{ display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 13px;
+  border-radius:11px; background:#fff; border:1px solid var(--cizgi-2);
+  font-size:13px; font-weight:500; color:var(--ink-soft); cursor:pointer; transition:all .16s ease; }
+.chip:hover{ border-color:rgba(16,36,58,.22); color:var(--ink); }
+.chip svg{ opacity:.6; }
+.chip.chip-on{ background:var(--navy); color:#fff; border-color:var(--navy); }
+.chip.chip-on svg{ opacity:.9; }
+.chip.chip-on .text-faint{ color:rgba(255,255,255,.7); }
+
+.lead-pill{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11px; font-weight:600; }
+
+.freshdot{ width:7px; height:7px; border-radius:50%; flex:none; display:inline-block; }
+
+/* ---- tablo (lead/opsiyon/paylaşım listeleri) ---- */
+.tablo{ width:100%; border-collapse:separate; border-spacing:0; }
+.tablo th{
+  text-align:left; font-size:11px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; color:var(--ink-faint); padding:0 14px 11px;
+  border-bottom:1px solid var(--cizgi);
+}
+.tablo td{ padding:13px 14px; border-bottom:1px solid var(--cizgi); font-size:13.5px; vertical-align:middle; }
+.tablo tbody tr{ transition:background .15s ease; cursor:pointer; }
+.tablo tbody tr:hover{ background:rgba(16,36,58,.03); }
+.tablo tbody tr:last-child td{ border-bottom:none; }
+
+/* ---- galeri / medya placeholder ---- */
+.medya{ position:relative; overflow:hidden; border-radius:14px; cursor:pointer;
+  transition:transform .25s ease, box-shadow .25s ease; }
+.medya:hover{ transform:translateY(-3px); box-shadow:var(--golge-2); }
+.m-1{ background:radial-gradient(120% 100% at 75% 10%, rgba(255,255,255,.28), transparent 55%), linear-gradient(145deg,#16465a,#1e7d8a 55%,#2fb36b); }
+.m-2{ background:radial-gradient(120% 100% at 25% 15%, rgba(255,255,255,.22), transparent 55%), linear-gradient(160deg,#13314b,#2a5a78 60%,#3f8fa0); }
+.m-3{ background:radial-gradient(120% 100% at 60% 20%, rgba(255,255,255,.20), transparent 55%), linear-gradient(135deg,#3a3357,#6a5a8c 55%,#b58f54); }
+.m-4{ background:radial-gradient(120% 100% at 40% 10%, rgba(255,255,255,.24), transparent 55%), linear-gradient(150deg,#1e3a2f,#2f7d5e 55%,#6fc79a); }
+.m-floor{ background:linear-gradient(135deg,#f2f5fa,#e2e8f1); }
+.m-map{ background:
+  linear-gradient(0deg, rgba(30,155,138,.10), rgba(30,155,138,.10)),
+  repeating-linear-gradient(0deg, rgba(16,36,58,.07) 0 1px, transparent 1px 38px),
+  repeating-linear-gradient(90deg, rgba(16,36,58,.07) 0 1px, transparent 1px 38px),
+  linear-gradient(145deg,#e8edf4,#dfe6ef); }
+
+/* ---- daire detay paneli (proje-detay inline) ---- */
+.detay-panel{ display:none; }
+.detay-panel.acik{ display:block; }
+
+@media (max-width:1100px){ .sidebar{ display:none; } }
+@media (max-width:760px){
+  .topbar-meta{ display:none; }
+  .kpi-grid{ grid-template-columns:repeat(2,1fr) !important; }
+  .proj-grid{ grid-template-columns:1fr !important; }
+  .filterbar{ overflow-x:auto; }
+  .galeri-grid{ grid-template-columns:repeat(2,1fr) !important; }
+  .tablo-wrap{ overflow-x:auto; }
+}
