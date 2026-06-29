@@ -37,5 +37,17 @@ create policy birim_emlakci_select on birim for select using (
   emlakci_birim_gorebilir(birim.id, birim.proje_id, birim.blok_id, birim.tip_id, birim.kat, birim.tur::text)
 );
 
--- Eski 5-argümanlı sürüm artık orphan (6-arg yenisi geçerli) — temizle.
+-- opsiyon_talep_insert de 6-arg kullanmalı (daire-bazlı: emlakçı yalnız tahsisli daireye talep açsın)
+drop policy if exists opsiyon_talep_insert on opsiyon_talep;
+create policy opsiyon_talep_insert on opsiyon_talep for insert with check (
+  talep_eden_id = auth.uid()
+  and exists (
+    select 1 from birim b
+    where b.id = opsiyon_talep.birim_id
+      and b.satilabilir = true and b.durum = 'musait'
+      and emlakci_birim_gorebilir(b.id, b.proje_id, b.blok_id, b.tip_id, b.kat, b.tur::text)
+  )
+);
+
+-- Eski 5-argümanlı sürüm artık orphan (tüm policy'ler 6-arg'a taşındı) — temizle.
 drop function if exists emlakci_birim_gorebilir(uuid, uuid, uuid, int, text);
