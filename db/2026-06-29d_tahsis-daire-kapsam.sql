@@ -36,3 +36,6 @@ drop policy if exists birim_emlakci_select on birim;
 create policy birim_emlakci_select on birim for select using (
   emlakci_birim_gorebilir(birim.id, birim.proje_id, birim.blok_id, birim.tip_id, birim.kat, birim.tur::text)
 );
+
+-- Eski 5-argümanlı sürüm artık orphan (6-arg yenisi geçerli) — temizle.
+drop function if exists emlakci_birim_gorebilir(uuid, uuid, uuid, int, text);
