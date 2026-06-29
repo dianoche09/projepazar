@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -58,6 +59,37 @@ export async function opsiyonTalepGonder(
   return error
     ? { ok: false, mesaj: "Talep gönderilemedi — daire müsait olmayabilir" }
     : { ok: true, mesaj: "Opsiyon talebin gönderildi — müteahhit onayına düştü" };
+}
+
+// ── KYC belge yükleme (mesleki yeterlilik + vergi levhası) → kyc-belge bucket + beklemede ──
+const BELGE_TIPLERI = ["mesleki_yeterlilik", "vergi_levhasi"] as const;
+
+export async function belgeYukle(formData: FormData): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  let yuklendi = 0;
+  for (const tip of BELGE_TIPLERI) {
+    const file = formData.get(tip);
+    if (!(file instanceof File) || file.size === 0) continue;
+    if (file.size > 8 * 1024 * 1024) redirect(`/havuz/dogrulama?hata=${encodeURIComponent("Dosya 8MB'tan büyük olamaz")}`);
+    const uzanti = (file.name.split(".").pop() || "bin").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const yol = `${user.id}/${tip}-${Date.now()}.${uzanti}`;
+    const { error: upErr } = await supabase.storage
+      .from("kyc-belge")
+      .upload(yol, file, { upsert: true, contentType: file.type || undefined });
+    if (upErr) redirect(`/havuz/dogrulama?hata=${encodeURIComponent(upErr.message)}`);
+    await supabase.from("kullanici_belge").insert({ profile_id: user.id, tip, url: yol, durum: "beklemede" });
+    yuklendi++;
+  }
+  // belge_durumu='beklemede' (trigger 'dogrulandi'yi engeller; bunu yalnız admin yapar)
+  if (yuklendi > 0) await supabase.from("profiles").update({ belge_durumu: "beklemede" }).eq("id", user.id);
+  revalidatePath("/havuz/dogrulama");
+  revalidatePath("/havuz");
+  redirect(`/havuz/dogrulama?mesaj=${encodeURIComponent(yuklendi > 0 ? "Belgeler yüklendi — doğrulama bekleniyor" : "Dosya seçilmedi")}`);
 }
 
 /** Emlakçı kendi BEKLEYEN talebini geri çeker. */

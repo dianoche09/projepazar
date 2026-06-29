@@ -18,11 +18,12 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
 
   // Havuz: emlakçı + admin + (Faz-1'de ayrı paneli olmayan) ofis/marka/arsa rolleri tahsisli stok görür.
   const HAVUZ_ROL = ["emlakci", "admin", "ofis_yetkili", "marka_yetkili", "arsa_sahibi"];
-  const { data: profil } = await supabase.from("profiles").select("ad, rol").eq("id", user.id).single();
+  const { data: profil } = await supabase.from("profiles").select("ad, rol, belge_durumu").eq("id", user.id).single();
   if (!profil || !HAVUZ_ROL.includes(profil.rol)) {
     redirect(profil ? panelYolu(profil.rol) : "/");
   }
   const adminMi = profil.rol === "admin";
+  const dogrulanmadi = !adminMi && profil.belge_durumu !== "dogrulandi";
   const ad = profil.ad ?? user.email ?? "Emlakçı";
   const basHarf = ad.trim().charAt(0).toUpperCase() || "E";
 
@@ -116,6 +117,13 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
               <Link href="/admin" className="shrink-0 font-bold text-amber-700 hover:underline flex items-center gap-1">
                 <span>←</span> Admin Paneli
               </Link>
+            </div>
+          ) : null}
+
+          {dogrulanmadi ? (
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/50 bg-amber-soft px-4 py-2.5 text-xs text-amber-700">
+              <span className="font-semibold">Hesabın doğrulanmadı — yalnız demo projeyi görüyorsun.</span>
+              <Link href="/havuz/dogrulama" className="shrink-0 font-bold text-amber-700 hover:underline">Belgeni yükle →</Link>
             </div>
           ) : null}
 
