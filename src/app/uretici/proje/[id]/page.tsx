@@ -45,7 +45,7 @@ export default async function ProjeDetay({
   const { data: birimler } = await supabase
     .from("birim")
     .select(
-      "id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, para_birimi, satilabilir, net_m2, brut_m2, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
+      "id, blok_id, tip_id, tur, ana_birim_id, kat, daire_no, durum, liste_fiyati, para_birimi, satilabilir, net_m2, brut_m2, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
     )
     .eq("proje_id", id);
 
@@ -66,18 +66,20 @@ export default async function ProjeDetay({
   const videolar = (belgeler ?? []).filter((b) => b.tip === "video" && b.url);
   const brosurler = (belgeler ?? []).filter((b) => b.tip === "brosur" && b.url);
 
+  // Eklentiler (otopark/depo, ana_birim_id dolu) ana stok sayımına/tahsise girmez — parent dairesiyle gider.
+  const anaBirimler = (birimler ?? []).filter((b) => b.ana_birim_id == null);
   const tahsisKatlar = [
-    ...new Set((birimler ?? []).map((b) => b.kat).filter((k): k is number => k != null)),
+    ...new Set(anaBirimler.map((b) => b.kat).filter((k): k is number => k != null)),
   ].sort((a, b) => a - b);
   const blokMap = new Map((bloklar ?? []).map((b) => [b.id, b.ad]));
   const ofisMap = new Map((ofisler ?? []).map((o) => [o.id, o.ad]));
   const emlakciMap = new Map(emlakcilar.map((e) => [e.id, e.ad]));
-  const toplam = birimler?.length ?? 0;
+  const toplam = anaBirimler.length;
   const stats = {
     toplam,
-    musait: (birimler ?? []).filter((b) => b.durum === "musait").length,
-    opsiyon: (birimler ?? []).filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length,
-    satildi: (birimler ?? []).filter((b) => b.durum === "satildi").length,
+    musait: anaBirimler.filter((b) => b.durum === "musait").length,
+    opsiyon: anaBirimler.filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length,
+    satildi: anaBirimler.filter((b) => b.durum === "satildi").length,
   };
 
   return (
@@ -245,7 +247,7 @@ export default async function ProjeDetay({
             tipler={tipler ?? []}
             ofisler={ofisler ?? []}
             emlakcilar={emlakcilar}
-            birimler={(birimler ?? []).map((b) => ({
+            birimler={anaBirimler.map((b) => ({
               id: b.id,
               daire_no: b.daire_no,
               blok_id: b.blok_id,

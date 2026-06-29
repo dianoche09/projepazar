@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
-import { birimDurumGuncelle, birimGuncelle } from "@/app/uretici/actions";
+import { birimDurumGuncelle, birimGuncelle, eklentiEkle, eklentiSil } from "@/app/uretici/actions";
 import { opsiyonTalepGonder, opsiyonBirakSessiz } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 import { KatPlani } from "@/components/KatPlani";
@@ -13,10 +13,20 @@ const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satil
 const inp =
   "rounded-xl border border-white/5 bg-[#0f172a] px-3.5 py-2.5 text-sm text-white/90 outline-none transition-all focus:border-teal/30 focus:bg-[#090d16]";
 
+/** Bir ana daireye bağlı eklenti birim (otopark/depo) — salt gösterim/fiyat. */
+export type Eklenti = {
+  id: string;
+  tur: string;
+  daire_no: string | null;
+  liste_fiyati: number | null;
+  para_birimi: string;
+};
+
 export type ModalBirim = {
   id: string;
   daire_no: string | null;
   kat: number | null;
+  tur: string;
   durum: BirimDurum;
   satilabilir: boolean;
   liste_fiyati: number | null;
@@ -37,6 +47,30 @@ export type ModalBirim = {
 
 const fmt = (n: number) => n.toLocaleString("tr-TR");
 const PARA_SIMGE: Record<string, string> = { TRY: "₺", USD: "$", EUR: "€", GBP: "£", AED: "AED" };
+const EKLENTI_ETIKET: Record<string, string> = { otopark: "Otopark", depo: "Depo" };
+
+/** Eklenti tür ikonu — DaireModal slate paletiyle uyumlu inline svg. */
+function EklentiIkon({ tur, className = "size-4" }: { tur: string; className?: string }) {
+  if (tur === "depo") {
+    // kutu / depo
+    return (
+      <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M21 8V21H3V8" />
+        <path d="M1 3h22v5H1z" />
+        <path d="M10 12h4" />
+      </svg>
+    );
+  }
+  // otopark / araç (varsayılan)
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M19 17h2l-1.4-5.4A2 2 0 0 0 17.66 10H6.34a2 2 0 0 0-1.94 1.6L3 17h2" />
+      <path d="M5 17v2M19 17v2" />
+      <circle cx="7.5" cy="14.5" r="1.5" />
+      <circle cx="16.5" cy="14.5" r="1.5" />
+    </svg>
+  );
+}
 /** Tazelik tier nokta rengi (tasarım dili imzası): 0-24sa yeşil · 1-7g teal · 7-15g amber · 15g+ gri. */
 function tazelikDot(iso: string): string {
   const gun = (Date.now() - new Date(iso).getTime()) / 86_400_000;
@@ -76,6 +110,7 @@ export function DaireModal({
   projeAd = "",
   shareUrl = "",
   benimOpsiyon = false,
+  eklentiler = [],
 }: {
   birim: ModalBirim;
   projeId: string;
@@ -85,6 +120,8 @@ export function DaireModal({
   shareUrl?: string;
   /** Emlakçı modu: bu opsiyon bu emlakçıya mı ait (bırak butonu yalnız o zaman). */
   benimOpsiyon?: boolean;
+  /** Bu daireye bağlı eklentiler (otopark/depo). Üretici modunda ekle/sil; diğerlerinde salt-okunur. */
+  eklentiler?: Eklenti[];
 }) {
   const [durum, setDurum] = useState<BirimDurum>(birim.durum);
   const [bekliyor, basla] = useTransition();
@@ -98,6 +135,13 @@ export function DaireModal({
   const katKatki = taban != null && sKat ? Math.round((taban * sKat) / 100) : null;
   const manzaraKatki = taban != null && sManzara ? Math.round((taban * sManzara) / 100) : null;
   const fark = taban != null && liste != null ? liste - taban : null;
+
+  // Eklenti toplamı (yalnız para birimi ana daireyle aynı olanlar; farklı kur Faz-2).
+  const eklentiToplam = eklentiler.reduce(
+    (t, e) => (e.liste_fiyati != null && e.para_birimi === birim.para_birimi ? t + e.liste_fiyati : t),
+    0,
+  );
+  const genelToplam = liste != null ? liste + eklentiToplam : null;
 
   // Paylaşımda fiyat CANLI değerden basılır (DEĞİŞMEZ #2). Çok-satırlı + mikrosite link'i.
   const paylasMetni = [
@@ -198,6 +242,90 @@ export function DaireModal({
           <div className="mt-4 bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex justify-between items-center shadow-sm">
             <span className="text-xs font-bold text-slate-500">Liste Fiyatı</span>
             <span className="font-mono text-lg font-extrabold text-teal">{fmt(liste)} {psim}</span>
+          </div>
+        ) : null}
+
+        {/* Eklentiler — otopark/depo (ana daireye bağlı). Üretici: ekle/sil; diğer: salt-okunur. */}
+        {eklentiler.length > 0 || mod === "uretici" ? (
+          <div className="mt-4 rounded-xl border border-slate-200/60 bg-slate-50 p-4">
+            <p className="mb-2.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 font-mono">Eklentiler</p>
+
+            {eklentiler.length > 0 ? (
+              <div className="space-y-1.5">
+                {eklentiler.map((e) => {
+                  const esim = PARA_SIMGE[e.para_birimi] ?? "₺";
+                  return (
+                    <div key={e.id} className="flex items-center justify-between gap-2 text-xs">
+                      <span className="flex items-center gap-2 font-bold text-slate-700">
+                        <span className="text-teal"><EklentiIkon tur={e.tur} /></span>
+                        <span>
+                          {EKLENTI_ETIKET[e.tur] ?? e.tur}
+                          {e.daire_no ? <span className="ml-1 font-medium text-slate-500">· {e.daire_no}</span> : null}
+                        </span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <span className="font-mono font-extrabold text-slate-800">
+                          {e.liste_fiyati != null ? `${fmt(e.liste_fiyati)} ${esim}` : "—"}
+                        </span>
+                        {mod === "uretici" ? (
+                          <form action={eklentiSil}>
+                            <input type="hidden" name="proje_id" value={projeId} />
+                            <input type="hidden" name="birim_id" value={e.id} />
+                            <button
+                              type="submit"
+                              className="rounded-lg px-2 py-1 text-[10px] font-bold text-slate-400 transition-colors hover:bg-red-soft hover:text-red"
+                              aria-label="Eklentiyi kaldır"
+                            >
+                              Kaldır
+                            </button>
+                          </form>
+                        ) : null}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : mod === "uretici" ? (
+              <p className="text-xs font-medium text-slate-400">Bu daireye bağlı otopark/depo yok.</p>
+            ) : null}
+
+            {/* Toplam (daire + eklenti) — yalnız daire fiyatı ve en az 1 eklenti fiyatı varsa anlamlı */}
+            {genelToplam != null && eklentiToplam > 0 ? (
+              <div className="mt-2.5 flex items-center justify-between border-t border-slate-200/60 pt-2.5 text-sm">
+                <span className="font-extrabold text-slate-900">Toplam (daire + eklenti)</span>
+                <span className="font-mono font-extrabold text-teal">{fmt(genelToplam)} {psim}</span>
+              </div>
+            ) : null}
+
+            {/* Üretici: yeni eklenti ekle mini-form */}
+            {mod === "uretici" ? (
+              <form action={eklentiEkle} className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200/60 pt-3">
+                <input type="hidden" name="proje_id" value={projeId} />
+                <input type="hidden" name="ana_birim_id" value={birim.id} />
+                <select name="tur" className="rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold text-slate-700 outline-none focus:border-teal">
+                  <option value="otopark">Otopark</option>
+                  <option value="depo">Depo</option>
+                </select>
+                <input
+                  name="liste_fiyati"
+                  type="number"
+                  min="0"
+                  placeholder="Fiyat ₺"
+                  className="w-24 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-800 outline-none focus:border-teal placeholder:text-slate-400"
+                />
+                <input
+                  name="daire_no"
+                  placeholder="Etiket (ops.)"
+                  className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs text-slate-800 outline-none focus:border-teal placeholder:text-slate-400"
+                />
+                <button
+                  type="submit"
+                  className="rounded-lg bg-teal px-3 py-2 text-xs font-bold text-navy transition-colors hover:bg-teal/90"
+                >
+                  + Ekle
+                </button>
+              </form>
+            ) : null}
           </div>
         ) : null}
 

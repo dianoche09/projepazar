@@ -426,6 +426,54 @@ export async function birimGuncelle(formData: FormData) {
   revalidatePath("/uretici/stok");
 }
 
+// ── Eklenti birimler (otopark/depo → ana daireye bağlı; daireden doğrudan eklenir/silinir) ──
+const EKLENTI_TUR = ["otopark", "depo"] as const;
+
+export async function eklentiEkle(formData: FormData): Promise<void> {
+  const proje_id = String(formData.get("proje_id"));
+  const ana_birim_id = String(formData.get("ana_birim_id"));
+  const tur = String(formData.get("tur"));
+  const geri = `/uretici/proje/${proje_id}`;
+  if (!z.string().uuid().safeParse(proje_id).success || !z.string().uuid().safeParse(ana_birim_id).success)
+    hataya(geri, "Geçersiz birim");
+  if (!(EKLENTI_TUR as readonly string[]).includes(tur)) hataya(geri, "Eklenti türü otopark veya depo olmalı");
+  const fRaw = String(formData.get("liste_fiyati") ?? "").trim();
+  const fiyat = fRaw === "" ? null : Number(fRaw);
+  if (fiyat != null && (!Number.isFinite(fiyat) || fiyat < 0)) hataya(geri, "Geçersiz fiyat");
+  const etiket = String(formData.get("daire_no") ?? "").trim() || (tur === "otopark" ? "Otopark" : "Depo");
+
+  const supabase = await createClient();
+  // RLS: üretici yalnız KENDİ projesinin birimine insert edebilir (birim insert policy proje sahipliğini kontrol eder).
+  const { error } = await supabase.from("birim").insert({
+    proje_id,
+    ana_birim_id,
+    tur,
+    daire_no: etiket,
+    liste_fiyati: fiyat,
+    para_birimi: "TRY",
+    durum: "musait",
+    satilabilir: true,
+  });
+  if (error) hataya(geri, error.message);
+  revalidatePath(geri);
+  revalidatePath("/uretici/stok");
+  basariya(geri, formData, "Eklenti eklendi");
+}
+
+export async function eklentiSil(formData: FormData): Promise<void> {
+  const proje_id = String(formData.get("proje_id"));
+  const birim_id = String(formData.get("birim_id"));
+  const geri = `/uretici/proje/${proje_id}`;
+  if (!z.string().uuid().safeParse(birim_id).success) hataya(geri, "Geçersiz birim");
+  const supabase = await createClient();
+  // Yalnız EKLENTİ silinsin (ana_birim_id dolu) — ana daire bu yolla silinemez.
+  const { error } = await supabase.from("birim").delete().eq("id", birim_id).not("ana_birim_id", "is", null);
+  if (error) hataya(geri, error.message);
+  revalidatePath(geri);
+  revalidatePath("/uretici/stok");
+  basariya(geri, formData, "Eklenti kaldırıldı");
+}
+
 // ── Opsiyon TALEBİ: müteahhit kararı. RPC SECURITY DEFINER (yetki + çift-satış fonksiyon içinde). ──
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

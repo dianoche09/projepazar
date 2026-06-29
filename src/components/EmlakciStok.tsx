@@ -99,8 +99,9 @@ export function EmlakciStok({
   };
 
   const aktifBlokObj = bloklar.find((b) => b.id === aktifBlok) ?? null;
-  // Bu blokta gerçekten var olan daire tipleri (filtre dropdown'u için)
-  const blokBirimleri = birimler.filter((b) => b.blok_id === aktifBlok);
+  // Bu blokta gerçekten var olan daire tipleri (filtre dropdown'u için). Eklentiler (ana_birim_id dolu)
+  // listede standalone görünmez — parent dairenin modalında.
+  const blokBirimleri = birimler.filter((b) => b.blok_id === aktifBlok && b.ana_birim_id == null);
   const blokTipIds = new Set(blokBirimleri.map((b) => b.tip_id).filter(Boolean) as string[]);
 
   const filtreli = blokBirimleri
@@ -114,6 +115,7 @@ export function EmlakciStok({
       id: b.id,
       daire_no: b.daire_no,
       kat: b.kat,
+      tur: b.tur ?? "daire",
       durum: b.durum as BirimDurum,
       satilabilir: b.satilabilir,
       liste_fiyati: b.liste_fiyati,
@@ -263,6 +265,15 @@ export function EmlakciStok({
           projeAd={projeAd}
           shareUrl={shareUrlMap[secili.id] ?? ""}
           benimOpsiyon={benimOpsiyonlar?.includes(secili.id) ?? false}
+          eklentiler={birimler
+            .filter((e) => e.ana_birim_id === secili.id)
+            .map((e) => ({
+              id: e.id,
+              tur: e.tur ?? "depo",
+              daire_no: e.daire_no,
+              liste_fiyati: e.liste_fiyati,
+              para_birimi: e.para_birimi,
+            }))}
           onKapat={() => setSecili(null)}
         />
       ) : null}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { DURUM_ETIKET } from "@/lib/types";
-import { DaireModal, type ModalBirim } from "./DaireModal";
+import { DaireModal, type ModalBirim, type Eklenti } from "./DaireModal";
 import { useSecim } from "./SecimDuzenle";
 
 /** Birim durumu → bina kesiti hücre gradyan sınıfı (v2 .hucre). */
@@ -25,6 +25,7 @@ export function BirimHucre({
   projeAd = "",
   shareUrl = "",
   benimOpsiyon = false,
+  eklentiler = [],
 }: {
   birim: ModalBirim;
   projeId: string;
@@ -32,6 +33,7 @@ export function BirimHucre({
   projeAd?: string;
   shareUrl?: string;
   benimOpsiyon?: boolean;
+  eklentiler?: Eklenti[];
 }) {
   const [acik, setAcik] = useState(false);
   const secim = useSecim();
@@ -69,6 +71,7 @@ export function BirimHucre({
           projeAd={projeAd}
           shareUrl={shareUrl}
           benimOpsiyon={benimOpsiyon}
+          eklentiler={eklentiler}
           onKapat={() => setAcik(false)}
         />
       ) : null}

@@ -13,6 +13,8 @@ type BirimRaw = {
   proje_id: string;
   blok_id: string | null;
   tip_id: string | null;
+  tur: string | null;
+  ana_birim_id: string | null;
   kat: number | null;
   daire_no: string | null;
   durum: string;
@@ -49,7 +51,7 @@ export default async function UreticiStok({
       supabase
         .from("birim")
         .select(
-          "id, proje_id, blok_id, tip_id, kat, daire_no, durum, liste_fiyati, kira_bedeli, para_birimi, net_m2, brut_m2, satilabilir, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
+          "id, proje_id, blok_id, tip_id, tur, ana_birim_id, kat, daire_no, durum, liste_fiyati, kira_bedeli, para_birimi, net_m2, brut_m2, satilabilir, yon, manzara, serefiye, odeme_plani, durum_notu, son_guncelleme",
         ),
       supabase.from("blok").select("id, ad"),
       supabase.from("daire_tipi").select("id, ad, oda, net_m2, taban_fiyat, plan_url"),
@@ -68,13 +70,14 @@ export default async function UreticiStok({
   const tipPlan = new Map((tipler ?? []).map((t) => [t.id, (t.plan_url as string | null) ?? null]));
   const projeAd = new Map((projeler ?? []).map((p) => [p.id, p.ad as string]));
 
-  // KPI
-  const toplam = birimler.length;
-  const musait = birimler.filter((b) => b.durum === "musait").length;
-  const opsiyon = birimler.filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length;
-  const satildi = birimler.filter((b) => b.durum === "satildi").length;
+  // KPI — eklentiler (otopark/depo) ana stok sayımına girmez; ana birimler üzerinden
+  const anaBirimler = birimler.filter((b) => b.ana_birim_id == null);
+  const toplam = anaBirimler.length;
+  const musait = anaBirimler.filter((b) => b.durum === "musait").length;
+  const opsiyon = anaBirimler.filter((b) => b.durum === "opsiyonlu" || b.durum === "satis_beklemede").length;
+  const satildi = anaBirimler.filter((b) => b.durum === "satildi").length;
 
-  const fiyatlar = birimler
+  const fiyatlar = anaBirimler
     .map((b) => b.liste_fiyati)
     .filter((f): f is number => f != null && f > 0);
   const minFiyat = fiyatlar.length ? Math.min(...fiyatlar) : 0;
@@ -111,6 +114,8 @@ export default async function UreticiStok({
       tip_tam_ad: tipTamAd.get(b.tip_id ?? "") ?? null,
       oda: tipOda.get(b.tip_id ?? "") ?? null,
       plan_url: tipPlan.get(b.tip_id ?? "") ?? null,
+      tur: b.tur,
+      ana_birim_id: b.ana_birim_id,
     }));
 
   const projeFiltre = (projeler ?? []).map((p) => ({ id: p.id, ad: p.ad as string }));

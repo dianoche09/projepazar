@@ -37,6 +37,8 @@ export type StokSatir = {
   tip_tam_ad: string | null;
   oda: string | null;
   plan_url: string | null;
+  tur: string | null;
+  ana_birim_id: string | null;
 };
 
 /** Stok satırını DaireModal'ın beklediği künyeye çevirir (üretici modu). */
@@ -45,6 +47,7 @@ function satirToModalBirim(s: StokSatir): ModalBirim {
     id: s.id,
     daire_no: s.daire_no,
     kat: s.kat,
+    tur: s.tur ?? "daire",
     durum: s.durum as BirimDurum,
     satilabilir: s.satilabilir,
     liste_fiyati: s.liste_fiyati,
@@ -99,6 +102,7 @@ export function StokTablo({
 
   const gosterilen = useMemo(() => {
     return satirlar.filter((s) => {
+      if (s.ana_birim_id != null) return false; // eklentiler tabloda standalone satır olmaz (parent modalında)
       if (projeId !== "tumu" && s.proje_id !== projeId) return false;
       if (durum !== "tumu" && kova(s.durum) !== durum) return false;
       return true;
@@ -280,6 +284,15 @@ export function StokTablo({
           projeId={acikSatir.proje_id}
           mod="uretici"
           projeAd={acikSatir.proje_ad}
+          eklentiler={satirlar
+            .filter((e) => e.ana_birim_id === acikSatir.id)
+            .map((e) => ({
+              id: e.id,
+              tur: e.tur ?? "depo",
+              daire_no: e.daire_no,
+              liste_fiyati: e.liste_fiyati,
+              para_birimi: e.para_birimi ?? "TRY",
+            }))}
           onKapat={() => {
             setAcikSatir(null);
             // Güncellenen durum/fiyat canlı stok tablosuna yansısın (server action revalidate'i tamamlar).

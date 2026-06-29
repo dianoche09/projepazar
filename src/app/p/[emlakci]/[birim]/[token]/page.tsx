@@ -93,6 +93,27 @@ export default async function PublicBirimPage({
   }));
   /* eslint-enable @typescript-eslint/no-explicit-any */
 
+  // Eklenti birimler (otopark/depo) — bu daireye bağlı; satış argümanı olarak fiyatla göster
+  const { data: eklentiRaw } = await supabase
+    .from("birim")
+    .select("id, tur, daire_no, liste_fiyati, para_birimi")
+    .eq("ana_birim_id", birim);
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  const eklentiler = ((eklentiRaw ?? []) as any[]).map((x) => ({
+    id: x.id as string,
+    tur: (x.tur as string | null) ?? "depo",
+    daire_no: x.daire_no as string | null,
+    liste_fiyati: x.liste_fiyati as number | null,
+    para_birimi: (x.para_birimi as string | null) ?? "TRY",
+  }));
+  /* eslint-enable @typescript-eslint/no-explicit-any */
+  // Toplam: yalnız ana daireyle aynı para birimindeki eklentiler eklenir (farklı kur Faz-2)
+  const eklentiToplam = eklentiler.reduce(
+    (acc, e) => acc + (e.liste_fiyati != null && e.para_birimi === (b.para_birimi ?? "TRY") ? e.liste_fiyati : 0),
+    0,
+  );
+  const genelToplam = b.liste_fiyati != null ? b.liste_fiyati + eklentiToplam : null;
+
   const { data: kapakBelge } = await supabase
     .from("proje_belge")
     .select("url")
@@ -275,6 +296,28 @@ export default async function PublicBirimPage({
                         <div className="flex justify-between"><span className="text-gray">{odeme.ay} ay taksit</span><span className="font-semibold text-ink">{fmt(odeme.aylik)} {psim}/ay</span></div>
                       ) : null}
                       {odeme.vade === 0 ? <p className="text-[11px] font-medium text-teal-d">Vade farksız</p> : null}
+                    </div>
+                  ) : null}
+                  {eklentiler.length > 0 ? (
+                    <div className="mt-3 space-y-1 border-t border-hair pt-3 text-sm">
+                      <p className="font-sans text-[11px] font-semibold uppercase tracking-wide text-gray">Eklentiler</p>
+                      {eklentiler.map((e) => (
+                        <div key={e.id} className="flex justify-between">
+                          <span className="text-gray">
+                            {e.tur === "otopark" ? "Otopark" : "Depo"}
+                            {e.daire_no ? ` · ${e.daire_no}` : ""}
+                          </span>
+                          <span className="text-ink">
+                            {e.liste_fiyati != null ? `${fmt(e.liste_fiyati)} ${PARA_SIMGE[e.para_birimi] ?? "₺"}` : "—"}
+                          </span>
+                        </div>
+                      ))}
+                      {genelToplam != null && eklentiToplam > 0 ? (
+                        <div className="mt-1.5 flex justify-between border-t border-hair pt-1.5 font-semibold">
+                          <span className="text-ink">Toplam (daire + eklenti)</span>
+                          <span className="text-teal-d">{fmt(genelToplam)} {psim}</span>
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                 </div>

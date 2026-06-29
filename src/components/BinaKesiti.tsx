@@ -5,6 +5,8 @@ export type BinaBirim = {
   id: string;
   blok_id: string | null;
   tip_id: string | null;
+  tur: string | null;
+  ana_birim_id: string | null;
   kat: number | null;
   daire_no: string | null;
   durum: string;
@@ -59,7 +61,8 @@ export function BinaKesiti({
   return (
     <div className="space-y-6">
       {bloklar.map((blok) => {
-        const bb = birimler.filter((b) => b.blok_id === blok.id);
+        // Eklentiler (ana_birim_id dolu) grid'de standalone hücre OLMAZ — parent dairenin modalında görünür.
+        const bb = birimler.filter((b) => b.blok_id === blok.id && b.ana_birim_id == null);
         const katlar = [...new Set(bb.map((b) => b.kat).filter((k): k is number => k != null))].sort(
           (a, b) => b - a,
         );
@@ -125,6 +128,16 @@ export function BinaKesiti({
                             {kb.map((b) => {
                               const tip = b.tip_id ? tipMap.get(b.tip_id) : null;
                               const shareUrl = shareUrlMap?.[b.id] ?? "";
+                              // Bu daireye bağlı eklentiler (otopark/depo) — modalda gösterim/yönetim.
+                              const eklentiler = birimler
+                                .filter((e) => e.ana_birim_id === b.id)
+                                .map((e) => ({
+                                  id: e.id,
+                                  tur: e.tur ?? "depo",
+                                  daire_no: e.daire_no,
+                                  liste_fiyati: e.liste_fiyati,
+                                  para_birimi: e.para_birimi,
+                                }));
                               return (
                                 <BirimHucre
                                   key={b.id}
@@ -133,10 +146,12 @@ export function BinaKesiti({
                                   projeAd={projeAd}
                                   shareUrl={shareUrl}
                                   benimOpsiyon={benimOpsiyonlar?.includes(b.id) ?? false}
+                                  eklentiler={eklentiler}
                                   birim={{
                                     id: b.id,
                                     daire_no: b.daire_no,
                                     kat: b.kat,
+                                    tur: b.tur ?? "daire",
                                     durum: b.durum as BirimDurum,
                                     satilabilir: b.satilabilir,
                                     liste_fiyati: b.liste_fiyati,
