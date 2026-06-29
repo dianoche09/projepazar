@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { ASAMA_ETIKET, fmtPara, type InsaatAsama } from "@/lib/types";
 import { EmlakciStok } from "@/components/EmlakciStok";
+import { PaylasWhatsApp } from "@/components/PaylasWhatsApp";
 import { projeKapak } from "@/lib/gorsel";
 import { generateShareToken } from "@/lib/sharing";
 
@@ -127,11 +128,8 @@ export default async function HavuzProjeDetay({
     .in("durum", ["opsiyonlu", "satis_beklemede"]);
   const benimOpsiyonlar = (benimOps ?? []).map((o) => o.birim_id as string);
 
-  // WhatsApp paylaşım — public microsite varsa onu, yoksa proje konum/aşama özeti
-  const paylasimMetni = `${proje.ad} · ${konum}\nİnşaat: ${ASAMA_ETIKET[proje.insaat_asamasi as InsaatAsama]} (%${proje.ilerleme_yuzde})${
-    proje.public_slug ? `\n${appUrl}/proje/${proje.public_slug}` : ""
-  }`;
-  const waUrl = `https://wa.me/?text=${encodeURIComponent(paylasimMetni)}`;
+  // WhatsApp paylaşım — proje konum/aşama özeti. (public_slug /proje route'u Faz-2; 404 link basma.)
+  const paylasimMetni = `${proje.ad} · ${konum}\nİnşaat: ${ASAMA_ETIKET[proje.insaat_asamasi as InsaatAsama]} (%${proje.ilerleme_yuzde})`;
 
   return (
     <div className="belir mx-auto max-w-5xl py-2">
@@ -161,17 +159,12 @@ export default async function HavuzProjeDetay({
           <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent" />
 
           {/* Paylaş — sağ üst */}
-          <a
-            href={waUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-wa absolute right-4 top-4 z-10 shadow-card"
-          >
+          <PaylasWhatsApp text={paylasimMetni} projeId={id} className="btn-wa absolute right-4 top-4 z-10 shadow-card">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
               <path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.7 4.8-1.3A10 10 0 1 0 12 2Zm5.5 14.2c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .2-3.2-.7-2.7-1.1-4.4-3.9-4.5-4.1-.1-.2-1.1-1.5-1.1-2.8s.7-2 .9-2.2c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.1.1.3 0 .5-.1.2-.2.3-.3.5l-.5.5c-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1l1.8.9c.2.1.4.2.5.3.1.2.1.7-.1 1.2Z" />
             </svg>
             WhatsApp Paylaş
-          </a>
+          </PaylasWhatsApp>
         </div>
 
         {/* Hero alt bilgi */}

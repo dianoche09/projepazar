@@ -6,6 +6,7 @@ import { birimDurumGuncelle, birimGuncelle } from "@/app/uretici/actions";
 import { opsiyonTalepGonder, opsiyonBirakSessiz } from "@/app/havuz/actions";
 import { DURUM_BG, DURUM_ETIKET, zamanOnce, type BirimDurum } from "@/lib/types";
 import { KatPlani } from "@/components/KatPlani";
+import { PaylasWhatsApp } from "@/components/PaylasWhatsApp";
 import { useToast } from "@/components/ui/Toast";
 
 const DURUMLAR: BirimDurum[] = ["musait", "opsiyonlu", "satis_beklemede", "satildi", "stop"];
@@ -109,7 +110,6 @@ export function DaireModal({
   ]
     .filter(Boolean)
     .join("\n");
-  const waLink = `https://wa.me/?text=${encodeURIComponent(paylasMetni)}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
@@ -317,17 +317,17 @@ export function DaireModal({
           <div className="mt-5 space-y-3">
             {birim.durum === "musait" && birim.satilabilir ? (
               <>
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <PaylasWhatsApp
+                  text={paylasMetni}
+                  projeId={projeId}
+                  birimId={birim.id}
                   className="flex items-center justify-center gap-2 rounded-xl bg-[#1faa5b] hover:bg-[#178c4a] py-3.5 text-xs font-bold text-white transition-all duration-300 shadow-[0_4px_12px_rgba(31,170,91,0.25)]"
                 >
                   <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
                     <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.623-1.023-5.086-2.884-6.948C16.59 1.993 14.137.973 11.52.973c-5.437 0-9.859 4.373-9.864 9.803-.002 1.757.475 3.468 1.385 4.988L2.082 21.82l6.565-1.666zM17.29 14.7c-.283-.143-1.67-.82-1.929-.915-.258-.094-.446-.142-.634.143-.188.283-.729.915-.892 1.102-.163.189-.327.213-.61.072-2.046-1.023-3.4-1.918-4.755-4.249-.356-.61.356-.566 1.02-1.888.106-.212.053-.399-.026-.541-.079-.142-.633-1.526-.867-2.09-.228-.548-.46-.473-.633-.482-.164-.008-.352-.01-.54-.01s-.494.07-.753.353c-.259.283-.988.962-.988 2.348s1.009 2.72 1.15 2.908c.141.189 1.984 3.01 4.806 4.217.672.287 1.196.459 1.603.589.675.215 1.29.185 1.776.113.541-.08 1.67-.68 1.905-1.339.235-.66.235-1.226.165-1.343-.07-.118-.282-.189-.564-.332z"/>
                   </svg>
                   WhatsApp ile Paylaş
-                </a>
+                </PaylasWhatsApp>
                 <p className="text-center text-[10.5px] leading-snug text-[var(--ink-faint)] font-bold">
                   Müşterinizle birebir paylaşın — yetkisiz ilan yasal risk taşımaktadır.
                 </p>

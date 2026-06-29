@@ -120,6 +120,26 @@ export async function opsiyonBirakSessiz(
   return error ? { ok: false, mesaj: "Bırakılamadı" } : { ok: true, mesaj: "Opsiyon bırakıldı" };
 }
 
+/** WhatsApp paylaşımı tıklanınca ANONİM paylaşım sinyali (Paylaştıklarım sayfası + Talep Radarı moat). */
+export async function paylasimKaydet(projeId: string, birimId?: string | null): Promise<void> {
+  const p = uuid.safeParse(projeId);
+  if (!p.success) return;
+  const b = birimId ? uuid.safeParse(birimId) : null;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+  await kayitYaz({
+    tip: "paylasim",
+    profileId: user.id,
+    projeId: p.data,
+    birimId: b && b.success ? b.data : null,
+    payload: {},
+  });
+  revalidatePath("/havuz/paylastiklarim");
+}
+
 /**
  * Lead durumunu ilerlet (yeni→arandı→görüşme→opsiyon→kazanıldı/kaybedildi).
  * lead_update RLS politikası yok → sahiplik RLS-select ile doğrulanır, sonra
