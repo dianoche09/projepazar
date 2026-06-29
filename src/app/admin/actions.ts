@@ -96,6 +96,24 @@ export async function ureticiyeAbonelikAta(formData: FormData) {
   redirect(`/admin/ureticiler?mesaj=${encodeURIComponent(paket_id ? "Abonelik atandı" : "Abonelik kaldırıldı")}`);
 }
 
+// ── KYC belge doğrulama (admin onay/red → emlakçı belge_durumu; trigger 'dogrulandi'ya yalnız admin izin verir) ──
+export async function belgeKarar(formData: FormData): Promise<void> {
+  const adminId = await adminGuard();
+  const profileId = String(formData.get("profile_id"));
+  const karar = String(formData.get("karar"));
+  if (!z.string().uuid().safeParse(profileId).success || (karar !== "onay" && karar !== "red")) {
+    redirect("/admin/dogrulama?hata=" + encodeURIComponent("Geçersiz istek"));
+  }
+  const yeni = karar === "onay" ? "dogrulandi" : "red";
+  const supabase = await createClient();
+  await supabase.from("kullanici_belge").update({ durum: yeni }).eq("profile_id", profileId).eq("durum", "beklemede");
+  await supabase.from("profiles").update({ belge_durumu: yeni }).eq("id", profileId);
+  await kayitYaz({ tip: "dogrulama", profileId: adminId, payload: { hedef: profileId, karar: yeni } });
+  revalidatePath("/admin/dogrulama");
+  revalidatePath("/admin");
+  redirect(`/admin/dogrulama?mesaj=${encodeURIComponent(karar === "onay" ? "Danışman doğrulandı" : "Belgeler reddedildi")}`);
+}
+
 // ── Üyelik paketi CRUD (tip/fiyat/kota %100 admin-kontrollü; üç hedef) ──
 const bosNull = (v: FormDataEntryValue | null) => {
   const s = String(v ?? "").trim();

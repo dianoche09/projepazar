@@ -21,6 +21,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .from("profiles")
     .select("id", { count: "exact", head: true })
     .eq("durum", "onay_bekliyor");
+  const { count: belgeBekleyen } = await supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("belge_durumu", "beklemede");
 
   const ad = profil.ad ?? user.email ?? "Yönetici";
   const basHarf = ad.trim().slice(0, 2).toUpperCase() || "PA";
@@ -34,7 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Logo size={30} wordmark />
           </Link>
 
-          <AdminNav onayBekleyen={onayBekleyen ?? 0} />
+          <AdminNav onayBekleyen={onayBekleyen ?? 0} belgeBekleyen={belgeBekleyen ?? 0} />
 
           <div className="mt-auto pt-4">
             <div className="flex items-center gap-2.5 rounded-2xl border border-hair bg-card p-2.5 shadow-card">
@@ -68,7 +72,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </form>
           </header>
           <div className="border-b border-hair bg-card px-3 py-2 md:hidden">
-            <AdminNav mobil onayBekleyen={onayBekleyen ?? 0} />
+            <AdminNav mobil onayBekleyen={onayBekleyen ?? 0} belgeBekleyen={belgeBekleyen ?? 0} />
           </div>
 
           <main className="min-w-0 flex-1">{children}</main>

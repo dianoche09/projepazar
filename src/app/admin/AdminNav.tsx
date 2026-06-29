@@ -25,6 +25,11 @@ const YONETIM: NavItem[] = [
     ikon: ic(<><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></>),
   },
   {
+    href: "/admin/dogrulama",
+    etiket: "Belge Doğrulama",
+    ikon: ic(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><path d="M9 15l2 2 4-4" /></>),
+  },
+  {
     href: "/admin/kullanicilar",
     etiket: "Kullanıcılar",
     ikon: ic(<><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>),
@@ -56,7 +61,7 @@ const PANELLER = [
   { href: "/havuz", etiket: "Emlakçı Havuzu" },
 ];
 
-export function AdminNav({ mobil = false, onayBekleyen = 0 }: { mobil?: boolean; onayBekleyen?: number }) {
+export function AdminNav({ mobil = false, onayBekleyen = 0, belgeBekleyen = 0 }: { mobil?: boolean; onayBekleyen?: number; belgeBekleyen?: number }) {
   const yol = usePathname();
   const aktif = (h: string, tam?: boolean) => (tam ? yol === h : yol.startsWith(h));
 
@@ -73,6 +78,7 @@ export function AdminNav({ mobil = false, onayBekleyen = 0 }: { mobil?: boolean;
           >
             {n.etiket}
             {n.href === "/admin/onay" && onayBekleyen > 0 ? <span className="ml-1.5 font-mono text-xs">{onayBekleyen}</span> : null}
+            {n.href === "/admin/dogrulama" && belgeBekleyen > 0 ? <span className="ml-1.5 font-mono text-xs">{belgeBekleyen}</span> : null}
           </Link>
         ))}
         {PANELLER.map((n) => (
@@ -93,6 +99,11 @@ export function AdminNav({ mobil = false, onayBekleyen = 0 }: { mobil?: boolean;
           {n.href === "/admin/onay" && onayBekleyen > 0 ? (
             <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-amber-soft px-1.5 font-mono text-[11px] font-bold text-amber">
               {onayBekleyen}
+            </span>
+          ) : null}
+          {n.href === "/admin/dogrulama" && belgeBekleyen > 0 ? (
+            <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-md bg-amber-soft px-1.5 font-mono text-[11px] font-bold text-amber">
+              {belgeBekleyen}
             </span>
           ) : null}
         </Link>
