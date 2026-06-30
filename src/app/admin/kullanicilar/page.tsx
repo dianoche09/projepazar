@@ -17,7 +17,7 @@ export default async function KullanicilarSayfasi({
   const [{ data: kullanicilar }, { data: ofisler }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, ad, rol, durum, ofis_id, telefon, son_giris, talep_rol, created_at")
+      .select("id, ad, rol, durum, ofis_id, telefon, son_giris, talep_rol, created_at, marka, il, ilce, uzmanlik")
       .order("created_at", { ascending: false }),
     supabase.from("ofis").select("id, ad").order("ad"),
   ]);

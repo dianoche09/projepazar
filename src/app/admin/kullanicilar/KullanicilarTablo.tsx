@@ -21,7 +21,20 @@ export type Kullanici = {
   telefon: string | null;
   son_giris: string | null;
   talep_rol: string | null;
+  marka: string | null;
+  il: string | null;
+  ilce: string | null;
+  uzmanlik: string | null;
 };
+
+const MARKALAR = ["RE/MAX", "Century 21", "Coldwell Banker", "Keller Williams", "Turyap", "EVA Gayrimenkul", "Bağımsız"];
+const UZMANLIKLAR: [string, string][] = [
+  ["", "—"],
+  ["konut", "Konut"],
+  ["ticari", "Ticari"],
+  ["arsa", "Arsa"],
+  ["proje", "Proje"],
+];
 
 function Kaydet() {
   const { pending } = useFormStatus();
@@ -56,6 +69,11 @@ export function KullanicilarTablo({
 
   return (
     <div>
+      <datalist id="markalar">
+        {MARKALAR.map((m) => (
+          <option key={m} value={m} />
+        ))}
+      </datalist>
       {/* Filtre çubuğu */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1">
@@ -166,6 +184,33 @@ export function KullanicilarTablo({
                               ))}
                             </select>
                           </label>
+                          {k.rol === "emlakci" ? (
+                            <>
+                              <span className="w-full text-[10px] font-bold uppercase tracking-wide text-gray">
+                                Kategorizasyon (segment tahsis için — boşsa ofisten türetilir)
+                              </span>
+                              <label className="flex flex-col gap-1 text-[11px] font-medium text-gray">
+                                Marka
+                                <input name="marka" defaultValue={k.marka ?? ""} list="markalar" placeholder="RE/MAX…" className={sel} />
+                              </label>
+                              <label className="flex flex-col gap-1 text-[11px] font-medium text-gray">
+                                Şehir
+                                <input name="il" defaultValue={k.il ?? ""} placeholder="Ankara" className={sel} />
+                              </label>
+                              <label className="flex flex-col gap-1 text-[11px] font-medium text-gray">
+                                İlçe
+                                <input name="ilce" defaultValue={k.ilce ?? ""} placeholder="Çankaya" className={sel} />
+                              </label>
+                              <label className="flex flex-col gap-1 text-[11px] font-medium text-gray">
+                                Uzmanlık
+                                <select name="uzmanlik" defaultValue={k.uzmanlik ?? ""} className={sel}>
+                                  {UZMANLIKLAR.map(([v, a]) => (
+                                    <option key={v} value={v}>{a}</option>
+                                  ))}
+                                </select>
+                              </label>
+                            </>
+                          ) : null}
                           <Kaydet />
                         </form>
                       </td>

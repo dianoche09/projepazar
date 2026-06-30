@@ -279,12 +279,35 @@ export async function kullaniciGuncelle(formData: FormData) {
   }
 
   const supabase = await createClient();
+  // Kategorizasyon (segment tahsis için): marka/il/ilce/uzmanlik. Boş + ofis varsa → ofisten türet.
+  const kat: { marka: string | null; il: string | null; ilce: string | null; uzmanlik: string | null } = {
+    marka: String(formData.get("marka") ?? "").trim() || null,
+    il: String(formData.get("il") ?? "").trim() || null,
+    ilce: String(formData.get("ilce") ?? "").trim() || null,
+    uzmanlik: String(formData.get("uzmanlik") ?? "").trim() || null,
+  };
+  if (parsed.data.ofis_id && (!kat.marka || !kat.il || !kat.ilce)) {
+    const { data: ofis } = await supabase
+      .from("ofis")
+      .select("marka, il, ilce")
+      .eq("id", parsed.data.ofis_id)
+      .single();
+    if (ofis) {
+      kat.marka = kat.marka ?? ((ofis.marka as string | null) ?? null);
+      kat.il = kat.il ?? ((ofis.il as string | null) ?? null);
+      kat.ilce = kat.ilce ?? ((ofis.ilce as string | null) ?? null);
+    }
+  }
   await supabase
     .from("profiles")
     .update({
       rol: parsed.data.rol,
       ofis_id: parsed.data.ofis_id || null,
       durum: parsed.data.durum,
+      marka: kat.marka,
+      il: kat.il,
+      ilce: kat.ilce,
+      uzmanlik: kat.uzmanlik,
     })
     .eq("id", parsed.data.kullanici_id);
   revalidatePath("/admin/kullanicilar");

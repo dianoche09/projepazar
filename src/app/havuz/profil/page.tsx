@@ -10,7 +10,7 @@ export default async function Profil() {
   } = await supabase.auth.getUser();
   const { data: profil } = await supabase
     .from("profiles")
-    .select("ad, rol, telefon, ofis_id, durum, onay_tarihi")
+    .select("ad, rol, telefon, ofis_id, durum, onay_tarihi, marka, il, ilce, uzmanlik")
     .eq("id", user?.id ?? "")
     .single();
   const { data: ofis } = profil?.ofis_id
@@ -21,11 +21,14 @@ export default async function Profil() {
   const basHarf = ad.trim().charAt(0).toUpperCase() || "D";
   const onayli = profil?.durum === "aktif";
 
+  const UZMANLIK_AD: Record<string, string> = { konut: "Konut", ticari: "Ticari", arsa: "Arsa", proje: "Proje" };
   const kunye: [string, string][] = [
     ["Rol", profil ? ROL_ETIKET[profil.rol as Rol] : "—"],
     ["Hesap Durumu", profil ? HESAP_DURUM_ETIKET[profil.durum as HesapDurum] : "—"],
     ["E-posta", user?.email ?? "—"],
     ["Telefon", profil?.telefon ?? "—"],
+    ["Kategori (segment)", [profil?.marka, profil?.il, profil?.ilce].filter(Boolean).join(" · ") || "—"],
+    ["Uzmanlık", profil?.uzmanlik ? UZMANLIK_AD[profil.uzmanlik] ?? profil.uzmanlik : "—"],
   ];
 
   return (
