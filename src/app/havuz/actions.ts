@@ -6,8 +6,9 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz } from "@/lib/events";
+import { zUuid } from "@/lib/uuid";
 
-const uuid = z.string().uuid();
+const uuid = zUuid;
 
 /**
  * OPSİYON TALEP→ONAY (üretici-kontrollü — DEĞİŞMEZ #3 korunur).

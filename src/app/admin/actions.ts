@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz } from "@/lib/events";
+import { zUuid } from "@/lib/uuid";
 
 /** Çağıran oturumun admin olduğunu doğrula (service-role işlemleri öncesi şart). Admin id döner. */
 async function adminGuard(): Promise<string> {
@@ -32,8 +33,8 @@ export async function ureticiDogrula(formData: FormData) {
 }
 
 const AtaSchema = z.object({
-  ofis_id: z.string().uuid(),
-  paket_id: z.union([z.string().uuid(), z.literal("")]),
+  ofis_id: zUuid,
+  paket_id: z.union([zUuid, z.literal("")]),
 });
 
 /**
@@ -63,8 +64,8 @@ export async function ofiseAbonelikAta(formData: FormData) {
 }
 
 const UretAtaSchema = z.object({
-  uretici_id: z.string().uuid(),
-  paket_id: z.union([z.string().uuid(), z.literal("")]),
+  uretici_id: zUuid,
+  paket_id: z.union([zUuid, z.literal("")]),
 });
 
 /**
@@ -101,7 +102,7 @@ export async function belgeKarar(formData: FormData): Promise<void> {
   const adminId = await adminGuard();
   const profileId = String(formData.get("profile_id"));
   const karar = String(formData.get("karar"));
-  if (!z.string().uuid().safeParse(profileId).success || (karar !== "onay" && karar !== "red")) {
+  if (!zUuid.safeParse(profileId).success || (karar !== "onay" && karar !== "red")) {
     redirect("/admin/dogrulama?hata=" + encodeURIComponent("Geçersiz istek"));
   }
   const yeni = karar === "onay" ? "dogrulandi" : "red";
@@ -159,7 +160,7 @@ export async function paketEkle(formData: FormData) {
 /** Mevcut paketi düzenle (fiyat/kota/özellik/aktiflik). */
 export async function paketDuzenle(formData: FormData) {
   await adminGuard();
-  const id = z.string().uuid().safeParse(formData.get("id"));
+  const id = zUuid.safeParse(formData.get("id"));
   const parsed = paketGirdi(formData);
   if (!id.success || !parsed.success) return;
   const supabase = await createClient();
@@ -170,7 +171,7 @@ export async function paketDuzenle(formData: FormData) {
 /** Paketi sil — atanmış aktif abonelik varsa silmek yerine pasifleştirir. */
 export async function paketSil(formData: FormData) {
   await adminGuard();
-  const id = z.string().uuid().safeParse(formData.get("id"));
+  const id = zUuid.safeParse(formData.get("id"));
   if (!id.success) return;
   const supabase = await createClient();
   const { count } = await supabase
@@ -188,9 +189,9 @@ export async function paketSil(formData: FormData) {
 
 // ── Onay kuyruğu (kayıt → admin onayı → aktif) ──
 const OnaySchema = z.object({
-  kullanici_id: z.string().uuid(),
+  kullanici_id: zUuid,
   rol: z.enum(["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi"]),
-  ofis_id: z.union([z.string().uuid(), z.literal("")]),
+  ofis_id: z.union([zUuid, z.literal("")]),
 });
 
 /** Bekleyen kaydı onayla: rol + ofis ata, durum=aktif, onay izini bırak. */
@@ -221,7 +222,7 @@ export async function kullaniciOnayla(formData: FormData) {
 /** Bekleyen kaydı reddet → durum=pasif (soft; iz kalır, silinmez). */
 export async function kullaniciReddet(formData: FormData) {
   const adminId = await adminGuard();
-  const id = z.string().uuid().safeParse(formData.get("kullanici_id"));
+  const id = zUuid.safeParse(formData.get("kullanici_id"));
   if (!id.success) return;
   const supabase = await createClient();
   await supabase.from("profiles").update({ durum: "pasif" }).eq("id", id.data);
@@ -234,7 +235,7 @@ export async function hesapDurumDegistir(formData: FormData) {
   const adminId = await adminGuard();
   const parsed = z
     .object({
-      kullanici_id: z.string().uuid(),
+      kullanici_id: zUuid,
       durum: z.enum(["aktif", "pasif", "askida", "arsivli"]),
     })
     .safeParse({
@@ -257,9 +258,9 @@ export async function hesapDurumDegistir(formData: FormData) {
 
 // ── Kullanıcı düzenleme (rol + ofis + durum tek formda) ──
 const KullaniciSchema = z.object({
-  kullanici_id: z.string().uuid(),
+  kullanici_id: zUuid,
   rol: z.enum(["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi", "admin"]),
-  ofis_id: z.union([z.string().uuid(), z.literal("")]),
+  ofis_id: z.union([zUuid, z.literal("")]),
   durum: z.enum(["onay_bekliyor", "aktif", "pasif", "askida", "arsivli"]),
 });
 
@@ -296,7 +297,7 @@ const OlusturSchema = z.object({
   ad: z.string().trim().min(2, "Ad-soyad"),
   telefon: z.string().trim().max(20).optional(),
   rol: z.enum(["uretici", "emlakci", "ofis_yetkili", "marka_yetkili", "arsa_sahibi", "admin"]),
-  ofis_id: z.union([z.string().uuid(), z.literal("")]),
+  ofis_id: z.union([zUuid, z.literal("")]),
   parola: z.string().min(8, "Parola en az 8 karakter"),
 });
 
@@ -345,7 +346,7 @@ export async function kullaniciOlustur(formData: FormData) {
 /** Kullanıcının parolasını sıfırla (admin → yeni geçici parola). Service-role. */
 export async function parolaSifirla(formData: FormData) {
   await adminGuard();
-  const id = z.string().uuid().safeParse(formData.get("kullanici_id"));
+  const id = zUuid.safeParse(formData.get("kullanici_id"));
   const parola = z.string().min(8).safeParse(formData.get("parola"));
   if (!id.success || !parola.success) {
     redirect(`/admin/kullanicilar?hata=${encodeURIComponent("Parola en az 8 karakter")}`);

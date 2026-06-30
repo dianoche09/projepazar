@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz, kayitlarYaz, durumTip } from "@/lib/events";
+import { UUID_RE, zUuid } from "@/lib/uuid";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import * as XLSX from "xlsx";
@@ -426,10 +427,6 @@ export async function birimGuncelle(formData: FormData) {
   revalidatePath("/uretici/stok");
 }
 
-// Lenient UUID — demo id'ler (2222.../7777.../5555...) RFC-uyumsuz (4. grup 8/9/a/b ile başlamıyor);
-// z.string().uuid() STRICT onları reddediyordu → tahsis/eklenti "kaydetmiyordu". DB FK bütünlüğü zaten garanti.
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 // ── Eklenti birimler (otopark/depo → ana daireye bağlı; daireden doğrudan eklenir/silinir) ──
 const EKLENTI_TUR = ["otopark", "depo"] as const;
 
@@ -502,7 +499,7 @@ function idListesi(formData: FormData): string[] {
   return String(formData.get("birim_idler") ?? "")
     .split(",")
     .map((s) => s.trim())
-    .filter((s) => z.string().uuid().safeParse(s).success);
+    .filter((s) => zUuid.safeParse(s).success);
 }
 
 export async function birimTopluGuncelle(formData: FormData) {
@@ -727,7 +724,7 @@ export async function tahsisEkle(formData: FormData) {
 }
 
 export async function tahsisSil(formData: FormData) {
-  const id = z.string().uuid().safeParse(formData.get("tahsis_id"));
+  const id = zUuid.safeParse(formData.get("tahsis_id"));
   const proje_id = String(formData.get("proje_id"));
   if (!id.success) return;
   const supabase = await createClient();
@@ -835,7 +832,7 @@ export async function medyaYukle(formData: FormData) {
 }
 
 export async function medyaSil(formData: FormData) {
-  const id = z.string().uuid().safeParse(formData.get("belge_id"));
+  const id = zUuid.safeParse(formData.get("belge_id"));
   const proje_id = String(formData.get("proje_id"));
   if (!id.success) return;
 
@@ -987,7 +984,7 @@ export async function mahalEkle(formData: FormData) {
 }
 
 export async function mahalSil(formData: FormData) {
-  const id = z.string().uuid().safeParse(formData.get("mahal_id"));
+  const id = zUuid.safeParse(formData.get("mahal_id"));
   const proje_id = String(formData.get("proje_id"));
   if (!id.success) return;
   const supabase = await createClient();
