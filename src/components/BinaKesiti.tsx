@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { BirimHucre } from "@/components/BirimHucre";
 import type { BirimDurum } from "@/lib/types";
 
@@ -58,9 +61,40 @@ export function BinaKesiti({
 }) {
   const tipMap = new Map(tipler.map((t) => [t.id, t]));
 
+  // Çok blok → sekme (hepsini alt alta basmak uzun scroll yapıyordu). Tek blok → sekmesiz.
+  const cokBlok = bloklar.length > 1;
+  const [aktif, setAktif] = useState<string | null>(bloklar[0]?.id ?? null);
+  const aktifId = cokBlok ? (bloklar.some((b) => b.id === aktif) ? aktif : bloklar[0]?.id ?? null) : null;
+  const gosterilen = cokBlok ? bloklar.filter((b) => b.id === aktifId) : bloklar;
+
   return (
-    <div className="space-y-6">
-      {bloklar.map((blok) => {
+    <div className="space-y-4">
+      {cokBlok ? (
+        <div className="flex gap-1.5 overflow-x-auto pb-1">
+          {bloklar.map((blok) => {
+            const bb = birimler.filter((b) => b.blok_id === blok.id && b.ana_birim_id == null);
+            const m = bb.filter((b) => b.durum === "musait").length;
+            const seciliMi = blok.id === aktifId;
+            return (
+              <button
+                key={blok.id}
+                type="button"
+                onClick={() => setAktif(blok.id)}
+                className={`flex-none whitespace-nowrap rounded-xl border px-3 py-1.5 text-[12.5px] font-semibold transition-all ${
+                  seciliMi
+                    ? "border-teal bg-teal text-white shadow-sm"
+                    : "border-hair bg-card text-ink-soft hover:border-teal/30 hover:bg-soft"
+                }`}
+              >
+                {blok.ad} Blok
+                <span className={`ml-1.5 font-mono text-[11px] ${seciliMi ? "text-white/80" : "text-green"}`}>{m}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {gosterilen.map((blok) => {
         // Eklentiler (ana_birim_id dolu) grid'de standalone hücre OLMAZ — parent dairenin modalında görünür.
         const bb = birimler.filter((b) => b.blok_id === blok.id && b.ana_birim_id == null);
         const katlar = [...new Set(bb.map((b) => b.kat).filter((k): k is number => k != null))].sort(
