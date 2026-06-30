@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { tahsisEkle } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { AliciSecici } from "./AliciSecici";
 
 const inp = "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-teal";
 
@@ -45,7 +46,6 @@ export function TahsisForm({
   katlar,
   tipler,
   ofisler,
-  emlakcilar,
   birimler = [],
   geriYol,
 }: {
@@ -54,7 +54,6 @@ export function TahsisForm({
   katlar: number[];
   tipler: { id: string; ad: string | null; oda: string | null }[];
   ofisler: { id: string; ad: string }[];
-  emlakcilar: { id: string; ad: string | null; ofis: string | null }[];
   /** Daire-bazlı kapsam için ham birim listesi (opsiyonel — boşsa daire seçimi gizlenir). */
   birimler?: { id: string; daire_no: string | null; blok_id: string | null; kat: number | null }[];
   /** Wizard akışı: doluysa tahsis sonrası bu yola döner (yoksa proje ekranına). */
@@ -96,26 +95,8 @@ export function TahsisForm({
           <span className="font-medium text-teal-d">Görünürlük = tahsis.</span>
         </p>
 
-        {/* Emlakçılar — çoklu checkbox */}
-        {emlakcilar.length ? (
-          <div className="mt-2.5">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-gray">Danışmanlar</p>
-            <div className="mt-1.5 grid gap-1.5 sm:grid-cols-2">
-              {emlakcilar.map((e) => (
-                <label
-                  key={e.id}
-                  className="flex cursor-pointer items-start gap-2 rounded-xl border border-hair bg-card px-3 py-2 transition-colors hover:border-teal/40 has-[:checked]:border-teal has-[:checked]:bg-teal/5"
-                >
-                  <input type="checkbox" name="emlakci_ids" value={e.id} className="mt-0.5 size-4 shrink-0 accent-teal" />
-                  <span className="min-w-0">
-                    <span className="block truncate text-[13px] font-medium text-ink">{e.ad ?? "Danışman"}</span>
-                    {e.ofis ? <span className="block truncate text-[11px] text-gray">{e.ofis}</span> : null}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        ) : null}
+        {/* Danışmanlar — ÖLÇEKLENEBİLİR aramalı seçici (binlerce emlakçıda checkbox listesi yerine) */}
+        <AliciSecici />
 
         {/* Ofisler — çoklu checkbox */}
         {ofisler.length ? (

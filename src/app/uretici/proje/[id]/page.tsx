@@ -246,7 +246,6 @@ export default async function ProjeDetay({
             katlar={tahsisKatlar}
             tipler={tipler ?? []}
             ofisler={ofisler ?? []}
-            emlakcilar={emlakcilar}
             birimler={anaBirimler.map((b) => ({
               id: b.id,
               daire_no: b.daire_no,

@@ -103,7 +103,6 @@ export function ProjeWizard({
   birimSayisi,
   belgeler,
   ofisler,
-  emlakcilar,
   hata,
   mesaj,
 }: {
@@ -114,7 +113,6 @@ export function ProjeWizard({
   birimSayisi: number;
   belgeler: WizardBelge[];
   ofisler: WizardOfis[];
-  emlakcilar: { id: string; ad: string | null; ofis: string | null }[];
   hata?: string;
   mesaj?: string;
 }) {
@@ -451,7 +449,6 @@ export function ProjeWizard({
             katlar={katlar}
             tipler={tipler.map((t) => ({ id: t.id, ad: t.ad, oda: t.oda }))}
             ofisler={ofisler}
-            emlakcilar={emlakcilar}
             birimler={[]}
             geriYol={geriYol(6)}
           />
