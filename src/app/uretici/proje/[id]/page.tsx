@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { tahsisSil } from "@/app/uretici/actions";
 import { TahsisForm } from "./TahsisForm";
-import { tahsisEmlakcilari } from "@/lib/tahsis";
+import { tahsisEmlakcilari, tahsisSecenekleri } from "@/lib/tahsis";
 import { BinaKesiti } from "@/components/BinaKesiti";
 import { SecimDuzenle } from "@/components/SecimDuzenle";
 import { ProjeKomutBari } from "@/components/ProjeKomutBari";
@@ -51,10 +51,11 @@ export default async function ProjeDetay({
 
   const { data: tahsisler } = await supabase
     .from("tahsis")
-    .select("id, hedef_tip, hedef_id, kapsam, komisyon_tip, komisyon_deger, munhasir, kontenjan, fiyat_gorunur")
+    .select("id, hedef_tip, hedef_id, hedef_filtre, kapsam, komisyon_tip, komisyon_deger, munhasir, kontenjan, fiyat_gorunur")
     .eq("proje_id", id);
   const { data: ofisler } = await supabase.from("ofis").select("id, ad").order("ad");
   const emlakcilar = await tahsisEmlakcilari();
+  const secenekler = await tahsisSecenekleri();
   const { data: belgeler } = await supabase
     .from("proje_belge")
     .select("id, tip, ad, url, dogrulandi")
@@ -207,11 +208,13 @@ export default async function ProjeDetay({
             return (
               <div key={t.id} className="kart flex flex-wrap items-center gap-3 p-3.5">
                 <span className="rozet bg-teal-soft text-teal-d">
-                  {t.hedef_tip === "herkes"
-                    ? "Herkese açık (yayın)"
-                    : t.hedef_tip === "danisman"
-                      ? `Danışman: ${emlakciMap.get(t.hedef_id) ?? "?"}`
-                      : `Ofis: ${ofisMap.get(t.hedef_id) ?? "?"}`}
+                  {(() => {
+                    if (t.hedef_tip === "danisman") return `Danışman: ${emlakciMap.get(t.hedef_id) ?? "?"}`;
+                    if (t.hedef_tip === "ofis") return `Ofis: ${ofisMap.get(t.hedef_id) ?? "?"}`;
+                    const f = t.hedef_filtre as { marka?: string; il?: string; ilce?: string; uzmanlik?: string } | null;
+                    const parca = f ? [f.marka, f.il, f.ilce, f.uzmanlik].filter(Boolean) : [];
+                    return parca.length ? `Segment: ${parca.join(" · ")}` : "Tüm ağ (yayın)";
+                  })()}
                 </span>
                 <span className="text-sm text-ink-soft">{bloklarKapsam || "tüm proje"}</span>
                 <span className="mono text-xs text-[var(--ink-faint)]">
@@ -246,6 +249,7 @@ export default async function ProjeDetay({
             katlar={tahsisKatlar}
             tipler={tipler ?? []}
             ofisler={ofisler ?? []}
+            secenekler={secenekler}
             birimler={anaBirimler.map((b) => ({
               id: b.id,
               daire_no: b.daire_no,

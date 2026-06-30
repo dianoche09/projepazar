@@ -664,16 +664,33 @@ export async function tahsisEkle(formData: FormData) {
   if (!UUID_RE.test(proje_id)) hataya("/uretici", "Geçersiz proje");
   const geri = `/uretici/proje/${proje_id}`;
 
-  // ALICILAR — çoklu emlakçı + çoklu ofis + herkes (her alıcı = ayrı tahsis satırı)
-  // UUID_RE (lenient) ŞART: strict z.uuid() demo id'leri (2222.../5555...) eler → "kaydetmiyordu" bug'ı.
+  // ALICILAR — mod: tum_ag | segment | ofis | danisman. UUID_RE (lenient) ŞART (demo id'leri RFC-uyumsuz).
   const uuidler = (k: string) =>
     formData.getAll(k).map(String).filter((s) => UUID_RE.test(s));
-  const alicilar: { hedef_tip: "danisman" | "ofis" | "herkes"; hedef_id: string | null }[] = [
-    ...uuidler("emlakci_ids").map((id) => ({ hedef_tip: "danisman" as const, hedef_id: id })),
-    ...uuidler("ofis_ids").map((id) => ({ hedef_tip: "ofis" as const, hedef_id: id })),
-    ...(formData.get("herkes") === "on" ? [{ hedef_tip: "herkes" as const, hedef_id: null }] : []),
-  ];
-  if (alicilar.length === 0) hataya(geri, "En az bir alıcı (danışman/ofis/herkes) seç");
+  type Alici = {
+    hedef_tip: "danisman" | "ofis" | "herkes";
+    hedef_id: string | null;
+    hedef_filtre: Record<string, string> | null;
+  };
+  const modu = String(formData.get("hedef_modu") ?? "tum_ag");
+  let alicilar: Alici[] = [];
+  if (modu === "segment") {
+    // Segment = hedef_tip 'herkes' + filtre (canlı: sonradan katılan eşleşen de görür). RLS hedef_filtre eşler.
+    const f: Record<string, string> = {};
+    for (const k of ["marka", "il", "ilce", "uzmanlik"]) {
+      const v = String(formData.get(`f_${k}`) ?? "").trim();
+      if (v) f[k] = v;
+    }
+    if (Object.keys(f).length === 0) hataya(geri, "Segment için en az bir filtre seç (marka/şehir/ilçe/uzmanlık)");
+    alicilar = [{ hedef_tip: "herkes", hedef_id: null, hedef_filtre: f }];
+  } else if (modu === "ofis") {
+    alicilar = uuidler("ofis_ids").map((id) => ({ hedef_tip: "ofis" as const, hedef_id: id, hedef_filtre: null }));
+  } else if (modu === "danisman") {
+    alicilar = uuidler("emlakci_ids").map((id) => ({ hedef_tip: "danisman" as const, hedef_id: id, hedef_filtre: null }));
+  } else {
+    alicilar = [{ hedef_tip: "herkes", hedef_id: null, hedef_filtre: null }]; // tum_ag
+  }
+  if (alicilar.length === 0) hataya(geri, "Alıcı seç: Tüm ağ / Segment / Ofis / Belirli danışman");
 
   // ŞARTLAR (seçili tüm alıcılara aynı; farklı şart için ayrı kayıt yap)
   const komRaw = String(formData.get("komisyon_deger") ?? "").trim();
@@ -709,6 +726,7 @@ export async function tahsisEkle(formData: FormData) {
       proje_id,
       hedef_tip: a.hedef_tip,
       hedef_id: a.hedef_id,
+      hedef_filtre: a.hedef_filtre,
       kapsam,
       komisyon_tip: terim.komisyon_tip,
       komisyon_deger: terim.komisyon_deger,

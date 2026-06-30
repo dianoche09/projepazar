@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { tahsisEkle } from "@/app/uretici/actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { AliciSecici } from "./AliciSecici";
+import { TahsisHedef } from "./TahsisHedef";
 
 const inp = "rounded-lg border border-hair bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-teal";
 
@@ -46,6 +46,7 @@ export function TahsisForm({
   katlar,
   tipler,
   ofisler,
+  secenekler = { markalar: [], iller: [], ilceler: [] },
   birimler = [],
   geriYol,
 }: {
@@ -54,6 +55,8 @@ export function TahsisForm({
   katlar: number[];
   tipler: { id: string; ad: string | null; oda: string | null }[];
   ofisler: { id: string; ad: string }[];
+  /** Segment filtre seçenekleri (aktif emlakçılardan distinct marka/şehir/ilçe). */
+  secenekler?: { markalar: string[]; iller: string[]; ilceler: string[] };
   /** Daire-bazlı kapsam için ham birim listesi (opsiyonel — boşsa daire seçimi gizlenir). */
   birimler?: { id: string; daire_no: string | null; blok_id: string | null; kat: number | null }[];
   /** Wizard akışı: doluysa tahsis sonrası bu yola döner (yoksa proje ekranına). */
@@ -87,39 +90,8 @@ export function TahsisForm({
       <input type="hidden" name="proje_id" value={projeId} />
       {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
-      {/* 1 — ALICILAR (kapalı-devre tahsis = ürünün YILDIZI; görünürlük = tahsis) */}
-      <div>
-        <p className="flex items-center gap-2 text-[14px] font-bold text-ink">
-          <span className="inline-flex size-5 items-center justify-center rounded-full bg-teal text-[11px] font-bold text-white">1</span>
-          Bu projeyi kime açıyorsun?
-        </p>
-        <p className="mt-1 pl-7 text-[12px] leading-snug text-gray">
-          Seçtiğin danışman/ofis bu projeyi <span className="font-medium text-ink">panelinde görür ve müşterisine paylaşır</span>.
-          Tahsis etmediğin kimse göremez. Birden çoğunu seçebilirsin.
-        </p>
-
-        {/* Danışmanlar — ÖLÇEKLENEBİLİR aramalı seçici (binlerce emlakçıda checkbox listesi yerine) */}
-        <AliciSecici />
-
-        {/* Ofisler — çoklu checkbox */}
-        {ofisler.length ? (
-          <div className="mt-3">
-            <p className="text-[11px] font-bold uppercase tracking-wide text-gray">Ofisler (tamamı)</p>
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {ofisler.map((o) => <Cip key={o.id} name="ofis_ids" value={o.id} etiket={o.ad} />)}
-            </div>
-          </div>
-        ) : null}
-
-        {/* Tüm ağ — tek checkbox (value YOK → action 'on' bekler) */}
-        <label className="mt-3 flex cursor-pointer items-start gap-2 rounded-xl border border-hair bg-card px-3 py-2.5 transition-colors hover:border-teal/40 has-[:checked]:border-teal has-[:checked]:bg-teal/5">
-          <input type="checkbox" name="herkes" className="mt-0.5 size-4 shrink-0 accent-teal" />
-          <span>
-            <span className="block text-[13px] font-bold text-ink">Tüm ağ (yayın)</span>
-            <span className="block text-[11px] text-gray">Tüm doğrulanmış danışmanlar görür</span>
-          </span>
-        </label>
-      </div>
+      {/* 1 — HEDEF: segment/ofis/danışman seçici (müteahhit isim aramaz; segmente açar) */}
+      <TahsisHedef ofisler={ofisler} secenekler={secenekler} />
 
       {/* 2 — KAPSAM: açık toggle: tüm proje VEYA belirli kapsam */}
       <div className="space-y-3 rounded-xl border border-hair bg-card p-3">

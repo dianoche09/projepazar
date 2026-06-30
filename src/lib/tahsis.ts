@@ -21,3 +21,24 @@ export async function tahsisEmlakcilari(): Promise<TahsisEmlakci[]> {
     ofis: p.ofis_id ? ofisAd.get(p.ofis_id as string) ?? null : null,
   }));
 }
+
+export type TahsisSecenekler = { markalar: string[]; iller: string[]; ilceler: string[] };
+
+/** Segment filtre seçenekleri — aktif emlakçılardan distinct marka/şehir/ilçe (admin client, server-only). */
+export async function tahsisSecenekleri(): Promise<TahsisSecenekler> {
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("profiles")
+    .select("marka, il, ilce")
+    .eq("rol", "emlakci")
+    .eq("durum", "aktif");
+  const uniq = (k: "marka" | "il" | "ilce") =>
+    [
+      ...new Set(
+        (data ?? [])
+          .map((r) => (r[k] as string | null)?.trim())
+          .filter((v): v is string => !!v),
+      ),
+    ].sort((a, b) => a.localeCompare(b, "tr"));
+  return { markalar: uniq("marka"), iller: uniq("il"), ilceler: uniq("ilce") };
+}
