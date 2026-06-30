@@ -507,14 +507,13 @@ export default async function UreticiKokpit() {
                             <span className="mono">{t.metin}</span>
                           </span>
                         </td>
-                        <td>
-                          {k === "musait" ? (
-                            <Link href={`/uretici/proje/${b.proje_id}`} className="btn-action h-auto min-h-0 px-2.5 py-[5px] text-[11px]">
-                              Yönet
-                            </Link>
-                          ) : (
-                            <span className="text-[11px] text-[var(--ink-faint)]">—</span>
-                          )}
+                        <td className="text-right">
+                          <Link
+                            href={`/uretici/proje/${b.proje_id}`}
+                            className="whitespace-nowrap text-[11px] font-semibold text-teal hover:underline"
+                          >
+                            Yönet →
+                          </Link>
                         </td>
                       </tr>
                     );
