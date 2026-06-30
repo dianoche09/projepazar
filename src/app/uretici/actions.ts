@@ -426,6 +426,10 @@ export async function birimGuncelle(formData: FormData) {
   revalidatePath("/uretici/stok");
 }
 
+// Lenient UUID — demo id'ler (2222.../7777.../5555...) RFC-uyumsuz (4. grup 8/9/a/b ile başlamıyor);
+// z.string().uuid() STRICT onları reddediyordu → tahsis/eklenti "kaydetmiyordu". DB FK bütünlüğü zaten garanti.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // ── Eklenti birimler (otopark/depo → ana daireye bağlı; daireden doğrudan eklenir/silinir) ──
 const EKLENTI_TUR = ["otopark", "depo"] as const;
 
@@ -434,8 +438,7 @@ export async function eklentiEkle(formData: FormData): Promise<void> {
   const ana_birim_id = String(formData.get("ana_birim_id"));
   const tur = String(formData.get("tur"));
   const geri = `/uretici/proje/${proje_id}`;
-  if (!z.string().uuid().safeParse(proje_id).success || !z.string().uuid().safeParse(ana_birim_id).success)
-    hataya(geri, "Geçersiz birim");
+  if (!UUID_RE.test(proje_id) || !UUID_RE.test(ana_birim_id)) hataya(geri, "Geçersiz birim");
   if (!(EKLENTI_TUR as readonly string[]).includes(tur)) hataya(geri, "Eklenti türü otopark veya depo olmalı");
   const fRaw = String(formData.get("liste_fiyati") ?? "").trim();
   const fiyat = fRaw === "" ? null : Number(fRaw);
@@ -464,7 +467,7 @@ export async function eklentiSil(formData: FormData): Promise<void> {
   const proje_id = String(formData.get("proje_id"));
   const birim_id = String(formData.get("birim_id"));
   const geri = `/uretici/proje/${proje_id}`;
-  if (!z.string().uuid().safeParse(birim_id).success) hataya(geri, "Geçersiz birim");
+  if (!UUID_RE.test(birim_id)) hataya(geri, "Geçersiz birim");
   const supabase = await createClient();
   // Yalnız EKLENTİ silinsin (ana_birim_id dolu) — ana daire bu yolla silinemez.
   const { error } = await supabase.from("birim").delete().eq("id", birim_id).not("ana_birim_id", "is", null);
@@ -475,7 +478,6 @@ export async function eklentiSil(formData: FormData): Promise<void> {
 }
 
 // ── Opsiyon TALEBİ: müteahhit kararı. RPC SECURITY DEFINER (yetki + çift-satış fonksiyon içinde). ──
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function talepOnayla(talepId: string, gun = 7): Promise<{ ok: boolean; mesaj: string }> {
   if (!UUID_RE.test(talepId)) return { ok: false, mesaj: "Geçersiz talep" };
@@ -662,12 +664,13 @@ const TerimSemasi = z.object({
 
 export async function tahsisEkle(formData: FormData) {
   const proje_id = String(formData.get("proje_id"));
-  if (!z.string().uuid().safeParse(proje_id).success) hataya("/uretici", "Geçersiz proje");
+  if (!UUID_RE.test(proje_id)) hataya("/uretici", "Geçersiz proje");
   const geri = `/uretici/proje/${proje_id}`;
 
   // ALICILAR — çoklu emlakçı + çoklu ofis + herkes (her alıcı = ayrı tahsis satırı)
+  // UUID_RE (lenient) ŞART: strict z.uuid() demo id'leri (2222.../5555...) eler → "kaydetmiyordu" bug'ı.
   const uuidler = (k: string) =>
-    formData.getAll(k).map(String).filter((s) => z.string().uuid().safeParse(s).success);
+    formData.getAll(k).map(String).filter((s) => UUID_RE.test(s));
   const alicilar: { hedef_tip: "danisman" | "ofis" | "herkes"; hedef_id: string | null }[] = [
     ...uuidler("emlakci_ids").map((id) => ({ hedef_tip: "danisman" as const, hedef_id: id })),
     ...uuidler("ofis_ids").map((id) => ({ hedef_tip: "ofis" as const, hedef_id: id })),
