@@ -87,12 +87,15 @@ export function TahsisForm({
       <input type="hidden" name="proje_id" value={projeId} />
       {geriYol ? <input type="hidden" name="geri_yol" value={geriYol} /> : null}
 
-      {/* ALICILAR — çoklu seçim (kapalı-devre tahsis = ürünün YILDIZI; görünürlük = tahsis) */}
+      {/* 1 — ALICILAR (kapalı-devre tahsis = ürünün YILDIZI; görünürlük = tahsis) */}
       <div>
-        <p className="text-[13px] font-bold text-ink">Bu projeyi kime açıyorsun?</p>
-        <p className="mt-0.5 text-[11.5px] text-gray">
-          Birden çok danışman/ofis seçebilirsin; her biri ayrı tahsis olarak kaydedilir.{" "}
-          <span className="font-medium text-teal-d">Görünürlük = tahsis.</span>
+        <p className="flex items-center gap-2 text-[14px] font-bold text-ink">
+          <span className="inline-flex size-5 items-center justify-center rounded-full bg-teal text-[11px] font-bold text-white">1</span>
+          Bu projeyi kime açıyorsun?
+        </p>
+        <p className="mt-1 pl-7 text-[12px] leading-snug text-gray">
+          Seçtiğin danışman/ofis bu projeyi <span className="font-medium text-ink">panelinde görür ve müşterisine paylaşır</span>.
+          Tahsis etmediğin kimse göremez. Birden çoğunu seçebilirsin.
         </p>
 
         {/* Danışmanlar — ÖLÇEKLENEBİLİR aramalı seçici (binlerce emlakçıda checkbox listesi yerine) */}
@@ -118,9 +121,12 @@ export function TahsisForm({
         </label>
       </div>
 
-      {/* KAPSAM — açık toggle: tüm proje VEYA belirli kapsam */}
+      {/* 2 — KAPSAM: açık toggle: tüm proje VEYA belirli kapsam */}
       <div className="space-y-3 rounded-xl border border-hair bg-card p-3">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-gray">Kapsam — bu tahsis hangi birimleri kapsar</p>
+        <p className="flex items-center gap-2 text-[14px] font-bold text-ink">
+          <span className="inline-flex size-5 items-center justify-center rounded-full bg-teal text-[11px] font-bold text-white">2</span>
+          Ne kadarını açıyorsun?
+        </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {([
             ["tum", "Tüm proje", "Projedeki tüm satılabilir birimler"],
@@ -200,9 +206,14 @@ export function TahsisForm({
         ) : null}
       </div>
 
-      {/* ŞARTLAR — seçili tüm alıcılara aynı uygulanır */}
-      <div className="space-y-3 rounded-xl border border-hair bg-card p-3">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-gray">Şartlar</p>
+      {/* 3 — ŞARTLAR: gelişmiş & isteğe bağlı — çoğu tahsis bunlara dokunmaz, katlanır tutuyoruz */}
+      <details className="rounded-xl border border-hair bg-card">
+        <summary className="cursor-pointer list-none px-3 py-2.5 text-[13px] font-semibold text-ink">
+          <span className="select-none text-gray">▸ </span>
+          Gelişmiş ayarlar
+          <span className="ml-1 font-normal text-gray">— komisyon · süre · münhasır (isteğe bağlı)</span>
+        </summary>
+        <div className="space-y-3 border-t border-hair p-3">
         <div className="flex flex-wrap items-end gap-2">
           <label className="flex flex-col gap-1 text-xs text-gray">
             Komisyon
@@ -244,7 +255,8 @@ export function TahsisForm({
         <p className="text-[11px] text-gray">
           Seçili tüm alıcılara <span className="font-medium text-ink">aynı şart</span> uygulanır; farklı şart için ayrı kayıt yap.
         </p>
-      </div>
+        </div>
+      </details>
 
       <SubmitButton className="justify-self-start">Tahsis et</SubmitButton>
     </form>
