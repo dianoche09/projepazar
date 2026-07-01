@@ -60,6 +60,18 @@ const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon:
     ),
   },
   {
+    href: "/havuz/eslestir",
+    etiket: "Eşleştir",
+    tam: true,
+    ikon: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <circle cx="12" cy="12" r="5" />
+        <circle cx="12" cy="12" r="1.4" fill="currentColor" />
+      </>
+    ),
+  },
+  {
     href: "/havuz/bildirimler",
     etiket: "Bildirimler",
     tam: true,
