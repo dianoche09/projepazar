@@ -60,6 +60,17 @@ const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon:
     ),
   },
   {
+    href: "/havuz/bildirimler",
+    etiket: "Bildirimler",
+    tam: true,
+    ikon: (
+      <>
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </>
+    ),
+  },
+  {
     href: "/havuz/profil",
     etiket: "Profil",
     ikon: (
@@ -71,7 +82,7 @@ const NAV: { href: string; etiket: string; tam?: boolean; canli?: boolean; ikon:
   },
 ];
 
-export function EmlakciNav() {
+export function EmlakciNav({ bildirimSayi = 0 }: { bildirimSayi?: number }) {
   const yol = usePathname();
   const aktif = (n: { href: string; etiket: string; tam?: boolean }) =>
     n.etiket === "Havuz" ? yol === n.href : n.tam ? yol === n.href || yol.startsWith(`${n.href}/`) : false;
@@ -80,13 +91,18 @@ export function EmlakciNav() {
     <nav className="flex flex-col gap-1.5">
       {NAV.map((n) => {
         const a = aktif(n);
+        const rozetli = n.href === "/havuz/bildirimler" && bildirimSayi > 0;
         return (
           <Link key={n.etiket} href={n.href} className={`nav-item${a ? " active" : ""}`} aria-current={a ? "page" : undefined}>
             <svg className="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               {n.ikon}
             </svg>
             {n.etiket}
-            {n.canli ? (
+            {rozetli ? (
+              <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                {bildirimSayi > 99 ? "99+" : bildirimSayi}
+              </span>
+            ) : n.canli ? (
               <span className="nabiz ml-auto size-1.5 rounded-full bg-teal" aria-hidden />
             ) : null}
           </Link>

@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz } from "@/lib/events";
+import { bildirimYaz } from "@/lib/bildirim";
 import { zUuid } from "@/lib/uuid";
 
 const uuid = zUuid;
@@ -53,6 +54,22 @@ export async function opsiyonTalepGonder(
       birimId: b.data,
       payload: { eylem: "talep" },
     });
+    // Müteahhide anlık bildirim (talep bekliyor)
+    const admin = createAdminClient();
+    const [{ data: proje }, { data: birim }, { data: ben }] = await Promise.all([
+      admin.from("proje").select("ad, uretici_id").eq("id", p.data).single(),
+      admin.from("birim").select("daire_no").eq("id", b.data).single(),
+      admin.from("profiles").select("ad").eq("id", user.id).single(),
+    ]);
+    if (proje?.uretici_id) {
+      await bildirimYaz({
+        profile_id: proje.uretici_id as string,
+        tip: "talep",
+        baslik: "Yeni opsiyon talebi",
+        govde: `${ben?.ad ?? "Bir danışman"} · ${proje.ad ?? "Proje"} · Daire ${birim?.daire_no ?? "?"}`,
+        link: "/uretici/opsiyonlar",
+      });
+    }
   }
   revalidatePath(`/havuz/proje/${p.data}`);
   revalidatePath("/havuz");

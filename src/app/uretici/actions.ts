@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { kayitYaz, kayitlarYaz, durumTip } from "@/lib/events";
+import { bildirimYaz, bildirimlerYaz } from "@/lib/bildirim";
 import { UUID_RE, zUuid } from "@/lib/uuid";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
@@ -476,10 +477,40 @@ export async function eklentiSil(formData: FormData): Promise<void> {
 
 // ── Opsiyon TALEBİ: müteahhit kararı. RPC SECURITY DEFINER (yetki + çift-satış fonksiyon içinde). ──
 
+/** Talep sahibi emlakçıya onay/red bildirimi (best-effort, admin client). */
+async function talepBildir(talepId: string, karar: "onay" | "red", gun?: number): Promise<void> {
+  try {
+    const admin = createAdminClient();
+    const { data: talep } = await admin
+      .from("opsiyon_talep")
+      .select("talep_eden_id, birim:birim_id(daire_no, proje:proje_id(ad))")
+      .eq("id", talepId)
+      .single();
+    if (!talep?.talep_eden_id) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const birim = talep.birim as any;
+    const daire = birim?.daire_no ?? "?";
+    const projeAd = birim?.proje?.ad ?? "Proje";
+    await bildirimYaz({
+      profile_id: talep.talep_eden_id as string,
+      tip: karar === "onay" ? "onay" : "red",
+      baslik: karar === "onay" ? "Opsiyon talebin onaylandı" : "Opsiyon talebin reddedildi",
+      govde:
+        karar === "onay"
+          ? `${projeAd} · Daire ${daire}${gun ? ` · ${gun} gün opsiyon` : ""}`
+          : `${projeAd} · Daire ${daire}`,
+      link: "/havuz/opsiyonlarim",
+    });
+  } catch {
+    /* best-effort */
+  }
+}
+
 export async function talepOnayla(talepId: string, gun = 7): Promise<{ ok: boolean; mesaj: string }> {
   if (!UUID_RE.test(talepId)) return { ok: false, mesaj: "Geçersiz talep" };
   const supabase = await createClient();
   const { error } = await supabase.rpc("opsiyon_talep_onayla", { p_talep: talepId, p_gun: gun });
+  if (!error) await talepBildir(talepId, "onay", gun);
   revalidatePath("/uretici/opsiyonlar");
   revalidatePath("/uretici/stok");
   revalidatePath("/uretici");
@@ -490,6 +521,7 @@ export async function talepReddet(talepId: string): Promise<{ ok: boolean; mesaj
   if (!UUID_RE.test(talepId)) return { ok: false, mesaj: "Geçersiz talep" };
   const supabase = await createClient();
   const { error } = await supabase.rpc("opsiyon_talep_reddet", { p_talep: talepId });
+  if (!error) await talepBildir(talepId, "red");
   revalidatePath("/uretici/opsiyonlar");
   return error ? { ok: false, mesaj: error.message } : { ok: true, mesaj: "Talep reddedildi" };
 }
@@ -737,6 +769,28 @@ export async function tahsisEkle(formData: FormData) {
     })),
   );
   if (error) hataya(geri, error.message);
+
+  // Bildirim: bireysel danışman + ofis üyeleri (segment/herkes fan-out'u atlanır — çok sayıda olabilir)
+  try {
+    const admin = createAdminClient();
+    const { data: proje } = await admin.from("proje").select("ad").eq("id", proje_id).single();
+    const danismanIds = alicilar.filter((a) => a.hedef_tip === "danisman" && a.hedef_id).map((a) => a.hedef_id as string);
+    const ofisIds = alicilar.filter((a) => a.hedef_tip === "ofis" && a.hedef_id).map((a) => a.hedef_id as string);
+    let ofisUyeleri: string[] = [];
+    if (ofisIds.length) {
+      const { data } = await admin.from("profiles").select("id").eq("rol", "emlakci").in("ofis_id", ofisIds);
+      ofisUyeleri = (data ?? []).map((p) => p.id as string);
+    }
+    await bildirimlerYaz([...danismanIds, ...ofisUyeleri], {
+      tip: "tahsis",
+      baslik: "Yeni proje sana açıldı",
+      govde: (proje?.ad as string | null) ?? "Proje",
+      link: "/havuz",
+    });
+  } catch {
+    /* bildirim best-effort */
+  }
+
   revalidatePath(geri);
   basariya(geri, formData, `${alicilar.length} tahsis eklendi`);
 }

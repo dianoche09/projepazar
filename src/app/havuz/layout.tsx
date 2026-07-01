@@ -24,6 +24,10 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
   }
   const adminMi = profil.rol === "admin";
   const dogrulanmadi = !adminMi && profil.belge_durumu !== "dogrulandi";
+  const { count: bildirimSayi } = await supabase
+    .from("bildirim")
+    .select("id", { count: "exact", head: true })
+    .eq("okundu", false);
   const ad = profil.ad ?? user.email ?? "Emlakçı";
   const basHarf = ad.trim().charAt(0).toUpperCase() || "E";
 
@@ -51,7 +55,7 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
 
           {/* Navigasyon */}
           <div className="flex-1 overflow-y-auto">
-            <EmlakciNav />
+            <EmlakciNav bildirimSayi={bildirimSayi ?? 0} />
           </div>
 
           {/* Tahsisli Erişim — kapsam/rol sınırı notu */}
@@ -102,6 +106,19 @@ export default async function HavuzLayout({ children }: { children: React.ReactN
               <Logo size={22} wordmark />
             </Link>
             <div className="flex items-center gap-3">
+              <Link
+                href="/havuz/bildirimler"
+                aria-label="Bildirimler"
+                className="relative grid size-8 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              >
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                {bildirimSayi && bildirimSayi > 0 ? (
+                  <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border border-white bg-red" />
+                ) : null}
+              </Link>
               {canliRozet}
               <form action={cikisYap}>
                 <button className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50">

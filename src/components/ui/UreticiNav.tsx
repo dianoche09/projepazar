@@ -20,6 +20,7 @@ const LINKLER: NavLink[] = [
   { yol: "/uretici/tahsis", etiket: "Tahsis", ikon: "tahsis", tam: false },
   { yol: "/uretici/opsiyonlar", etiket: "Opsiyonlar", ikon: "opsiyon", tam: false },
   { yol: "/uretici/talep-radari", etiket: "Talep Radarı", ikon: "radar", tam: false },
+  { yol: "/uretici/bildirimler", etiket: "Bildirimler", ikon: "bildirim", tam: false },
   { yol: "/uretici/lead-sorgu", etiket: "Müşteri Sorgula", ikon: "ara", tam: false },
   { yol: "/uretici/raporlar", etiket: "Raporlar", ikon: "rapor", tam: false },
   { yol: "/uretici/proje/yeni", etiket: "Yeni Proje", ikon: "arti", tam: false },
@@ -76,6 +77,13 @@ function Ikon({ ad }: { ad: string }) {
           <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
         </svg>
       );
+    case "bildirim":
+      return (
+        <svg {...ortak}>
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      );
     case "ara":
       return (
         <svg {...ortak}>
@@ -107,10 +115,16 @@ function Ikon({ ad }: { ad: string }) {
 }
 
 /** Üretici workspace navigasyonu — v2 .nav-item stili, aktif çizgi. mobil=true → yatay çip. */
-export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
+export function UreticiNav({ mobil = false, bildirimSayi = 0 }: { mobil?: boolean; bildirimSayi?: number }) {
   const yol = usePathname();
   // Kokpit (tam) → yalnız tam eşleşme; diğerleri startsWith → alt sayfalar item'ı aktif tutar.
   const aktif = (l: NavLink) => (l.tam ? yol === l.yol : yol.startsWith(l.yol));
+  const rozet = (l: NavLink) =>
+    l.yol === "/uretici/bildirimler" && bildirimSayi > 0 ? (
+      <span className="ml-auto rounded-full bg-red px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+        {bildirimSayi > 99 ? "99+" : bildirimSayi}
+      </span>
+    ) : null;
 
   if (mobil) {
     return (
@@ -127,6 +141,7 @@ export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
           >
             <Ikon ad={l.ikon} />
             {l.etiket}
+            {rozet(l)}
           </Link>
         ))}
       </nav>
@@ -139,6 +154,7 @@ export function UreticiNav({ mobil = false }: { mobil?: boolean }) {
         <Link key={l.etiket} href={l.yol} className={`nav-item${aktif(l) ? " active" : ""}`}>
           <Ikon ad={l.ikon} />
           {l.etiket}
+          {rozet(l)}
         </Link>
       ))}
     </nav>
