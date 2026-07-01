@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizeTelefon } from "@/lib/telefon";
+import { bildirimYaz } from "@/lib/bildirim";
 
 export async function POST(request: Request) {
   try {
@@ -66,6 +67,23 @@ export async function POST(request: Request) {
     if (eventError) {
       console.error("Event log yazma hatası:", eventError);
       // Lead kaydedildiği için event log hatası kritik engel teşkil etmez.
+    }
+
+    // 3. Lead sahibi emlakçıya anlık bildirim (best-effort; PII yalnız lead sahibine gider)
+    if (emlakciId) {
+      const niyetAd: Record<string, string> = {
+        bilgi: "Bilgi istedi",
+        randevu: "Randevu istedi",
+        on_rezervasyon: "Ön rezervasyon",
+      };
+      const n = typeof niyet === "string" ? niyet : "bilgi";
+      await bildirimYaz({
+        profile_id: emlakciId,
+        tip: "lead",
+        baslik: "Yeni müşteri (lead)",
+        govde: `${ad} · ${niyetAd[n] ?? "İletişim"}`,
+        link: "/havuz/leadler",
+      });
     }
 
     return NextResponse.json({ basarili: true, id: leadData.id });

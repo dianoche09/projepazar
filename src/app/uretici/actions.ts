@@ -770,18 +770,33 @@ export async function tahsisEkle(formData: FormData) {
   );
   if (error) hataya(geri, error.message);
 
-  // Bildirim: bireysel danışman + ofis üyeleri (segment/herkes fan-out'u atlanır — çok sayıda olabilir)
+  // Bildirim: danışman + ofis üyeleri + segment/herkes fan-out (yalnız DOĞRULANMIŞ; in-app, cap 500)
   try {
     const admin = createAdminClient();
     const { data: proje } = await admin.from("proje").select("ad").eq("id", proje_id).single();
-    const danismanIds = alicilar.filter((a) => a.hedef_tip === "danisman" && a.hedef_id).map((a) => a.hedef_id as string);
+    const hedefler = new Set<string>();
+    for (const id of alicilar.filter((a) => a.hedef_tip === "danisman" && a.hedef_id).map((a) => a.hedef_id as string)) hedefler.add(id);
+
     const ofisIds = alicilar.filter((a) => a.hedef_tip === "ofis" && a.hedef_id).map((a) => a.hedef_id as string);
-    let ofisUyeleri: string[] = [];
     if (ofisIds.length) {
-      const { data } = await admin.from("profiles").select("id").eq("rol", "emlakci").in("ofis_id", ofisIds);
-      ofisUyeleri = (data ?? []).map((p) => p.id as string);
+      const { data } = await admin.from("profiles").select("id").eq("rol", "emlakci").eq("durum", "aktif").in("ofis_id", ofisIds).limit(500);
+      (data ?? []).forEach((p) => hedefler.add(p.id as string));
     }
-    await bildirimlerYaz([...danismanIds, ...ofisUyeleri], {
+
+    // herkes / segment → eşleşen doğrulanmış danışmanlar (görüntüleyebilecekler)
+    const herkes = alicilar.find((a) => a.hedef_tip === "herkes");
+    if (herkes) {
+      let q = admin.from("profiles").select("id").eq("rol", "emlakci").eq("durum", "aktif").eq("belge_durumu", "dogrulandi").limit(500);
+      const f = herkes.hedef_filtre;
+      if (f?.marka) q = q.eq("marka", f.marka);
+      if (f?.il) q = q.eq("il", f.il);
+      if (f?.ilce) q = q.eq("ilce", f.ilce);
+      if (f?.uzmanlik) q = q.eq("uzmanlik", f.uzmanlik);
+      const { data } = await q;
+      (data ?? []).forEach((p) => hedefler.add(p.id as string));
+    }
+
+    await bildirimlerYaz([...hedefler], {
       tip: "tahsis",
       baslik: "Yeni proje sana açıldı",
       govde: (proje?.ad as string | null) ?? "Proje",
