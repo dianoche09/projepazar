@@ -20,6 +20,7 @@ const LINKLER: NavLink[] = [
   { yol: "/uretici/tahsis", etiket: "Tahsis", ikon: "tahsis", tam: false },
   { yol: "/uretici/opsiyonlar", etiket: "Opsiyonlar", ikon: "opsiyon", tam: false },
   { yol: "/uretici/talep-radari", etiket: "Talep Radarı", ikon: "radar", tam: false },
+  { yol: "/uretici/fiyat-onerisi", etiket: "Fiyat Önerisi", ikon: "fiyat", tam: false },
   { yol: "/uretici/bildirimler", etiket: "Bildirimler", ikon: "bildirim", tam: false },
   { yol: "/uretici/lead-sorgu", etiket: "Müşteri Sorgula", ikon: "ara", tam: false },
   { yol: "/uretici/raporlar", etiket: "Raporlar", ikon: "rapor", tam: false },
@@ -82,6 +83,13 @@ function Ikon({ ad }: { ad: string }) {
         <svg {...ortak}>
           <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      );
+    case "fiyat":
+      return (
+        <svg {...ortak}>
+          <path d="M20.59 13.41 13.42 20.6a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+          <circle cx="7" cy="7" r="1.2" fill="currentColor" />
         </svg>
       );
     case "ara":
